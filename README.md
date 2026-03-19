@@ -92,6 +92,3 @@ src/
 - Security headers: X-Frame-Options, HSTS, X-Content-Type-Options, Referrer-Policy
 - Environment variables excluded from version control via `.gitignore`
 
-## License
-
-MIT
