@@ -4,10 +4,7 @@ import OpenAI from 'openai'
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 
-const aiClient = new OpenAI({
-  apiKey: process.env.AI_API_KEY,
-  baseURL: process.env.AI_BASE_URL,
-})
+// Client instantiated dynamically inside handlers to prevent build errors
 
 interface TxRow {
   amount: string | number
@@ -24,6 +21,11 @@ export async function generateFinancialInsights() {
   const admin = createAdminClient()
   const sixtyDaysAgo = new Date()
   sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60)
+
+  const aiClient = new OpenAI({
+    apiKey: process.env.AI_API_KEY || '',
+    baseURL: process.env.AI_BASE_URL,
+  })
 
   const { data: transactions } = await admin
     .from('transactions')

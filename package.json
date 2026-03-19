@@ -47,7 +47,8 @@
     "use-debounce": "^10.1.0",
     "utf-8-validate": "^6.0.6",
     "ws": "^8.19.0",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

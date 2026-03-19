@@ -10,6 +10,8 @@ import type { OverviewPeriod, OverviewData } from '@/lib/types'
 import { InteractiveChartsManager } from '@/components/dashboard/InteractiveChartsManager'
 import { FinancialHealthScore } from '@/components/dashboard/FinancialHealthScore'
 import { AIAdvisorCard } from '@/components/dashboard/advisor/AIAdvisorCard'
+import { useCurrencyStore } from '@/store/useCurrencyStore'
+import { formatCurrency } from '@/lib/currency'
 
 interface Props {
   initialData: OverviewData
@@ -29,12 +31,7 @@ function getPeriodLabel(period: OverviewPeriod): string {
   return option?.label || 'This Month'
 }
 
-function formatCurrency(value: number): string {
-  const abs = Math.abs(value)
-  if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`
-  if (abs >= 10_000) return `$${(value / 1_000).toFixed(1)}K`
-  return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-}
+// Removed local formatCurrency
 
 export default function DashboardClient({ initialData }: Props) {
   const router = useRouter()
@@ -42,6 +39,9 @@ export default function DashboardClient({ initialData }: Props) {
   const [data, setData] = useState<OverviewData>(initialData)
   const [loading, setLoading] = useState(false)
   const range = (searchParams.get('range') as OverviewPeriod) || 'this-month'
+  const { currency, toggleCurrency } = useCurrencyStore()
+
+  const safeFormatCurrency = (val: number) => formatCurrency(val, currency, 'USD')
 
   useEffect(() => {
     if (range !== data.period) {
@@ -106,6 +106,15 @@ export default function DashboardClient({ initialData }: Props) {
                     {p.label}
                   </button>
                 ))}
+                
+                <div className="w-px h-4 bg-[var(--border-light)] mx-1" />
+                
+                <button
+                  onClick={toggleCurrency}
+                  className="px-3 py-1.5 rounded-full text-[9px] font-bold transition-all border bg-[var(--bg-surface)] text-[var(--accent)] border-[var(--border-light)] hover:border-[var(--text-main)]"
+                >
+                  View in {currency === 'USD' ? 'INR' : 'USD'}
+                </button>
               </div>
             </div>
           </div>
@@ -117,8 +126,8 @@ export default function DashboardClient({ initialData }: Props) {
                 <>No activity recorded for this period. Add your first transaction to see insights here.</>
               ) : (
                 <>
-                  {getPeriodLabel(data.period)} Summary: You earned {formatCurrency(metrics.inflow)} and spent {formatCurrency(metrics.outflow)}.
-                  {' '}Net {metrics.netPosition >= 0 ? 'saved' : 'deficit'}: {formatCurrency(Math.abs(metrics.netPosition))} ({metrics.savingsRate.toFixed(1)}% efficiency).
+                  {getPeriodLabel(data.period)} Summary: You earned {safeFormatCurrency(metrics.inflow)} and spent {safeFormatCurrency(metrics.outflow)}.
+                  {' '}Net {metrics.netPosition >= 0 ? 'saved' : 'deficit'}: {safeFormatCurrency(Math.abs(metrics.netPosition))} ({metrics.savingsRate.toFixed(1)}% efficiency).
                 </>
               )}
             </p>
@@ -128,14 +137,14 @@ export default function DashboardClient({ initialData }: Props) {
           <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
             <MetricCard 
               label="Net Position" 
-              value={formatCurrency(metrics.netPosition)} 
+              value={safeFormatCurrency(metrics.netPosition)} 
               hint="Net this period"
               icon={<TrendingUp className="w-3.5 h-3.5" />}
               color={metrics.netPosition >= 0 ? 'text-[var(--income-green)]' : 'text-[var(--expense-red)]'}
             />
             <MetricCard 
               label="Account Balance" 
-              value={formatCurrency(metrics.accountBalance)} 
+              value={safeFormatCurrency(metrics.accountBalance)} 
               hint="Across all accounts"
               icon={<Landmark className="w-3.5 h-3.5" />}
             />
@@ -147,14 +156,14 @@ export default function DashboardClient({ initialData }: Props) {
             />
             <MetricCard 
               label="Inflow" 
-              value={formatCurrency(metrics.inflow)} 
+              value={safeFormatCurrency(metrics.inflow)} 
               hint="Total income"
               icon={<ArrowUpRight className="w-3.5 h-3.5" />}
               color="text-[var(--income-green)]"
             />
             <MetricCard 
               label="Outflow" 
-              value={formatCurrency(metrics.outflow)} 
+              value={safeFormatCurrency(metrics.outflow)} 
               hint="Total expenses"
               icon={<ArrowDownRight className="w-3.5 h-3.5" />}
               color="text-[var(--expense-red)]"
@@ -219,7 +228,7 @@ export default function DashboardClient({ initialData }: Props) {
                     {format(new Date(tx.date), 'MMM dd, yyyy')}
                   </div>
                   <div className={`text-[13px] font-bold tabular-nums text-right min-w-[90px] ${tx.type === 'income' ? 'text-[var(--income-green)]' : 'text-[var(--text-main)]'}`}>
-                    {tx.type === 'income' ? '+ ' : '- '}$ {Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    {tx.type === 'income' ? '+ ' : '- '}{safeFormatCurrency(Number(tx.amount))}
                   </div>
                 </div>
               ))
@@ -252,7 +261,7 @@ export default function DashboardClient({ initialData }: Props) {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-xs font-bold text-[var(--text-main)] tabular-nums">$ {sub.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                        <div className="text-xs font-bold text-[var(--text-main)] tabular-nums">{safeFormatCurrency(Number(sub.amount))}</div>
                       </div>
                     </div>
                 ))}
@@ -281,7 +290,7 @@ export default function DashboardClient({ initialData }: Props) {
                         <span className="text-sm">{item.icon}</span>
                         <span className="text-[11px] font-bold uppercase tracking-tight text-[var(--text-main)]">{item.categoryName}</span>
                       </div>
-                      <span className="text-[11px] font-bold tabular-nums text-[var(--text-main)]">$ {item.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                      <span className="text-[11px] font-bold tabular-nums text-[var(--text-main)]">{safeFormatCurrency(Number(item.amount))}</span>
                     </div>
                     <div className="h-1.5 bg-[var(--bg-surface)] rounded-full overflow-hidden">
                       <div 

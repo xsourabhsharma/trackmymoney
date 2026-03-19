@@ -2,15 +2,17 @@ import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { createClient } from '@/utils/supabase/server'
 
-const aiClient = new OpenAI({
-  apiKey: process.env.AI_API_KEY,
-  baseURL: process.env.AI_BASE_URL,
-})
+// Client instantiated dynamically inside handlers to prevent build errors
 
 export async function POST(request: Request) {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
+    
+    const aiClient = new OpenAI({
+      apiKey: process.env.AI_API_KEY || '',
+      baseURL: process.env.AI_BASE_URL,
+    })
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

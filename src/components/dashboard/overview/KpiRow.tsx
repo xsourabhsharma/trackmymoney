@@ -1,4 +1,6 @@
 import { TrendingDown, TrendingUp, Wallet, Percent, CircleDollarSign } from 'lucide-react'
+import { useCurrencyStore } from '@/store/useCurrencyStore'
+import { formatCurrency } from '@/lib/currency'
 
 interface KpiRowProps {
   metrics: {
@@ -11,32 +13,30 @@ interface KpiRowProps {
 }
 
 export function KpiRow({ metrics }: KpiRowProps) {
-  const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(val)
+  const { currency } = useCurrencyStore()
+
+  const safeFormatCurrency = (val: number) => {
+    return formatCurrency(val, currency, 'USD')
   }
 
   const kpis = [
     {
       label: 'Net Position',
-      value: formatCurrency(metrics.netPosition),
+      value: safeFormatCurrency(metrics.netPosition),
       icon: metrics.netPosition >= 0 ? TrendingUp : TrendingDown,
       colorClass: metrics.netPosition > 0 ? 'text-green-600 dark:text-green-400' : metrics.netPosition < 0 ? 'text-red-600 dark:text-red-400' : 'text-[var(--text-main)]',
       tooltip: 'Income minus expenses. Positive means you saved money.'
     },
     {
       label: 'Total Inflow',
-      value: formatCurrency(metrics.totalInflow),
+      value: safeFormatCurrency(metrics.totalInflow),
       icon: CircleDollarSign,
       colorClass: 'text-green-600 dark:text-green-400',
       tooltip: 'Total money coming in (Income, Transfers).'
     },
     {
       label: 'Total Outflow',
-      value: formatCurrency(metrics.totalOutflow),
+      value: safeFormatCurrency(metrics.totalOutflow),
       icon: CircleDollarSign,
       colorClass: 'text-red-600 dark:text-red-400',
       tooltip: 'Total money going out (Expenses).'
@@ -50,7 +50,7 @@ export function KpiRow({ metrics }: KpiRowProps) {
     },
     {
       label: 'Total Balance',
-      value: formatCurrency(metrics.totalBalance),
+      value: safeFormatCurrency(metrics.totalBalance),
       icon: Wallet,
       colorClass: 'text-[var(--text-main)]',
       tooltip: 'Sum of all your account balances.'
