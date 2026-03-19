@@ -80,6 +80,41 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Target UI Variables */
+  --bg-base: #FFFFFF;
+  --bg-surface: #F8F7F4;
+  --bg-surface-dark: #45433A;
+  --bg-surface-hover: #F0EFEA;
+
+  --text-main: #1C1B19;
+  --text-muted: #828076;
+  --text-inverse: #FFFFFF;
+  --text-inverse-muted: #B3B0A4;
+
+  --border-light: #E8E6DF;
+  --border-dark: #D1CFC7;
+
+  --accent: #45433A;
+  --success: #3A4A3A;
+  --danger: #5A3A3A;
+  --income-green: #2D5A3D;
+  --expense-red: #6B3A3A;
+  --warning: #8B6914;
+
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 100px;
+
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
 }
 
 .dark {
@@ -114,6 +149,28 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* Dark theme overrides for Target UI */
+  --bg-base: #1C1B19;
+  --bg-surface: #252422;
+  --bg-surface-dark: #2A2927;
+  --bg-surface-hover: #2F2D2A;
+
+  --text-main: #FFFFFF;
+  --text-muted: #A3A198;
+  --text-inverse: #1C1B19;
+  --text-inverse-muted: #45433A;
+
+  --border-light: #3A3834;
+  --border-dark: #4A4843;
+
+  /* Brighter functional colors for dark mode visibility */
+  --accent: #B8B5A8;
+  --success: #6BCB77;
+  --danger: #FF6B6B;
+  --income-green: #6BCB77;
+  --expense-red: #FF6B6B;
+  --warning: #FFB020;
 }
 
 @layer base {

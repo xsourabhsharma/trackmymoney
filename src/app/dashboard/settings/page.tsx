@@ -1,0 +1,27 @@
+import { createClient } from '@/utils/supabase/server'
+import { DashboardSubNav } from '@/components/dashboard/DashboardSubNav'
+import { loadSettingsPageData } from '@/app/dashboard/settings/data'
+import { SettingsClientOrchestrator } from '@/components/dashboard/settings/SettingsClientOrchestrator'
+
+export default async function SettingsPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return null
+
+  const { settings, integrations } = await loadSettingsPageData()
+
+  return (
+    <div className="flex flex-col gap-8">
+      {/* Shared Sub Nav */}
+      <DashboardSubNav />
+
+      {/* Main Settings Grid orchestrated on the client for optimistic updates */}
+      <SettingsClientOrchestrator 
+        initialSettings={settings} 
+        integrations={integrations} 
+        email={user.email!} 
+      />
+    </div>
+  )
+}

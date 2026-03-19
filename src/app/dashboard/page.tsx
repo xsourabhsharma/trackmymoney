@@ -1,36 +1,59 @@
-export default async function DashboardOverview() {
+import { createClient } from '@/utils/supabase/server'
+import { loadOverviewData } from '@/lib/dashboard-service'
+import { DashboardSubNav } from '@/components/dashboard/DashboardSubNav'
+import { AddTransactionButton } from '@/components/dashboard/AddTransactionButton'
+import DashboardClient from './DashboardClient'
+import Link from 'next/link'
+import type { OverviewPeriod } from '@/lib/types'
+
+export default async function DashboardOverviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return null
+
+  const resolvedSearchParams = await searchParams
+  const range = (resolvedSearchParams?.range as OverviewPeriod) || 'this-month'
+
+  let overviewData: any = null
+  try {
+    overviewData = await loadOverviewData(range)
+  } catch (error) {
+    console.error('Failed to load dashboard data:', error)
+    return (
+        <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
+            <div className="text-4xl">⚠️</div>
+            <h1 className="text-xl font-bold uppercase tracking-widest text-[var(--text-main)]">Data Engine Failure</h1>
+            <p className="text-sm text-[var(--text-muted)] max-w-[400px] text-center">We couldn&apos;t aggregate your financial data. This might be due to a missing database schema or connection issue.</p>
+            <Link href="/dashboard" className="px-6 py-2 bg-[var(--text-main)] text-[var(--bg-base)] rounded-full text-xs font-bold uppercase tracking-widest mt-4">Try Reloading</Link>
+        </div>
+    )
+  }
+
+  // Fetch support data for the AddTransactionButton
+  const { data: allCategories } = await supabase.from('categories').select('*')
+  const { data: userAccounts } = await supabase.from('accounts').select('*')
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Overview</h1>
-        <button className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800">
-          + Add Transaction
-        </button>
-      </div>
-      
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h3 className="text-sm font-medium text-gray-500">Total Balance</h3>
-          <p className="mt-2 text-3xl font-semibold text-gray-900">$0.00</p>
-        </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h3 className="text-sm font-medium text-gray-500">Monthly Income</h3>
-          <p className="mt-2 text-3xl font-semibold text-green-600">$0.00</p>
-        </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h3 className="text-sm font-medium text-gray-500">Monthly Expenses</h3>
-          <p className="mt-2 text-3xl font-semibold text-red-600">$0.00</p>
+    <div className="flex flex-col gap-8">
+      {/* Shared Sub Nav */}
+      <div className="flex flex-wrap items-center justify-between gap-4 overflow-x-auto pb-2">
+        <DashboardSubNav />
+        <div className="ml-auto">
+          <AddTransactionButton 
+            categories={allCategories || []} 
+            accounts={userAccounts || []} 
+            defaultType="expense" 
+            buttonLabel="New Transaction" 
+          />
         </div>
       </div>
 
-      <div className="mt-8 rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-        <div className="border-b border-gray-200 px-6 py-4">
-          <h3 className="text-lg font-medium text-gray-900">Recent Transactions</h3>
-        </div>
-        <div className="p-6 text-center text-sm text-gray-500">
-          No transactions found. Add one to get started.
-        </div>
-      </div>
+      <DashboardClient initialData={overviewData} />
     </div>
   )
 }
