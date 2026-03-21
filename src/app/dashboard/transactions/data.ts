@@ -75,7 +75,7 @@ export async function loadTransactionsPageData(
       id, date, merchant, description, type, amount, currency, status,
       account_id,
       category_id,
-      categories!transactions_category_id_fkey ( id, name, icon, color ),
+      categories ( id, name, icon, color ),
       accounts ( id, name )
     `, { count: 'exact' });
 
@@ -113,7 +113,7 @@ export async function loadTransactionsPageData(
   
   let aggQuery = supabase
     .from('transactions')
-    .select('type, amount, category_id, categories!transactions_category_id_fkey(name, icon, color)')
+    .select('type, amount, category_id, categories(name, icon, color)')
     .eq('user_id', user.id);
 
   if (startDate) aggQuery = aggQuery.gte('date', startDate);

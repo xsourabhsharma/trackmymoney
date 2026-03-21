@@ -196,14 +196,14 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
   // 4. Fetch account balances
   let balanceQuery = admin
     .from('accounts')
-    .select('current_balance')
+    .select('balance')
     .eq('user_id', user.id)
 
   if (filter.scope !== 'all' && accountIds) {
     balanceQuery = balanceQuery.in('id', accountIds)
   }
   const { data: accountsData } = await balanceQuery
-  const totalBalance = (accountsData || []).reduce((s, a) => s + Number(a.current_balance || 0), 0)
+  const totalBalance = (accountsData || []).reduce((s, a: any) => s + Number(a.balance || 0), 0)
 
   // 5. Aggregate current period
   let periodIncome = 0

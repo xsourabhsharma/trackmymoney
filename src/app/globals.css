@@ -182,5 +182,248 @@
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PREMIUM ANIMATION SYSTEM — TrackMyMoney
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Keyframes ─────────────────────────────────────────────────────────── */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes progressFill {
+  from { width: 0%; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(45, 90, 61, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(45, 90, 61, 0);
+  }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.02); }
+}
+
+@keyframes borderDraw {
+  from { border-color: transparent; }
+  to   { border-color: var(--border-light); }
+}
+
+/* ─── Utility Classes ───────────────────────────────────────────────────── */
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-count-up {
+  animation: countUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Staggered entrance: use --delay CSS var or nth-child */
+.animate-stagger > * {
+  opacity: 0;
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.animate-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.animate-stagger > *:nth-child(2) { animation-delay: 60ms; }
+.animate-stagger > *:nth-child(3) { animation-delay: 120ms; }
+.animate-stagger > *:nth-child(4) { animation-delay: 180ms; }
+.animate-stagger > *:nth-child(5) { animation-delay: 240ms; }
+.animate-stagger > *:nth-child(6) { animation-delay: 300ms; }
+.animate-stagger > *:nth-child(7) { animation-delay: 360ms; }
+.animate-stagger > *:nth-child(8) { animation-delay: 420ms; }
+
+/* Shimmer loading skeleton */
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface) 25%,
+    var(--bg-surface-hover) 50%,
+    var(--bg-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* Progress bar fill */
+.animate-progress-fill {
+  animation: progressFill 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.3s;
+}
+
+/* Pulse glow (for active items, notifications) */
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Breathe (for hero elements) */
+.animate-breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+/* ─── Hover Micro-interactions ──────────────────────────────────────────── */
+
+/* Card lift on hover */
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.08),
+              0 4px 10px -3px rgba(0, 0, 0, 0.04);
+}
+.dark .hover-lift:hover {
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3),
+              0 4px 10px -3px rgba(0, 0, 0, 0.2);
+}
+
+/* Card with border glow on hover */
+.hover-glow {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.hover-glow:hover {
+  border-color: var(--border-dark);
+  box-shadow: 0 0 0 1px var(--border-dark);
+}
+
+/* Button press feedback */
+.btn-press {
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.15s ease;
+}
+.btn-press:hover {
+  transform: scale(1.02);
+}
+.btn-press:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+/* ─── Smooth Universal Transitions ──────────────────────────────────────── */
+
+/* All interactive elements get smooth transitions */
+a, button, input, select, textarea,
+[role="button"], [role="tab"], [role="menuitem"] {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+  transition-duration: 0.2s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Table row hover effect */
+tr {
+  transition: background-color 0.15s ease;
+}
+
+/* ─── Page Section Animations ───────────────────────────────────────────── */
+
+.dashboard-section {
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.dashboard-section:nth-child(1) { animation-delay: 0ms; }
+.dashboard-section:nth-child(2) { animation-delay: 80ms; }
+.dashboard-section:nth-child(3) { animation-delay: 160ms; }
+.dashboard-section:nth-child(4) { animation-delay: 240ms; }
+.dashboard-section:nth-child(5) { animation-delay: 320ms; }
+.dashboard-section:nth-child(6) { animation-delay: 400ms; }
+
+/* ─── Number Transitions (for animated values) ──────────────────────────── */
+
+.value-transition {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── Select & Input Focus Animations ───────────────────────────────────── */
+
+select:focus, input:focus, textarea:focus {
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* ─── Scrollbar Styling for Premium Feel ────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-dark);
+  border-radius: 100px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }

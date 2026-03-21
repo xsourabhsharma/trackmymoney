@@ -12,6 +12,7 @@ export function SecuritySettingsSection() {
   const [isPending, setIsPending] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [loginAlerts, setLoginAlerts] = useState(true)
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false)
 
   async function handlePasswordChange() {
     if (!password || password.length < 6) {
@@ -88,8 +89,11 @@ export function SecuritySettingsSection() {
             <span className="text-[13px] font-bold text-[var(--text-main)] uppercase tracking-tight">Two-Factor Auth</span>
             <span className="text-[10px] font-medium text-[var(--text-muted)] uppercase tracking-widest">Biometric / OTP Verification</span>
           </div>
-          <button className="w-10 h-5 bg-[var(--border-light)] rounded-full relative transition-all opacity-50 cursor-not-allowed" title="Coming soon">
-            <div className="absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition-all" />
+          <button 
+            onClick={() => setTwoFactorEnabled(!twoFactorEnabled)}
+            className={`w-10 h-5 rounded-full relative transition-colors duration-200 shadow-sm ${twoFactorEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+          >
+            <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${twoFactorEnabled ? 'translate-x-5' : 'translate-x-0.5'}`} />
           </button>
         </div>
 
@@ -100,9 +104,9 @@ export function SecuritySettingsSection() {
           </div>
           <button 
             onClick={() => setLoginAlerts(!loginAlerts)}
-            className={`w-10 h-5 rounded-full relative transition-all shadow-sm ${loginAlerts ? 'bg-[var(--accent)]' : 'bg-[var(--border-light)]'}`}
+            className={`w-10 h-5 rounded-full relative transition-colors duration-200 shadow-sm ${loginAlerts ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
           >
-            <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${loginAlerts ? 'left-6' : 'left-1'}`} />
+            <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${loginAlerts ? 'translate-x-5' : 'translate-x-0.5'}`} />
           </button>
         </div>
 

@@ -187,11 +187,11 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
             <button
               type="button"
               onClick={() => handleChange('rollover', !form.rollover)}
-              className={`w-10 h-6 rounded-full transition-all relative flex-shrink-0 ${
-                form.rollover ? 'bg-[var(--accent)]' : 'bg-[var(--border-light)]'
+              className={`w-10 h-6 rounded-full transition-colors duration-200 relative flex-shrink-0 ${
+                form.rollover ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'
               }`}
             >
-              <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${form.rollover ? 'left-5' : 'left-1'}`} />
+              <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${form.rollover ? 'translate-x-5' : 'translate-x-0.5'}`} />
             </button>
             <div>
               <p className="text-[11px] font-bold text-[var(--text-main)] uppercase tracking-tight">Enable Rollover</p>

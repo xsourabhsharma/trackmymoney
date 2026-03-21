@@ -115,7 +115,7 @@ export async function loadBudgetsPageData(filter: BudgetFilter): Promise<Budgets
     .select(`
       id, period_type, period_start, period_end, limit_amount, spent, rollover,
       category_id,
-      categories!budgets_category_id_fkey ( id, name, icon, color )
+      categories ( id, name, icon, color )
     `)
     .eq('user_id', user.id)
     .eq('status', 'active')
@@ -229,25 +229,30 @@ export async function loadBudgetsPageData(filter: BudgetFilter): Promise<Budgets
     })
   }
 
-  // 8. Load AI suggestions
-  const { data: suggestionsRaw } = await admin
-    .from('budget_ai_suggestions')
-    .select('*')
-    .eq('user_id', user.id)
-    .eq('status', 'pending')
-    .order('created_at', { ascending: false })
-    .limit(5)
+  // 8. Load AI suggestions (silently skip if table does not exist)
+  let aiSuggestions: AiBudgetSuggestion[] = []
+  try {
+    const { data: suggestionsRaw } = await admin
+      .from('budget_ai_suggestions')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false })
+      .limit(5)
 
-  const aiSuggestions: AiBudgetSuggestion[] = (suggestionsRaw || []).map((s: any) => ({
-    id: s.id,
-    budgetId: s.budget_id,
-    message: s.message,
-    fromAmount: s.from_amount ? Number(s.from_amount) : null,
-    toAmount: s.to_amount ? Number(s.to_amount) : null,
-    suggestionType: s.suggestion_type || 'general',
-    status: s.status,
-    createdAt: s.created_at,
-  }))
+    aiSuggestions = (suggestionsRaw || []).map((s: any) => ({
+      id: s.id,
+      budgetId: s.budget_id,
+      message: s.message,
+      fromAmount: s.from_amount ? Number(s.from_amount) : null,
+      toAmount: s.to_amount ? Number(s.to_amount) : null,
+      suggestionType: s.suggestion_type || 'general',
+      status: s.status,
+      createdAt: s.created_at,
+    }))
+  } catch {
+    // Table may not exist yet — silently no-op
+  }
 
   return {
     filter,

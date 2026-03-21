@@ -16,15 +16,9 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 
 import { Checkbox } from "@/components/ui/checkbox"
+import { useToast } from '@/components/ui/toast-provider'
 
 export function AddBudgetButton({ categories }: { categories: any[] }) {
   const [open, setOpen] = useState(false)
@@ -32,12 +26,13 @@ export function AddBudgetButton({ categories }: { categories: any[] }) {
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [rollover, setRollover] = useState<boolean>(false)
   const router = useRouter()
+  const { addToast } = useToast()
 
   const expenseCategories = categories.filter(c => c.type === 'expense')
 
   async function handleSubmit(formData: FormData) {
     if (!selectedCategory) {
-      alert("Please select a category")
+      addToast('Please select a category', 'warning')
       return
     }
     
@@ -53,7 +48,7 @@ export function AddBudgetButton({ categories }: { categories: any[] }) {
       router.refresh()
     } catch (error) {
       console.error(error)
-      alert('Failed to set budget')
+      addToast('Failed to set budget', 'error')
     } finally {
       setIsLoading(false)
     }
@@ -79,25 +74,16 @@ export function AddBudgetButton({ categories }: { categories: any[] }) {
         <form action={handleSubmit} className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="category">Category</Label>
-            <Select name="categoryId" value={selectedCategory} onValueChange={(val: any) => setSelectedCategory(val || '')} required>
-              <SelectTrigger>
-                <SelectValue placeholder="Select category">
-                  {selectedCategory 
-                    ? expenseCategories.find(c => c.id === selectedCategory)?.name 
-                    : "Select category"}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {expenseCategories.map(c => (
-                  <SelectItem key={c.id} value={c.id}>
-                    <div className="flex items-center gap-2">
-                      <span>{c.icon}</span>
-                      <span>{c.name}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="h-9 w-full rounded-md border bg-[var(--bg-surface)] text-[var(--text-main)] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/30 border-[var(--border-light)]"
+            >
+              <option value="">Select category</option>
+              {expenseCategories.map(c => (
+                <option key={c.id} value={c.id}>{c.icon ? `${c.icon} ` : ''}{c.name}</option>
+              ))}
+            </select>
           </div>
           
           <div className="grid gap-2">

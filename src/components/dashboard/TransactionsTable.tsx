@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useOptimistic, useTransition } from 'react'
+import { useCurrency } from '@/hooks/useCurrency'
 import { format } from 'date-fns'
 import { 
   ArrowUpDown, 
@@ -49,6 +50,7 @@ export function TransactionsTable({
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const [isPending, startTransition] = useTransition()
+  const { fmt } = useCurrency()
   
   const [optimisticTransactions, removeOptimisticTransactions] = useOptimistic(
     transactions,
@@ -291,7 +293,7 @@ export function TransactionsTable({
                     <TableCell className={`p-4 text-right text-[13px] font-bold tabular-nums tracking-tighter ${
                       tx.type === 'income' ? 'text-[var(--income-green)]' : 'text-[var(--text-main)]'
                     }`}>
-                      {tx.type === 'income' ? '+ ' : '- '}${parseFloat(tx.amount as string).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      {tx.type === 'income' ? '+ ' : '- '}{fmt(parseFloat(tx.amount as string), tx.currency)}
                     </TableCell>
                     <TableCell className="p-4 text-right">
                       <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

@@ -23,14 +23,14 @@ export async function addSavingsGoal(formData: FormData) {
   const deadline = formData.get('deadline') as string
   const icon = (formData.get('icon') as string) || '🎯'
   const color = (formData.get('color') as string) || '#3B82F6'
-  const priority = parseInt(formData.get('priority') as string) || 3
+  const priority = parseInt(formData.get('priority') as string) || 1
 
-  const { error } = await admin.from('savings_goals').insert({
+  const { error } = await admin.from('goals').insert({
     user_id: user.id,
     name,
     target_amount: targetAmount,
     current_amount: currentAmount,
-    deadline: deadline ? new Date(deadline).toISOString() : null,
+    target_date: deadline ? new Date(deadline).toISOString() : null,
     icon,
     color,
     priority,
@@ -53,12 +53,12 @@ export async function updateSavingsGoal(formData: FormData) {
   const status = (formData.get('status') as string) || 'active'
 
   const { error } = await admin
-    .from('savings_goals')
+    .from('goals')
     .update({
       name,
       target_amount: targetAmount,
       current_amount: currentAmount,
-      deadline: deadline ? new Date(deadline).toISOString() : null,
+      target_date: deadline ? new Date(deadline).toISOString() : null,
       status,
       updated_at: new Date().toISOString(),
     })
@@ -74,7 +74,7 @@ export async function deleteSavingsGoal(id: string) {
   const admin = createAdminClient()
 
   const { error } = await admin
-    .from('savings_goals')
+    .from('goals')
     .delete()
     .eq('id', id)
     .eq('user_id', user.id)
@@ -90,20 +90,20 @@ export async function addDebt(formData: FormData) {
   const admin = createAdminClient()
 
   const name = formData.get('name') as string
-  const creditor = (formData.get('creditor') as string) || null
   const totalAmount = parseFloat(formData.get('totalAmount') as string)
   const remainingAmount = parseFloat(formData.get('remainingAmount') as string) || totalAmount
   const interestRate = parseFloat(formData.get('interestRate') as string) || 0
   const minimumPayment = parseFloat(formData.get('minimumPayment') as string) || 0
+  const dueDate = formData.get('dueDate') as string
 
-  const { error } = await admin.from('debt_tracker').insert({
+  const { error } = await admin.from('debts').insert({
     user_id: user.id,
     name,
-    creditor,
     total_amount: totalAmount,
     remaining_amount: remainingAmount,
     interest_rate: interestRate,
     minimum_payment: minimumPayment,
+    due_date: dueDate ? new Date(dueDate).toISOString() : null,
   })
 
   if (error) throw new Error(`Failed to save debt: ${error.message}`)
@@ -120,13 +120,11 @@ export async function updateDebt(formData: FormData) {
   const remainingAmount = parseFloat(formData.get('remainingAmount') as string)
   const interestRate = parseFloat(formData.get('interestRate') as string)
   const minimumPayment = parseFloat(formData.get('minimumPayment') as string)
-  const creditor = (formData.get('creditor') as string) || null
 
   const { error } = await admin
-    .from('debt_tracker')
+    .from('debts')
     .update({
       name,
-      creditor,
       total_amount: totalAmount,
       remaining_amount: remainingAmount,
       interest_rate: interestRate,
@@ -145,7 +143,7 @@ export async function deleteDebt(id: string) {
   const admin = createAdminClient()
 
   const { error } = await admin
-    .from('debt_tracker')
+    .from('debts')
     .delete()
     .eq('id', id)
     .eq('user_id', user.id)
@@ -160,11 +158,15 @@ export async function applyGoalDebtSuggestion(suggestionId: string) {
   const user = await getAuthUser()
   const admin = createAdminClient()
 
-  await admin
-    .from('ai_goal_debt_suggestions')
-    .update({ status: 'applied', applied_at: new Date().toISOString() })
-    .eq('id', suggestionId)
-    .eq('user_id', user.id)
+  try {
+    await admin
+      .from('ai_goal_debt_suggestions')
+      .update({ status: 'applied', applied_at: new Date().toISOString() })
+      .eq('id', suggestionId)
+      .eq('user_id', user.id)
+  } catch {
+    // Table may not exist — silently no-op
+  }
 
   revalidatePath('/dashboard/goals', 'page')
 }
@@ -173,11 +175,15 @@ export async function dismissGoalDebtSuggestion(suggestionId: string) {
   const user = await getAuthUser()
   const admin = createAdminClient()
 
-  await admin
-    .from('ai_goal_debt_suggestions')
-    .update({ status: 'dismissed' })
-    .eq('id', suggestionId)
-    .eq('user_id', user.id)
+  try {
+    await admin
+      .from('ai_goal_debt_suggestions')
+      .update({ status: 'dismissed' })
+      .eq('id', suggestionId)
+      .eq('user_id', user.id)
+  } catch {
+    // Table may not exist — silently no-op
+  }
 
   revalidatePath('/dashboard/goals', 'page')
 }

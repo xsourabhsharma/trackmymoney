@@ -38,7 +38,7 @@ export function NotificationsSettingsSection({ settings, onSave }: Props) {
                   type="checkbox" 
                   checked={settings[n.key]} 
                   onChange={e => onSave({ [n.key]: e.target.checked })}
-                  className="w-4 h-4 rounded border-[var(--border-light)] text-[var(--accent)] focus:ring-[var(--accent)]/20 cursor-pointer accent-[var(--accent)]" 
+                  className="w-4 h-4 rounded border-[var(--border-light)] text-blue-600 focus:ring-blue-600/20 cursor-pointer accent-blue-600" 
                 />
                 <span className="group-hover:text-[var(--accent)] transition-colors">{n.label}</span>
               </label>

@@ -11,35 +11,42 @@ export async function upsertUserSettingsAction(partial: Partial<UserSettings>) {
   
   if (authErr || !user) throw new Error('Unauthorized')
 
-  const { data: existing } = await supabase
-    .from('user_settings')
-    .select('user_id')
-    .eq('user_id', user.id)
+  // Read existing preferences from profiles table
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('preferences, full_name')
+    .eq('id', user.id)
     .single()
 
-  if (existing) {
-    const { error } = await supabase
-      .from('user_settings')
-      .update(partial)
-      .eq('user_id', user.id)
+  const existingPrefs = (profile?.preferences as Record<string, unknown>) || {}
 
-    if (error) throw new Error(`Update failed: ${error.message}`)
-  } else {
-    const newRecord = {
-      user_id: user.id,
-      ...DEFAULT_SETTINGS,
-      ...partial,
-      full_name: partial.full_name || user.email?.split('@')[0] || 'Anonymous',
-    }
-    
-    // We must pass exactly the columns that exist. 
-    // Types align perfectly.
-    const { error } = await supabase
-      .from('user_settings')
-      .insert(newRecord)
+  // Merge existing with new partial settings
+  const mergedPrefs = { ...existingPrefs, ...partial }
 
-    if (error) throw new Error(`Insert failed: ${error.message}`)
+  // Build profile update payload
+  const updatePayload: Record<string, unknown> = {
+    preferences: mergedPrefs,
+    updated_at: new Date().toISOString(),
   }
+
+  // If full_name is being changed, also update the top-level column
+  if (partial.full_name !== undefined) {
+    updatePayload.full_name = partial.full_name
+  }
+
+  // If currency is being changed, also update the top-level column
+  if (partial.currency !== undefined) {
+    // Strip the display format for the DB column (e.g., 'INR (₹)' → 'INR')
+    const rawCurrency = partial.currency.split(' ')[0] || partial.currency
+    updatePayload.currency = rawCurrency
+  }
+
+  const { error } = await supabase
+    .from('profiles')
+    .update(updatePayload)
+    .eq('id', user.id)
+
+  if (error) throw new Error(`Settings update failed: ${error.message}`)
 
   revalidatePath('/dashboard/settings')
   revalidatePath('/dashboard', 'layout') // Revalidate whole dashboard since settings affect global UX

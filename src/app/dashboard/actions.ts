@@ -12,6 +12,22 @@ export async function addTransaction(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
+  // Fix missing profile issue
+  const { data: existingProfile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', user.id)
+    .single()
+
+  if (!existingProfile) {
+    await supabase.from('profiles').insert({
+      id: user.id,
+      email: user.email || 'unknown@example.com',
+      full_name: user.user_metadata?.full_name || 'User',
+      currency: 'USD'
+    })
+  }
+
   const amount = formData.get('amount') as string
   const type = formData.get('type') as 'income' | 'expense'
   const rawMerchant = formData.get('merchant') as string

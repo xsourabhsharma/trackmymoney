@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateText } from 'ai';
 import { createClient } from '@/utils/supabase/server';
+import { createGroq } from '@ai-sdk/groq';
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -75,14 +76,10 @@ Respond with ONLY a valid JSON array (no markdown, no code blocks) of objects wi
 - severity: "info" | "warning" | "opportunity"
 - actionHint: string (specific action to take)`;
 
-    let model;
-    if (hasGoogle) {
-      const { google } = await import('@ai-sdk/google');
-      model = google('gemini-2.0-flash');
-    } else {
-      const { openai } = await import('@ai-sdk/openai');
-      model = openai('gpt-4-turbo');
-    }
+    const groq = createGroq({
+      apiKey: process.env.GROQ_API_KEY,
+    });
+    const model = groq('llama-3.3-70b-versatile');
 
     const { text } = await generateText({
       model,

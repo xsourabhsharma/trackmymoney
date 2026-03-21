@@ -2,6 +2,7 @@
 
 import { TopSummaryMetrics, GoalsDebtsFilter } from '@/app/dashboard/goals/data'
 import { Target, TrendingDown, Activity, Plus, Calendar, Filter } from 'lucide-react'
+import { useCurrency } from '@/hooks/useCurrency'
 
 interface Props {
   summary: TopSummaryMetrics
@@ -11,11 +12,10 @@ interface Props {
   onAddDebt: () => void
 }
 
-function fmt(n: number) {
-  return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-}
+
 
 export function GoalsDebtsSummaryHeader({ summary, filter, onChangeFilter, onAddGoal, onAddDebt }: Props) {
+  const { fmt } = useCurrency()
   const { totalSavingsGoals, totalSavingsSaved, totalDebt, netProgressPercent } = summary
   const pct = Math.round(netProgressPercent)
   const isGood = pct >= 50
@@ -23,9 +23,9 @@ export function GoalsDebtsSummaryHeader({ summary, filter, onChangeFilter, onAdd
   return (
     <div className="flex flex-col gap-6">
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-stagger">
         {/* Savings Goals */}
-        <div className="group relative p-6 bg-[var(--bg-base)] border border-[var(--border-light)] hover:border-[var(--border-dark)] rounded-2xl transition-all hover:shadow-md overflow-hidden">
+        <div className="group relative p-6 bg-[var(--bg-base)] border border-[var(--border-light)] hover:border-[var(--border-dark)] rounded-2xl transition-all hover:shadow-md overflow-hidden hover-lift">
           <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--income-green)]/5 rounded-bl-[60px]" />
           <div className="flex items-start justify-between mb-4">
             <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
@@ -33,15 +33,15 @@ export function GoalsDebtsSummaryHeader({ summary, filter, onChangeFilter, onAdd
             </div>
             <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] bg-[var(--bg-surface)] px-2 py-1 rounded-full border border-[var(--border-light)]">Goals</span>
           </div>
-          <div className="text-3xl font-bold tabular-nums text-[var(--income-green)] tracking-tight">${fmt(totalSavingsGoals)}</div>
+          <div className="text-3xl font-bold tabular-nums text-[var(--income-green)] tracking-tight animate-count-up">{fmt(totalSavingsGoals)}</div>
           <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-[0.15em] mt-1">Total Savings Goals</div>
           <div className="text-[9px] text-[var(--text-muted)] mt-2 tabular-nums">
-            Saved: <span className="text-[var(--income-green)] font-bold">${fmt(totalSavingsSaved)}</span>
+            Saved: <span className="text-[var(--income-green)] font-bold">{fmt(totalSavingsSaved)}</span>
           </div>
         </div>
 
         {/* Total Debt */}
-        <div className="group relative p-6 bg-[var(--bg-base)] border border-[var(--border-light)] hover:border-[var(--border-dark)] rounded-2xl transition-all hover:shadow-md overflow-hidden">
+        <div className="group relative p-6 bg-[var(--bg-base)] border border-[var(--border-light)] hover:border-[var(--border-dark)] rounded-2xl transition-all hover:shadow-md overflow-hidden hover-lift">
           <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-bl-[60px]" />
           <div className="flex items-start justify-between mb-4">
             <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
@@ -49,7 +49,7 @@ export function GoalsDebtsSummaryHeader({ summary, filter, onChangeFilter, onAdd
             </div>
             <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] bg-[var(--bg-surface)] px-2 py-1 rounded-full border border-[var(--border-light)]">Debt</span>
           </div>
-          <div className="text-3xl font-bold tabular-nums text-[var(--expense-red)] tracking-tight">${fmt(totalDebt)}</div>
+          <div className="text-3xl font-bold tabular-nums text-[var(--expense-red)] tracking-tight animate-count-up">{fmt(totalDebt)}</div>
           <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-[0.15em] mt-1">Total Debt</div>
           <div className="text-[9px] text-[var(--text-muted)] mt-2">Outstanding balance</div>
         </div>
@@ -69,7 +69,7 @@ export function GoalsDebtsSummaryHeader({ summary, filter, onChangeFilter, onAdd
           <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-[0.15em] mt-1">Net Progress</div>
           <div className="mt-3 h-1.5 bg-[var(--bg-surface)] rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-700 ${isGood ? 'bg-[var(--accent)]' : 'bg-orange-400'}`}
+              className={`h-full rounded-full animate-progress-fill ${isGood ? 'bg-[var(--accent)]' : 'bg-orange-400'}`}
               style={{ width: `${pct}%` }}
             />
           </div>

@@ -3,12 +3,15 @@
 import { useState } from 'react'
 import { Download, Loader2, ChevronDown } from 'lucide-react'
 import { ReportsFilter } from '@/app/dashboard/reports/data'
+import { jsPDF } from 'jspdf'
+import 'jspdf-autotable'
+import Papa from 'papaparse'
 
 interface Props {
   filter: ReportsFilter
 }
 
-type ExportFormat = 'csv' | 'xlsx' | 'pdf'
+type ExportFormat = 'csv' | 'pdf'
 
 interface ExportCard {
   id: string
@@ -19,14 +22,12 @@ interface ExportCard {
 
 const EXPORT_CARDS: ExportCard[] = [
   { id: 'monthly', name: 'Monthly Summary Report', desc: 'Income, expenses, net, and category totals for the current period.', icon: '📋' },
-  { id: 'yearly', name: 'Yearly Overview Statement', desc: 'Full annual aggregation with month-over-month comparisons.', icon: '📊' },
   { id: 'tax', name: 'Tax-Ready Ledger', desc: 'Optimized transaction export for fiscal year tax prep.', icon: '🧾' },
-  { id: 'category', name: 'Category Flow (Detailed)', desc: 'Granular spending breakdown by category and month.', icon: '🗂️' },
 ]
 
 export function ReportsExportsSection({ filter }: Props) {
   const [formats, setFormats] = useState<Record<string, ExportFormat>>({
-    monthly: 'csv', yearly: 'csv', tax: 'csv', category: 'csv',
+    monthly: 'csv', tax: 'csv'
   })
   const [loading, setLoading] = useState<Record<string, boolean>>({})
   const [done, setDone] = useState<Record<string, boolean>>({})
@@ -40,30 +41,58 @@ export function ReportsExportsSection({ filter }: Props) {
     setLoading(prev => ({ ...prev, [card.id]: true }))
 
     try {
-      const params = new URLSearchParams({
-        type: card.id,
-        format: fmt,
-        period: filter.period,
-        scope: filter.scope,
-      })
+      // Fetch raw CSV data from the backend
+      const res = await fetch(`/api/reports/export?type=${card.id}&format=csv&period=${filter.period}&scope=${filter.scope}`)
+      if (!res.ok) throw new Error('Failed to fetch report data')
+      const csvText = await res.text()
 
-      const res = await fetch(`/api/reports/export?${params.toString()}`)
-      if (!res.ok) throw new Error('Export failed')
+      const now = new Date()
+      const filenameBase = `${card.id}-report-${now.toISOString().split('T')[0]}`
 
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${card.id}-report.${fmt}`
-      a.click()
-      URL.revokeObjectURL(url)
+      if (fmt === 'csv') {
+        const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${filenameBase}.csv`
+        a.click()
+        URL.revokeObjectURL(url)
+      } else if (fmt === 'pdf') {
+        const parsed = Papa.parse(csvText, { skipEmptyLines: true })
+        const data = parsed.data as string[][]
+        
+        if (data.length < 2) {
+          alert('Not enough data to generate PDF.')
+          return
+        }
+
+        const doc = new jsPDF()
+        const headers = data[0]
+        const body = data.slice(1)
+
+        doc.setFontSize(18)
+        doc.text(card.name, 14, 22)
+        doc.setFontSize(11)
+        doc.setTextColor(100)
+        doc.text(`Generated on ${now.toLocaleDateString()}`, 14, 30)
+
+        // @ts-ignore - jspdf-autotable plugin adds autoTable to jsPDF instance
+        doc.autoTable({
+          startY: 36,
+          head: [headers],
+          body: body,
+          theme: 'striped',
+          headStyles: { fillColor: [28, 27, 25] },
+          styles: { fontSize: 9, cellPadding: 4 },
+        })
+
+        doc.save(`${filenameBase}.pdf`)
+      }
 
       setDone(prev => ({ ...prev, [card.id]: true }))
       setTimeout(() => setDone(prev => ({ ...prev, [card.id]: false })), 3000)
     } catch (err) {
       console.error('Export error:', err)
-      // Show a toast or fall back to client-side CSV
-      alert('Export feature coming soon! Set up /api/reports/export to enable downloads.')
     } finally {
       setLoading(prev => ({ ...prev, [card.id]: false }))
     }
@@ -94,7 +123,6 @@ export function ReportsExportsSection({ filter }: Props) {
                 className="pl-3 pr-7 py-2 bg-[var(--bg-base)] border border-[var(--border-light)] rounded-lg text-[10px] font-bold uppercase appearance-none outline-none focus:border-[var(--border-dark)] cursor-pointer transition-all"
               >
                 <option value="csv">CSV</option>
-                <option value="xlsx">XLSX</option>
                 <option value="pdf">PDF</option>
               </select>
               <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-[var(--text-muted)] pointer-events-none" />

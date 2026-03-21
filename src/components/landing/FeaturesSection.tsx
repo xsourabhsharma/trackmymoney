@@ -85,8 +85,13 @@ export default function FeaturesSection() {
             <motion.div
               key={title}
               variants={fadeUp}
-              className="relative bg-[var(--bg-base)] rounded-[20px] border border-[var(--border-light)] p-6 md:p-7 hover:border-[var(--border-dark)] hover:shadow-lg transition-all duration-300 group"
+              whileHover={{ scale: 1.02, y: -5 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              className="relative bg-gradient-to-br from-[var(--bg-base)] to-[var(--bg-surface)] rounded-[24px] border border-[var(--border-light)] p-6 md:p-8 hover:border-[var(--income-green)]/30 hover:shadow-2xl hover:shadow-[var(--income-green)]/10 transition-colors duration-300 group overflow-hidden"
             >
+              {/* Premium inner glow on hover */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              
               {freelancer && (
                 <span className="absolute top-4 right-4 text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-light)]">
                   Freelancer-friendly

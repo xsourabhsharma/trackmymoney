@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { PiggyBank, RefreshCw, Activity, ArrowRight } from 'lucide-react'
 import type { SubscriptionsOverviewMetrics } from '@/app/dashboard/subscriptions/data'
+import { useCurrency } from '@/hooks/useCurrency'
 
 interface SubscriptionsOverviewProps {
   metrics: SubscriptionsOverviewMetrics
@@ -10,6 +11,7 @@ interface SubscriptionsOverviewProps {
 
 export function SubscriptionsOverview({ metrics }: SubscriptionsOverviewProps) {
   const [viewMode, setViewMode] = useState<'monthly' | 'yearly'>('monthly')
+  const { fmt } = useCurrency()
 
   const multiplier = viewMode === 'yearly' ? 12 : 1
   
@@ -38,16 +40,16 @@ export function SubscriptionsOverview({ metrics }: SubscriptionsOverviewProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-stagger">
         {/* Total Outflow Card */}
-        <div className="p-6 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-light)] relative overflow-hidden group hover:border-[var(--expense-red)]/30 transition-colors">
+        <div className="p-6 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-light)] relative overflow-hidden group hover:border-[var(--expense-red)]/30 transition-colors hover-lift">
           <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
             <RefreshCw className="w-24 h-24" />
           </div>
           <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] mb-2">{viewMode} Outflow</p>
           <div className="flex items-baseline gap-2 mb-4">
-            <span className="text-4xl font-light tracking-tight text-[var(--text-main)]">
-              ${displayOutflow.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            <span className="text-4xl font-light tracking-tight text-[var(--text-main)] animate-count-up">
+              {fmt(displayOutflow)}
             </span>
           </div>
           <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--bg-muted)] border border-[var(--border-light)]">
@@ -57,7 +59,7 @@ export function SubscriptionsOverview({ metrics }: SubscriptionsOverviewProps) {
         </div>
 
         {/* Active Subscriptions Card */}
-        <div className="p-6 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-light)] relative overflow-hidden group hover:border-[var(--accent)]/30 transition-colors">
+        <div className="p-6 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-light)] relative overflow-hidden group hover:border-[var(--accent)]/30 transition-colors hover-lift">
           <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] mb-2">Active Subscriptions</p>
           <div className="flex items-baseline gap-2 mb-4">
             <span className="text-4xl font-light tracking-tight text-[var(--text-main)]">
@@ -71,14 +73,14 @@ export function SubscriptionsOverview({ metrics }: SubscriptionsOverviewProps) {
         </div>
 
         {/* Potential Savings Card */}
-        <div className="p-6 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-light)] border-b-4 border-b-[var(--income-green)] relative overflow-hidden group shadow-sm">
+        <div className="p-6 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-light)] border-b-4 border-b-[var(--income-green)] relative overflow-hidden group shadow-sm hover-lift">
           <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity text-[var(--income-green)]">
             <PiggyBank className="w-24 h-24" />
           </div>
           <p className="text-[10px] font-bold text-[var(--income-green)] uppercase tracking-[0.2em] mb-2">Potential Savings</p>
           <div className="flex items-baseline gap-2 mb-4">
-            <span className="text-4xl font-light tracking-tight text-[var(--text-main)]">
-              ${displaySavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            <span className="text-4xl font-light tracking-tight text-[var(--text-main)] animate-count-up">
+              {fmt(displaySavings)}
             </span>
           </div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--income-green)]/10 border border-[var(--income-green)]/20 text-[var(--income-green)] cursor-pointer hover:bg-[var(--income-green)]/20 transition-colors">

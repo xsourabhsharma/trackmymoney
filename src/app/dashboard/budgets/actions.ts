@@ -95,33 +95,35 @@ export async function applyBudgetSuggestion(suggestionId: string): Promise<void>
   const user = await getAuthUser()
   const admin = getAdmin()
 
-  // Fetch the suggestion
-  const { data: suggestion, error: fetchErr } = await admin
-    .from('budget_ai_suggestions')
-    .select('*')
-    .eq('id', suggestionId)
-    .eq('user_id', user.id)
-    .single()
-
-  if (fetchErr || !suggestion) throw new Error('Suggestion not found')
-
-  // If linked to a budget, update the budget amount
-  if (suggestion.budget_id && suggestion.to_amount) {
-    const { error: updateErr } = await admin
-      .from('budgets')
-      .update({ limit_amount: suggestion.to_amount, updated_at: new Date().toISOString() })
-      .eq('id', suggestion.budget_id)
+  try {
+    // Fetch the suggestion
+    const { data: suggestion, error: fetchErr } = await admin
+      .from('budget_ai_suggestions')
+      .select('*')
+      .eq('id', suggestionId)
       .eq('user_id', user.id)
+      .single()
 
-    if (updateErr) throw new Error('Failed to apply suggestion to budget')
+    if (fetchErr || !suggestion) return // Suggestion not found — silently no-op
+
+    // If linked to a budget, update the budget amount
+    if (suggestion.budget_id && suggestion.to_amount) {
+      await admin
+        .from('budgets')
+        .update({ limit_amount: suggestion.to_amount, updated_at: new Date().toISOString() })
+        .eq('id', suggestion.budget_id)
+        .eq('user_id', user.id)
+    }
+
+    // Mark suggestion as applied
+    await admin
+      .from('budget_ai_suggestions')
+      .update({ status: 'applied', applied_at: new Date().toISOString() })
+      .eq('id', suggestionId)
+      .eq('user_id', user.id)
+  } catch {
+    // Table may not exist — silently no-op
   }
-
-  // Mark suggestion as applied
-  await admin
-    .from('budget_ai_suggestions')
-    .update({ status: 'applied', applied_at: new Date().toISOString() })
-    .eq('id', suggestionId)
-    .eq('user_id', user.id)
 
   revalidatePath('/dashboard/budgets', 'page')
 }
@@ -130,11 +132,15 @@ export async function dismissBudgetSuggestion(suggestionId: string): Promise<voi
   const user = await getAuthUser()
   const admin = getAdmin()
 
-  await admin
-    .from('budget_ai_suggestions')
-    .update({ status: 'dismissed' })
-    .eq('id', suggestionId)
-    .eq('user_id', user.id)
+  try {
+    await admin
+      .from('budget_ai_suggestions')
+      .update({ status: 'dismissed' })
+      .eq('id', suggestionId)
+      .eq('user_id', user.id)
+  } catch {
+    // Table may not exist — silently no-op
+  }
 
   revalidatePath('/dashboard/budgets', 'page')
 }

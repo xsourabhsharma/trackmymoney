@@ -2,6 +2,7 @@
 
 import { BudgetOverviewMetrics, BudgetFilter, BudgetPeriod, BudgetScope } from '@/app/dashboard/budgets/data'
 import { TrendingUp, TrendingDown, Wallet, Calendar, Building2, User } from 'lucide-react'
+import { useCurrency } from '@/hooks/useCurrency'
 
 interface Props {
   metrics: BudgetOverviewMetrics
@@ -22,11 +23,8 @@ const SCOPES: { key: BudgetScope; label: string; icon: React.ReactNode }[] = [
   { key: 'business', label: 'Business', icon: <Building2 className="w-3 h-3" /> },
 ]
 
-function fmt(n: number) {
-  return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-}
-
 export function BudgetOverviewHeader({ metrics, filter, onFilterChange }: Props) {
+  const { fmt } = useCurrency()
   const { totalBudget, totalSpent, remaining } = metrics
   const pctUsed = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0
   const isOver = remaining < 0
@@ -34,9 +32,9 @@ export function BudgetOverviewHeader({ metrics, filter, onFilterChange }: Props)
   return (
     <div className="flex flex-col gap-6">
       {/* Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-stagger">
         {/* Total Budget */}
-        <div className="group relative p-6 bg-[var(--bg-base)] border border-[var(--border-light)] hover:border-[var(--border-dark)] rounded-2xl transition-all hover:shadow-md overflow-hidden">
+        <div className="group relative p-6 bg-[var(--bg-base)] border border-[var(--border-light)] hover:border-[var(--border-dark)] rounded-2xl transition-all hover:shadow-md overflow-hidden hover-lift">
           <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--accent)]/5 rounded-bl-[60px]" />
           <div className="flex items-start justify-between mb-4">
             <div className="w-10 h-10 rounded-xl bg-[var(--accent)]/10 flex items-center justify-center">
@@ -47,7 +45,7 @@ export function BudgetOverviewHeader({ metrics, filter, onFilterChange }: Props)
             </span>
           </div>
           <div className="text-3xl font-bold tabular-nums text-[var(--text-main)] tracking-tight">
-            ${fmt(totalBudget)}
+            {fmt(totalBudget)}
           </div>
           <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-[0.15em] mt-1">
             Total Monthly Budget
@@ -55,7 +53,7 @@ export function BudgetOverviewHeader({ metrics, filter, onFilterChange }: Props)
           {/* Mini progress bar */}
           <div className="mt-4 h-1 bg-[var(--bg-surface)] rounded-full overflow-hidden">
             <div
-              className="h-full bg-[var(--accent)] rounded-full transition-all duration-500"
+              className="h-full bg-[var(--accent)] rounded-full animate-progress-fill"
               style={{ width: `${Math.min(pctUsed, 100)}%` }}
             />
           </div>
@@ -63,7 +61,7 @@ export function BudgetOverviewHeader({ metrics, filter, onFilterChange }: Props)
         </div>
 
         {/* Total Spent */}
-        <div className="group relative p-6 bg-[var(--bg-base)] border border-[var(--border-light)] hover:border-[var(--border-dark)] rounded-2xl transition-all hover:shadow-md overflow-hidden">
+        <div className="group relative p-6 bg-[var(--bg-base)] border border-[var(--border-light)] hover:border-[var(--border-dark)] rounded-2xl transition-all hover:shadow-md overflow-hidden hover-lift">
           <div className="absolute top-0 right-0 w-24 h-24 bg-orange-400/5 rounded-bl-[60px]" />
           <div className="flex items-start justify-between mb-4">
             <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
@@ -74,7 +72,7 @@ export function BudgetOverviewHeader({ metrics, filter, onFilterChange }: Props)
             </span>
           </div>
           <div className="text-3xl font-bold tabular-nums text-[var(--text-main)] tracking-tight">
-            ${fmt(totalSpent)}
+            {fmt(totalSpent)}
           </div>
           <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-[0.15em] mt-1">
             Total Spent
@@ -95,7 +93,7 @@ export function BudgetOverviewHeader({ metrics, filter, onFilterChange }: Props)
             </span>
           </div>
           <div className={`text-3xl font-bold tabular-nums tracking-tight ${isOver ? 'text-[var(--expense-red)]' : 'text-[var(--income-green)]'}`}>
-            {isOver ? '-' : ''}${fmt(Math.abs(remaining))}
+            {isOver ? '-' : ''}{fmt(Math.abs(remaining))}
           </div>
           <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-[0.15em] mt-1">
             {isOver ? 'Over Budget' : 'Remaining Balance'}

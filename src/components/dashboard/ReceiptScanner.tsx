@@ -45,14 +45,17 @@ export function ReceiptScanner() {
         body: JSON.stringify({ image }),
       })
 
-      if (!response.ok) throw new Error('OCR failed')
+      if (!response.ok) {
+        const errData = await response.json().catch(() => null)
+        throw new Error(errData?.details || 'OCR failed')
+      }
 
       const data = await response.json()
       setResult(data)
       addToast('Receipt scanned successfully!', 'success')
-    } catch (error) {
+    } catch (error: any) {
       console.error(error)
-      addToast('Failed to scan receipt. Please try again.', 'error')
+      addToast(`Error: ${error.message}`, 'error')
     } finally {
       setIsProcessing(false)
     }
@@ -75,8 +78,8 @@ export function ReceiptScanner() {
         })
         addToast('Transaction saved!', 'success')
         handleClear()
-      } catch (error) {
-        addToast('Failed to save transaction.', 'error')
+      } catch (error: any) {
+        addToast(error.message || 'Failed to save transaction.', 'error')
       }
     })
   }
@@ -133,9 +136,23 @@ export function ReceiptScanner() {
             >
               <div className="relative aspect-[3/4] w-full max-w-[300px] mx-auto rounded-[16px] overflow-hidden border border-[var(--border-light)] shadow-lg">
                 <Image src={image} alt="Receipt Preview" fill className="object-cover" />
+                
+                {/* 3D Hologram Scan Line */}
+                {isProcessing && (
+                  <motion.div
+                    className="absolute left-0 right-0 h-[2px] bg-[var(--income-green)] shadow-[0_0_20px_4px_var(--income-green)] z-20"
+                    initial={{ top: '0%' }}
+                    animate={{ top: ['0%', '100%', '0%'] }}
+                    transition={{ duration: 3, ease: 'linear', repeat: Infinity }}
+                  >
+                    <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-transparent to-[var(--income-green)]/30 -translate-y-full pointer-events-none" />
+                  </motion.div>
+                )}
+
                 <button 
                   onClick={handleClear}
-                  className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors"
+                  disabled={isProcessing}
+                  className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors disabled:opacity-0"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -143,12 +160,12 @@ export function ReceiptScanner() {
               <button
                 onClick={handleScan}
                 disabled={isProcessing}
-                className="w-full py-4 bg-[var(--text-main)] text-[var(--bg-base)] rounded-xl font-bold uppercase tracking-widest flex items-center justify-center gap-3 hover:opacity-90 transition-all disabled:opacity-50"
+                className="w-full py-4 bg-[var(--text-main)] text-[var(--bg-base)] rounded-xl font-bold uppercase tracking-widest flex items-center justify-center gap-3 hover:opacity-90 transition-all disabled:opacity-50 relative overflow-hidden"
               >
                 {isProcessing ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Analyzing Receipt...
+                    <Loader2 className="w-5 h-5 animate-spin relative z-10" />
+                    <span className="relative z-10">Extracting Data...</span>
                   </>
                 ) : (
                   <>

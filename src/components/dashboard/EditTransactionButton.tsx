@@ -15,13 +15,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { updateTransaction } from '@/app/dashboard/actions'
 
 export function EditTransactionButton({ transaction, categories, accounts = [] }: { transaction: any, categories: any[], accounts?: any[] }) {
@@ -33,7 +26,7 @@ export function EditTransactionButton({ transaction, categories, accounts = [] }
   const [selectedAccount, setSelectedAccount] = useState<string>(transaction.account_id || transaction.accountId || '')
   const [errors, setErrors] = useState<{ amount?: string; merchant?: string; category?: string }>({})
   
-  const availableCategories = categories.filter(c => c.type === transactionType)
+  const availableCategories = categories.filter(c => c.type === transactionType || c.id === selectedCategory);
 
   const handleTypeChange = (val: 'expense' | 'income') => {
     setTransactionType(val)
@@ -109,27 +102,21 @@ export function EditTransactionButton({ transaction, categories, accounts = [] }
         <form action={handleSubmit} className="grid gap-5 py-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="type" className="text-gray-600">Type</Label>
-              <Select 
-                name="type" 
-                value={transactionType} 
-                onValueChange={(val: any) => handleTypeChange(val as 'expense' | 'income')}
-                required
+              <Label htmlFor="type" className="text-[var(--text-muted)]">Type</Label>
+              <select
+                value={transactionType}
+                onChange={(e) => handleTypeChange(e.target.value as 'expense' | 'income')}
+                className="h-9 w-full rounded-md border bg-[var(--bg-surface)] text-[var(--text-main)] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/30 border-[var(--border-light)]"
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="expense">Expense</SelectItem>
-                  <SelectItem value="income">Income</SelectItem>
-                </SelectContent>
-              </Select>
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="amount" className="text-gray-600">Amount</Label>
+              <Label htmlFor="amount" className="text-[var(--text-muted)]">Amount</Label>
               <div className="relative">
-                <span className="absolute left-3 top-2.5 text-gray-500">$</span>
+                <span className="absolute left-3 top-2.5 text-[var(--text-muted)]">$</span>
                 <Input
                   id="amount"
                   name="amount"
@@ -163,35 +150,22 @@ export function EditTransactionButton({ transaction, categories, accounts = [] }
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="category" className="text-gray-600">Category</Label>
-              <Select name="categoryId" value={selectedCategory} onValueChange={(val: any) => setSelectedCategory(val || '')} required>
-                <SelectTrigger className={errors.category ? 'border-red-500' : ''}>
-                  <SelectValue placeholder="Select category">
-                    {selectedCategory 
-                      ? availableCategories.find(c => c.id === selectedCategory)?.name 
-                      : "Select category"}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {availableCategories.length === 0 ? (
-                    <div className="py-2 px-2 text-sm text-gray-500">No categories found</div>
-                  ) : (
-                    availableCategories.map(c => (
-                      <SelectItem key={c.id} value={c.id}>
-                        <div className="flex items-center gap-2">
-                          <span>{c.icon}</span>
-                          <span>{c.name}</span>
-                        </div>
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="category" className="text-[var(--text-muted)]">Category</Label>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className={`h-9 w-full rounded-md border bg-[var(--bg-surface)] text-[var(--text-main)] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/30 border-[var(--border-light)] ${errors.category ? 'border-red-500' : ''}`}
+              >
+                <option value="">Select category</option>
+                {availableCategories.map(c => (
+                  <option key={c.id} value={c.id}>{c.icon ? `${c.icon} ` : ''}{c.name}</option>
+                ))}
+              </select>
               {errors.category && <p className="text-xs text-red-500 mt-1">{errors.category}</p>}
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="date" className="text-gray-600">Date</Label>
+              <Label htmlFor="date" className="text-[var(--text-muted)]">Date</Label>
               <div className="relative">
                 <Input
                   id="date"
@@ -206,30 +180,22 @@ export function EditTransactionButton({ transaction, categories, accounts = [] }
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="account" className="text-gray-600">Account</Label>
-              <Select name="accountId" value={selectedAccount} onValueChange={(val: any) => setSelectedAccount(val || '')}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select account">
-                    {selectedAccount 
-                      ? accounts.find(a => a.id === selectedAccount)?.name 
-                      : "Select account"}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {accounts.length === 0 ? (
-                    <div className="py-2 px-2 text-sm text-gray-500">No accounts found</div>
-                  ) : (
-                    accounts.map((a: any) => (
-                      <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="account" className="text-[var(--text-muted)]">Account</Label>
+              <select
+                value={selectedAccount}
+                onChange={(e) => setSelectedAccount(e.target.value)}
+                className="h-9 w-full rounded-md border bg-[var(--bg-surface)] text-[var(--text-main)] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/30 border-[var(--border-light)]"
+              >
+                <option value="">Select account</option>
+                {accounts.map((a: any) => (
+                  <option key={a.id} value={a.id}>{a.name}</option>
+                ))}
+              </select>
             </div>
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="description" className="text-gray-600">Notes (Optional)</Label>
+              <Label htmlFor="description" className="text-[var(--text-muted)]">Notes (Optional)</Label>
             <div className="relative">
               <PenLine className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
               <Input

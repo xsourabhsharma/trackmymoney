@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import DashboardLayoutClient from './DashboardLayoutClient'
 import { getUserSettings } from './settings/data'
+import { GlobalAiWidget } from '@/components/dashboard/advisor/GlobalAiWidget'
 
 export default async function DashboardLayout({
   children,
@@ -16,16 +17,20 @@ export default async function DashboardLayout({
   }
 
   let theme: 'system' | 'light' | 'dark' = 'system'
+  let currency: 'USD' | 'INR' = 'USD'
+  
   try {
     const settings = await getUserSettings()
     theme = settings.theme ?? 'system'
+    currency = (settings.currency as 'USD' | 'INR') || 'USD'
   } catch {
-    // Settings table may not exist yet — fall through to 'system'
+    // Settings table may not exist yet — fall through to defaults
   }
 
   return (
-    <DashboardLayoutClient user={user} initialTheme={theme}>
+    <DashboardLayoutClient user={user} initialTheme={theme} initialCurrency={currency}>
       {children}
+      <GlobalAiWidget />
     </DashboardLayoutClient>
   )
 }

@@ -69,7 +69,7 @@ export async function updateSubscription(id: string, payload: Partial<CreateSubs
   if (payload.interval !== undefined) updateData.interval = payload.interval
   if (payload.status !== undefined) updateData.status = payload.status
   if (payload.nextChargeDate !== undefined) updateData.next_charge_date = payload.nextChargeDate
-  if (payload.lastChargeDate !== undefined) updateData.lastChargeDate = payload.lastChargeDate
+  if (payload.lastChargeDate !== undefined) updateData.last_charge_date = payload.lastChargeDate
   if (payload.categoryId !== undefined) updateData.category_id = payload.categoryId
   if (payload.linkedAccountId !== undefined) updateData.linked_account_id = payload.linkedAccountId
   if (payload.notes !== undefined) updateData.notes = payload.notes

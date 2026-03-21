@@ -16,6 +16,24 @@ export async function saveReceiptTransaction(data: {
     throw new Error('Unauthorized')
   }
 
+  // 0. Fix missing profile issue (Foreign Key Constraint)
+  const { data: existingProfile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', user.id)
+    .single()
+
+  if (!existingProfile) {
+    // Attempt to insert the missing profile record
+    await supabase.from('profiles').insert({
+      id: user.id,
+      email: user.email || 'unknown@example.com',
+      full_name: user.user_metadata?.full_name || 'User',
+      avatar_url: user.user_metadata?.avatar_url || '',
+      currency: 'USD'
+    })
+  }
+
   // 1. Resolve category ID
   const { data: category } = await supabase
     .from('categories')
@@ -38,7 +56,7 @@ export async function saveReceiptTransaction(data: {
 
   if (error) {
     console.error('Save Receipt Error:', error)
-    throw new Error('Failed to save transaction')
+    throw new Error(`Failed to save transaction: ${error.message}`)
   }
 
   revalidatePath('/dashboard')

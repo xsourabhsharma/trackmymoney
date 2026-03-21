@@ -37,12 +37,12 @@ export function AiAutomationSettingsSection({ settings, onSave }: Props) {
             </span>
             <button 
               onClick={() => onSave({ [t.key]: !settings[t.key] })}
-              className={`w-9 h-5 rounded-full relative transition-all shadow-sm ${
-                settings[t.key] ? 'bg-[var(--accent)]' : 'bg-[var(--border-light)]'
+              className={`w-9 h-5 rounded-full relative transition-colors duration-200 shadow-sm ${
+                settings[t.key] ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'
               }`}
             >
-              <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${
-                settings[t.key] ? 'left-5' : 'left-1'
+              <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${
+                settings[t.key] ? 'translate-x-4' : 'translate-x-0.5'
               }`} />
             </button>
           </div>
@@ -64,7 +64,7 @@ export function AiAutomationSettingsSection({ settings, onSave }: Props) {
                 key={level}
                 onClick={() => onSave({ anomaly_sensitivity: level })}
                 className={`flex-1 transition-all ${
-                  sensitivityIndex >= i ? 'bg-[var(--accent)]' : 'bg-[var(--bg-surface)]'
+                  sensitivityIndex >= i ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
                 }`}
               />
             ))}

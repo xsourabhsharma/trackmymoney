@@ -91,12 +91,12 @@ export function AppearanceSettingsSection({ settings, onSave }: Props) {
           </div>
           <button 
             onClick={() => onSave({ show_ai_panels: !settings.show_ai_panels })}
-            className={`w-10 h-5 rounded-full relative transition-all shadow-sm ${
-              settings.show_ai_panels ? 'bg-[var(--accent)]' : 'bg-[var(--border-light)]'
+            className={`w-10 h-5 rounded-full relative transition-colors duration-200 shadow-sm ${
+              settings.show_ai_panels ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'
             }`}
           >
-            <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${
-              settings.show_ai_panels ? 'left-6' : 'left-1'
+            <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${
+              settings.show_ai_panels ? 'translate-x-5' : 'translate-x-0.5'
             }`} />
           </button>
         </div>

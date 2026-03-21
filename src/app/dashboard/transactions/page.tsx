@@ -38,7 +38,7 @@ export default async function TransactionsPage({
   if (!user) return null
 
   const [ { data: categories }, { data: accounts } ] = await Promise.all([
-    supabase.from('categories').select('id, name, color, icon').order('name'),
+    supabase.from('categories').select('id, name, color, icon, type').order('name'),
     supabase.from('accounts').select('id, name').eq('user_id', user.id).order('name')
   ])
 

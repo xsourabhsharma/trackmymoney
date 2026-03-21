@@ -7,7 +7,7 @@ import { AddTransactionButton } from '@/components/dashboard/AddTransactionButto
 import { useDebounce } from '@/hooks/use-debounce'
 
 interface TransactionsFilterBarProps {
-  categories: { id: string; name: string }[];
+  categories: { id: string; name: string; type?: string; icon?: string }[];
   accounts: { id: string; name: string }[];
   currentPeriod: string;
   currentType: string;

@@ -11,7 +11,7 @@ import { SubscriptionsClientOrchestrator } from './client-orchestrator'
 export default async function SubscriptionsPage({
   searchParams
 }: {
-  searchParams: { [key: string]: string | undefined }
+  searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
   const supabase = await createClient()
   const { data: { user }, error: authErr } = await supabase.auth.getUser()
@@ -20,13 +20,15 @@ export default async function SubscriptionsPage({
     redirect('/login')
   }
 
+  const resolvedSearchParams = await searchParams
+
   // Parse URL Search Params into Filter object
   const filter: SubscriptionsFilter = {
-    status: (searchParams.status as SubscriptionStatus) || 'all',
-    searchQuery: searchParams.q || ''
+    status: (resolvedSearchParams.status as SubscriptionStatus) || 'all',
+    searchQuery: resolvedSearchParams.q || ''
   }
 
-  const page = Number(searchParams.page) || 1
+  const page = Number(resolvedSearchParams.page) || 1
   const pageSize = 20
 
   // Server-side Aggregation fetch

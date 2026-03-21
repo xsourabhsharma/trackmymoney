@@ -1,4 +1,4 @@
-import { google } from '@ai-sdk/google'
+import { createGroq } from '@ai-sdk/groq'
 import { generateObject } from 'ai'
 import { z } from 'zod'
 import { createClient } from '@/utils/supabase/server'
@@ -24,8 +24,12 @@ export async function POST(req: Request) {
     const base64Data = image.split(',')[1]
     const imageBuffer = Buffer.from(base64Data, 'base64')
 
+    const groq = createGroq({
+      apiKey: process.env.GROQ_API_KEY,
+    })
+
     const { object } = await generateObject({
-      model: google('models/gemini-1.5-flash'),
+      model: groq('llama-3.2-11b-vision-preview'),
       schema: z.object({
         merchant: z.string().describe('The name of the store or service provider'),
         amount: z.number().describe('The total amount spent'),
@@ -45,8 +49,15 @@ export async function POST(req: Request) {
     })
 
     return Response.json(object)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Receipt OCR Error:', error)
-    return new Response('Failed to process receipt', { status: 500 })
+    // Return a structured error response with the specific message
+    return new Response(
+      JSON.stringify({ 
+        error: 'Failed to process receipt', 
+        details: error.message || 'Unknown error' 
+      }), 
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    )
   }
 }

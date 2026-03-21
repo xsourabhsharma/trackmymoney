@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateText } from 'ai';
-import { openai } from '@ai-sdk/openai';
+import { createGroq } from '@ai-sdk/groq';
 import { createClient } from '@/utils/supabase/server';
 
 export async function POST(req: NextRequest) {
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
   try {
      // Mock if no API key
-     if (!process.env.OPENAI_API_KEY) {
+     if (!process.env.GROQ_API_KEY) {
         return NextResponse.json({
             candidates: [
                 { date: '2026-05-12', description: 'UBER TRIP', amount: 24.50, type: 'expense', inferredCategoryId: 'Transport', confidence: 0.95 },
@@ -41,8 +41,12 @@ export async function POST(req: NextRequest) {
       - confidence (0.0 to 1.0)
     `;
 
+    const groq = createGroq({
+      apiKey: process.env.GROQ_API_KEY,
+    });
+
     const { text } = await generateText({
-      model: openai('gpt-4-turbo'),
+      model: groq('llama-3.1-8b-instant'),
       prompt: prompt,
     });
 

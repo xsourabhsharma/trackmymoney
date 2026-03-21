@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus } from 'lucide-react'
 import { addSavingsGoal } from '@/app/dashboard/goals/actions'
+import { useToast } from '@/components/ui/toast-provider'
 import {
   Dialog,
   DialogContent,
@@ -21,16 +22,18 @@ export function AddGoalButton() {
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const { addToast } = useToast()
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true)
     try {
       await addSavingsGoal(formData)
       setOpen(false)
+      addToast('Goal created successfully!', 'success')
       router.refresh()
     } catch (error) {
       console.error(error)
-      alert('Failed to add goal')
+      addToast('Failed to add goal', 'error')
     } finally {
       setIsLoading(false)
     }

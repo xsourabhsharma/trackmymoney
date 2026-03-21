@@ -3,6 +3,7 @@
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
 import { EmptyState } from './EmptyState'
 import { Activity } from 'lucide-react'
+import { useCurrency } from '@/hooks/useCurrency'
 
 interface CashFlowChartProps {
   data: Array<{
@@ -13,6 +14,8 @@ interface CashFlowChartProps {
 }
 
 export function CashFlowChart({ data }: CashFlowChartProps) {
+  const { fmt } = useCurrency()
+
   if (!data || data.length === 0 || data.every(d => d.income === 0 && d.expense === 0)) {
     return (
       <EmptyState
@@ -23,11 +26,25 @@ export function CashFlowChart({ data }: CashFlowChartProps) {
     )
   }
 
+  // Transform data values for the chart using the currency formatter
+  // We keep raw numeric values for Recharts to scale the Y-axis correctly,
+  // but format them in the Tooltip and YAxis.
+  
+  // Wait, if the data amounts are in different base currencies, we assume they are USD for chart scaling. 
+  // Let's assume all DB aggregates are normalized or just apply fmt to them.
+  // Actually, we can just map over data and convert the raw numbers into the selected currency number so the chart bars scale relative to the *converted* amount.
+  const convertedData = data.map(d => ({
+    ...d,
+    // convert the value to the current currency numerically
+    incomeConverted: Number(fmt(d.income).replace(/[^0-9.-]+/g,"")),
+    expenseConverted: Number(fmt(d.expense).replace(/[^0-9.-]+/g,""))
+  }))
+
   return (
     <div className="w-full h-[350px] p-6 bg-[var(--bg-base)] border-[3px] border-[var(--border-main)] rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)]">
       <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--text-main)] mb-6">Cash Flow Over Time</h3>
       <ResponsiveContainer width="100%" height="85%">
-        <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+        <BarChart data={convertedData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-main)" opacity={0.5} />
           <XAxis 
             dataKey="date" 
@@ -41,10 +58,11 @@ export function CashFlowChart({ data }: CashFlowChartProps) {
             axisLine={false}
             tickLine={false}
             tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 600 }}
-            tickFormatter={(value) => `₹${Number(value) >= 1000 ? (Number(value) / 1000).toFixed(0) + 'k' : value}`}
+            tickFormatter={(value) => fmt(Number(value))}
           />
           <Tooltip 
             cursor={{ fill: 'var(--bg-muted)', opacity: 0.4 }}
+            formatter={(value: any) => [fmt(Number(value) || 0), ""]}
             contentStyle={{ 
               backgroundColor: 'var(--bg-base)', 
               border: '3px solid var(--border-main)',
@@ -55,8 +73,8 @@ export function CashFlowChart({ data }: CashFlowChartProps) {
             }}
           />
           <Legend wrapperStyle={{ paddingTop: '20px', fontWeight: 'bold' }} />
-          <Bar dataKey="income" name="Income" fill="#16a34a" radius={[4, 4, 0, 0]} barSize={32} />
-          <Bar dataKey="expense" name="Expense" fill="#dc2626" radius={[4, 4, 0, 0]} barSize={32} />
+          <Bar dataKey="incomeConverted" name="Income" fill="#16a34a" radius={[4, 4, 0, 0]} barSize={32} />
+          <Bar dataKey="expenseConverted" name="Expense" fill="#dc2626" radius={[4, 4, 0, 0]} barSize={32} />
         </BarChart>
       </ResponsiveContainer>
     </div>

@@ -16,14 +16,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { addTransaction } from '@/app/dashboard/actions'
+import { useCurrencyStore } from '@/store/useCurrencyStore'
 
 export function AddTransactionButton({ 
   categories, 
@@ -37,6 +31,7 @@ export function AddTransactionButton({
   buttonLabel?: string 
 }) {
   const router = useRouter()
+  const currentCurrency = useCurrencyStore((state) => state.currency)
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [transactionType, setTransactionType] = useState<'expense' | 'income' | 'transfer'>(defaultType)
@@ -102,6 +97,7 @@ export function AddTransactionButton({
     formData.set('type', transactionType)
     formData.set('categoryId', selectedCategory)
     formData.set('accountId', selectedAccount)
+    formData.set('currency', currentCurrency)
     
     // tags is captured but in formData natively
     // description is captured in formData natively
@@ -136,8 +132,8 @@ export function AddTransactionButton({
         onClick={() => handleTypeChange(type)} 
         className={`py-2 px-3 text-sm rounded-lg border transition-all ${
           isActive 
-            ? 'border-gray-900 bg-gray-50 font-medium text-gray-900 shadow-sm' 
-            : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+            ? 'border-[var(--text-main)] bg-[var(--bg-surface)] font-medium text-[var(--text-main)] shadow-sm' 
+            : 'border-[var(--border-light)] text-[var(--text-muted)] hover:bg-[var(--bg-surface)]'
         }`}
       >
         {label}
@@ -149,7 +145,7 @@ export function AddTransactionButton({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button className="inline-flex items-center justify-center gap-2 rounded-full bg-black px-5 py-2 text-sm font-medium text-white shadow hover:bg-gray-800 transition-colors h-10">
+          <Button suppressHydrationWarning className="inline-flex items-center justify-center gap-2 rounded-full bg-black px-5 py-2 text-sm font-medium text-white shadow hover:bg-gray-800 transition-colors h-10">
             <Plus className="h-4 w-4" />
             {buttonLabel}
           </Button>
@@ -158,13 +154,13 @@ export function AddTransactionButton({
       <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden border-0 shadow-2xl rounded-2xl">
         <div className="p-6 pb-0 flex items-center justify-between">
           <DialogTitle className="text-xl font-semibold p-0 m-0">Add Transaction</DialogTitle>
-          <DialogClose className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-gray-100 text-gray-500 transition-colors" />
+          <DialogClose className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-[var(--bg-surface)] text-[var(--text-muted)] transition-colors" />
         </div>
         
         <form action={handleSubmit} className="flex flex-col gap-5 p-6 pt-4 max-h-[80vh] overflow-y-auto w-full">
           
           <div className="flex flex-col gap-2">
-            <Label className="text-xs font-semibold text-gray-400 tracking-wider uppercase">Type</Label>
+            <Label className="text-xs font-semibold text-[var(--text-muted)] tracking-wider uppercase">Type</Label>
             <div className="grid grid-cols-3 gap-2">
               <TypeButton type="income" label="Income" />
               <TypeButton type="expense" label="Expense" />
@@ -174,19 +170,19 @@ export function AddTransactionButton({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="date" className="text-xs font-semibold text-gray-400 tracking-wider uppercase">Date</Label>
+              <Label htmlFor="date" className="text-xs font-semibold text-[var(--text-muted)] tracking-wider uppercase">Date</Label>
               <Input
                 id="date"
                 name="date"
                 type="date"
                 defaultValue={new Date().toISOString().split('T')[0]}
                 required
-                className="h-10 rounded-lg border-gray-200 focus:border-gray-300 focus:ring-1 focus:ring-gray-300"
+                className="h-10 rounded-lg border-[var(--border-light)] focus:border-[var(--border-dark)] focus:ring-1 focus:ring-[var(--border-dark)]"
               />
             </div>
             
             <div className="flex flex-col gap-2 relative">
-              <Label htmlFor="amount" className="text-xs font-semibold text-gray-400 tracking-wider uppercase">Amount</Label>
+              <Label htmlFor="amount" className="text-xs font-semibold text-[var(--text-muted)] tracking-wider uppercase">Amount</Label>
               <Input
                 id="amount"
                 name="amount"
@@ -194,7 +190,7 @@ export function AddTransactionButton({
                 step="0.01"
                 min="0.01"
                 placeholder="0.00"
-                className={`h-10 rounded-lg border-gray-200 focus:border-gray-300 focus:ring-1 focus:ring-gray-300 ${errors.amount ? 'border-red-500' : ''}`}
+                className={`h-10 rounded-lg border-[var(--border-light)] focus:border-[var(--border-dark)] focus:ring-1 focus:ring-[var(--border-dark)] ${errors.amount ? 'border-red-500' : ''}`}
                 onKeyDown={handleAmountKeyDown}
                 required
               />
@@ -203,13 +199,13 @@ export function AddTransactionButton({
           </div>
           
           <div className="flex flex-col gap-2 relative z-20">
-            <Label htmlFor="merchant" className="text-xs font-semibold text-gray-400 tracking-wider uppercase">Merchant / Description</Label>
+            <Label htmlFor="merchant" className="text-xs font-semibold text-[var(--text-muted)] tracking-wider uppercase">Merchant / Description</Label>
             <Input
               id="merchant"
               name="merchant"
               ref={merchantInputRef}
               placeholder="Enter merchant name..."
-              className={`h-10 rounded-lg border-gray-200 focus:border-gray-300 focus:ring-1 focus:ring-gray-300 ${errors.merchant ? 'border-red-500' : ''}`}
+              className={`h-10 rounded-lg border-[var(--border-light)] focus:border-[var(--border-dark)] focus:ring-1 focus:ring-[var(--border-dark)] ${errors.merchant ? 'border-red-500' : ''}`}
               autoComplete="off"
               onFocus={() => setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
@@ -219,14 +215,14 @@ export function AddTransactionButton({
               required
             />
             {showSuggestions && merchantSuggestions.length > 0 && (
-              <div className="absolute top-[68px] z-50 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+              <div className="absolute top-[68px] z-50 w-full bg-[var(--bg-base)] border border-[var(--border-light)] rounded-lg shadow-lg max-h-40 overflow-y-auto">
                 {merchantSuggestions
                   .filter(m => m.toLowerCase().includes(merchantInputRef.current?.value.toLowerCase() || ''))
                   .map(m => (
                     <button
                       key={m}
                       type="button"
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                      className="w-full text-left px-4 py-2 text-sm text-[var(--text-main)] hover:bg-[var(--bg-surface)]"
                       onClick={() => {
                         if (merchantInputRef.current) merchantInputRef.current.value = m
                         setShowSuggestions(false)
@@ -241,46 +237,41 @@ export function AddTransactionButton({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
-              <Label className="text-xs font-semibold text-gray-400 tracking-wider uppercase">Category</Label>
-              <Select name="categoryId" value={selectedCategory} onValueChange={(val) => { setSelectedCategory(val || ''); setErrors(prev => { const { category, ...rest } = prev; return rest }) }}>
-                <SelectTrigger className={`h-10 rounded-lg border-gray-200 focus:ring-1 focus:ring-gray-300 ${errors.category ? 'border-red-500' : ''}`}>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableCategories.map(c => (
-                    <SelectItem key={c.id} value={c.id}>
-                      <div className="flex items-center gap-2">
-                        {c.icon && <span>{c.icon}</span>}
-                        <span>{c.name}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label className="text-xs font-semibold text-[var(--text-muted)] tracking-wider uppercase">Category</Label>
+              <select
+                value={selectedCategory}
+                onChange={(e) => { setSelectedCategory(e.target.value); setErrors(prev => { const { category, ...rest } = prev; return rest }) }}
+                className={`h-10 w-full rounded-lg border bg-[var(--bg-surface)] text-[var(--text-main)] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/30 border-[var(--border-light)] ${errors.category ? 'border-red-500' : ''}`}
+              >
+                <option value="">Select category</option>
+                {availableCategories.map(c => (
+                  <option key={c.id} value={c.id}>{c.icon ? `${c.icon} ` : ''}{c.name}</option>
+                ))}
+              </select>
             </div>
             
             <div className="flex flex-col gap-2">
-              <Label className="text-xs font-semibold text-gray-400 tracking-wider uppercase">Account</Label>
-              <Select name="accountId" value={selectedAccount} onValueChange={(val) => { setSelectedAccount(val || ''); setErrors(prev => { const { account, ...rest } = prev; return rest }) }}>
-                <SelectTrigger className={`h-10 rounded-lg border-gray-200 focus:ring-1 focus:ring-gray-300 ${errors.account ? 'border-red-500' : ''}`}>
-                  <SelectValue placeholder="Select account" />
-                </SelectTrigger>
-                <SelectContent>
-                  {accounts.map(a => (
-                    <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label className="text-xs font-semibold text-[var(--text-muted)] tracking-wider uppercase">Account</Label>
+              <select
+                value={selectedAccount}
+                onChange={(e) => { setSelectedAccount(e.target.value); setErrors(prev => { const { account, ...rest } = prev; return rest }) }}
+                className={`h-10 w-full rounded-lg border bg-[var(--bg-surface)] text-[var(--text-main)] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/30 border-[var(--border-light)] ${errors.account ? 'border-red-500' : ''}`}
+              >
+                <option value="">Select account</option>
+                {accounts.map(a => (
+                  <option key={a.id} value={a.id}>{a.name}</option>
+                ))}
+              </select>
             </div>
           </div>
 
           <div className="flex flex-col gap-2 z-10">
-            <Label htmlFor="tags" className="text-xs font-semibold text-gray-400 tracking-wider uppercase">Tags (Comma Separated)</Label>
+            <Label htmlFor="tags" className="text-xs font-semibold text-[var(--text-muted)] tracking-wider uppercase">Tags (Comma Separated)</Label>
             <Input 
               id="tags" 
               name="source_metadata" 
               placeholder="e.g., business, recurring" 
-              className="h-10 rounded-lg border-gray-200 focus:border-gray-300 focus:ring-1 focus:ring-gray-300" 
+              className="h-10 rounded-lg border-[var(--border-light)] focus:border-[var(--border-dark)] focus:ring-1 focus:ring-[var(--border-dark)]" 
             />
           </div>
           
@@ -290,7 +281,7 @@ export function AddTransactionButton({
               id="description" 
               name="description" 
               placeholder="Add any additional notes..." 
-              className="min-h-[80px] rounded-lg border-gray-200 focus:border-gray-300 focus:ring-1 focus:ring-gray-300 resize-none" 
+              className="min-h-[80px] rounded-lg border-[var(--border-light)] focus:border-[var(--border-dark)] focus:ring-1 focus:ring-[var(--border-dark)] resize-none" 
             />
           </div>
 
@@ -299,14 +290,14 @@ export function AddTransactionButton({
               type="button" 
               variant="outline" 
               onClick={() => setOpen(false)}
-              className="rounded-full px-6 border-gray-200 hover:bg-gray-50 h-10"
+              className="rounded-full px-6 border-[var(--border-light)] hover:bg-[var(--bg-surface)] h-10"
             >
               Cancel
             </Button>
             <Button 
               type="submit" 
               disabled={isLoading} 
-              className="rounded-full bg-black hover:bg-gray-800 text-white px-6 h-10"
+              className="rounded-full bg-[var(--text-main)] hover:opacity-90 text-[var(--bg-base)] px-6 h-10"
             >
               {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Save Transaction

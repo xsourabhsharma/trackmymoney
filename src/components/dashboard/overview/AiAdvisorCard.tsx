@@ -1,6 +1,9 @@
+'use client'
+
 import { AiAdvisorState } from '@/lib/dal/overview'
-import { Sparkles, AlertTriangle, Lightbulb, PiggyBank } from 'lucide-react'
+import { Sparkles, AlertTriangle, Lightbulb, PiggyBank, RefreshCw, Zap } from 'lucide-react'
 import Link from 'next/link'
+import { AiOrb3D } from '@/components/3d/AiOrb3D'
 
 interface AiAdvisorCardProps {
   insight: {
@@ -12,54 +15,89 @@ interface AiAdvisorCardProps {
 }
 
 export function AiAdvisorCard({ insight }: AiAdvisorCardProps) {
-  let themeStyles = ''
   let Icon = Sparkles
+  let titleColor = 'text-blue-400'
 
   switch (insight.state) {
     case 'warning':
-      themeStyles = 'bg-red-50 border-red-500 text-red-900 dark:bg-red-950/30'
       Icon = AlertTriangle
+      titleColor = 'text-red-400'
       break
     case 'opportunity':
-      themeStyles = 'bg-amber-50 border-amber-500 text-amber-900 dark:bg-amber-950/30'
       Icon = PiggyBank
+      titleColor = 'text-green-400'
       break
     case 'neutral':
-      themeStyles = 'bg-green-50 border-green-500 text-green-900 dark:bg-green-950/30'
       Icon = Lightbulb
+      titleColor = 'text-blue-400'
       break
     case 'no_data':
     default:
-      themeStyles = 'bg-[var(--bg-muted)] border-[var(--border-main)] text-[var(--text-main)]'
       Icon = Sparkles
+      titleColor = 'text-gray-400'
       break
   }
 
   return (
-    <div className={`flex flex-col sm:flex-row gap-6 p-6 border-[3px] rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)] ${themeStyles}`}>
-      <div className="flex-shrink-0 flex items-center justify-center w-16 h-16 bg-white dark:bg-black border-[3px] border-[var(--border-main)] rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-        <Icon className="w-8 h-8" strokeWidth={2.5} />
+    <div className="flex flex-col h-full bg-[#42423d] text-white rounded-[32px] overflow-hidden shadow-md relative">
+      
+      {/* 3D Orb Background Top Half */}
+      <div className="absolute top-0 left-0 w-full h-[250px] opacity-70 pointer-events-none mix-blend-screen">
+         <AiOrb3D state={insight.state} />
+      </div>
+
+      <div className="p-8 flex flex-col h-full relative z-10">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8 z-10">
+          <div>
+            <h2 className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-gray-300" />
+              AI Advisor
+            </h2>
+            <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-wider">
+              Updated just now
+            </p>
+          </div>
+          <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-[10px] font-bold uppercase tracking-widest text-white border border-white/20 backdrop-blur-md">
+            <RefreshCw className="w-3 h-3" />
+            Refresh
+          </button>
+        </div>
+
+        {/* Spacer to let the 3D orb show through clearly */}
+        <div className="flex-grow min-h-[40px]"></div>
+
+        {/* Insight Card (Glassmorphism) */}
+        <div className="flex flex-col gap-3 p-5 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 hover:bg-black/50 transition-colors z-10 mt-auto shadow-2xl">
+          <div className="flex items-center gap-2 mb-1">
+            <Icon className={`w-4 h-4 ${titleColor}`} strokeWidth={3} />
+            <h3 className={`text-[11px] font-black uppercase tracking-widest ${titleColor}`}>
+              {insight.title}
+            </h3>
+          </div>
+          <p className="text-[13px] leading-relaxed text-gray-200 font-medium">
+            {insight.message}
+          </p>
+          
+          {insight.actions.length > 0 && (
+            <div className="mt-3">
+              {insight.actions.map((action, i) => (
+                <Link
+                  key={i}
+                  href={action.href}
+                  className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#d5c5a3] hover:text-white transition-colors"
+                >
+                  <Zap className="w-3 h-3 fill-current" />
+                  {action.label}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
       
-      <div className="flex-1 flex flex-col justify-center">
-        <h3 className="text-sm font-black uppercase tracking-widest mb-1 shadow-sm opacity-60">AI Advisor</h3>
-        <h4 className="text-xl font-bold tracking-tight mb-2">{insight.title}</h4>
-        <p className="text-sm font-medium leading-relaxed max-w-lg mb-4">{insight.message}</p>
-        
-        {insight.actions.length > 0 && (
-          <div className="flex flex-wrap gap-3">
-            {insight.actions.map((action, i) => (
-              <Link
-                key={i}
-                href={action.href}
-                className="px-4 py-2 bg-[var(--text-main)] text-[var(--bg-base)] text-xs font-bold uppercase tracking-wider rounded-full border-2 border-transparent hover:-translate-y-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)] transition-all"
-              >
-                {action.label}
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Background decoration */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none" />
     </div>
   )
 }

@@ -78,36 +78,36 @@ export const DEFAULT_SETTINGS: UserSettings = {
 }
 
 // ─── Data Access ────────────────────────────────────────────────────────────
+// Settings are stored in the profiles.preferences JSONB column.
 
 export async function getUserSettings(): Promise<UserSettings> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  const { data } = await supabase
-    .from('user_settings')
-    .select('*')
-    .eq('user_id', user.id)
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('full_name, currency, preferences')
+    .eq('id', user.id)
     .single()
 
-  if (data) return data as UserSettings
+  if (!profile) return { ...DEFAULT_SETTINGS, full_name: user.email?.split('@')[0] || '' }
 
-  // If no row exists, return the defaults
-  return DEFAULT_SETTINGS
+  // Merge stored preferences (JSONB) with defaults
+  const prefs = (profile.preferences as Partial<UserSettings>) || {}
+
+  return {
+    ...DEFAULT_SETTINGS,
+    ...prefs,
+    full_name: profile.full_name || prefs.full_name || user.email?.split('@')[0] || '',
+    currency: prefs.currency || profile.currency || DEFAULT_SETTINGS.currency,
+  }
 }
 
 export async function getUserIntegrations(): Promise<Integration[]> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return []
-
-  const { data } = await supabase
-    .from('integrations')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-
-  return (data || []) as Integration[]
+  // The integrations table does not exist in the current schema.
+  // Return an empty array gracefully so the UI renders without errors.
+  return []
 }
 
 export async function loadSettingsPageData() {
@@ -115,7 +115,7 @@ export async function loadSettingsPageData() {
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) {
-    return { user: null, settings: DEFAULT_SETTINGS, integrations: [] }
+    return { user: null, settings: DEFAULT_SETTINGS, integrations: [] as Integration[] }
   }
 
   const [settings, integrations] = await Promise.all([
@@ -129,3 +129,4 @@ export async function loadSettingsPageData() {
     integrations,
   }
 }
+

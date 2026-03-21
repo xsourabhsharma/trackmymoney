@@ -9,18 +9,26 @@ import Image from 'next/image'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { ToastProvider } from '@/components/ui/toast-provider'
 import { Menu, X, Bell, LogOut } from 'lucide-react'
+import { useCurrencyStore } from '@/store/useCurrencyStore'
 
 interface Props {
   user: User
   initialTheme: 'system' | 'light' | 'dark'
+  initialCurrency: 'USD' | 'INR'
   children: React.ReactNode
 }
 
-export default function DashboardLayoutClient({ user, initialTheme, children }: Props) {
+export default function DashboardLayoutClient({ user, initialTheme, initialCurrency, children }: Props) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+  const setCurrency = useCurrencyStore((state) => state.setCurrency)
+
+  // Hydrate currency store on mount
+  useEffect(() => {
+    setCurrency(initialCurrency)
+  }, [initialCurrency, setCurrency])
 
   // Apply the saved theme from DB on mount
   useEffect(() => {
