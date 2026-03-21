@@ -158,7 +158,7 @@ export default function DashboardLayoutClient({ user, initialTheme, initialCurre
         </div>
       )}
 
-      <main className="max-w-[1440px] mx-auto w-full p-6 lg:p-10 flex flex-col gap-8">
+      <main className="max-w-[1440px] mx-auto w-full p-4 md:p-6 lg:p-10 flex flex-col gap-6 md:gap-8">
         <ToastProvider>
           {children}
         </ToastProvider>

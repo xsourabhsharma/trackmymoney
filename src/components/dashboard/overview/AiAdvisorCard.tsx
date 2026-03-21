@@ -46,7 +46,7 @@ export function AiAdvisorCard({ insight }: AiAdvisorCardProps) {
          <AiOrb3D state={insight.state} />
       </div>
 
-      <div className="p-8 flex flex-col h-full relative z-10">
+      <div className="p-6 sm:p-8 flex flex-col h-full relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8 z-10">
           <div>
