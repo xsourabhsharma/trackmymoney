@@ -137,29 +137,28 @@ export function GlobalAiWidget() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex flex-col items-end">
+    <div className="fixed inset-x-3 bottom-3 md:inset-x-auto md:bottom-6 md:right-6 z-50 flex flex-col items-end pointer-events-none">
       <AnimatePresence>
         {widgetState !== 'minimized' && (
           <motion.div
+            layout
             initial={{ opacity: 0, y: 50, scale: 0.95 }}
-            animate={{ 
-              opacity: 1, 
-              y: 0, 
-              scale: 1,
-              width: widgetState === 'expanded' ? 'min(800px, calc(100vw - 2rem))' : 'min(400px, calc(100vw - 2rem))',
-              height: widgetState === 'expanded' ? 'min(80vh, calc(100dvh - 6rem))' : 'min(650px, calc(100dvh - 6rem))',
-            }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="bg-[#0f0f0f] border border-white/10 rounded-2xl md:rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden mb-4"
+            className={cn(
+              "bg-[#0f0f0f] border border-white/10 rounded-2xl md:rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden mb-4 pointer-events-auto",
+              "w-full h-[calc(100dvh-6rem)] max-h-[650px]",
+              widgetState === 'expanded' ? "max-w-[800px] md:h-[80vh]" : "max-w-[400px]"
+            )}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-[#0f0f0f]">
+            <div className="flex items-center justify-between px-3 py-2.5 md:px-4 md:py-3 border-b border-white/5 bg-[#0f0f0f] shrink-0">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-pink-400" />
-                <h3 className="font-semibold text-white tracking-wide text-[16px]">Ask AI Advisor</h3>
+                <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-pink-400" />
+                <h3 className="font-semibold text-white tracking-wide text-[14px] md:text-[16px]">Ask AI Advisor</h3>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 md:gap-2">
                 <button className="p-1 hover:bg-white/10 rounded-full text-gray-300 transition-colors">
                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
                 </button>
@@ -173,7 +172,7 @@ export function GlobalAiWidget() {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 md:p-5 space-y-4 scrollbar-thin scrollbar-thumb-white/10">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 md:p-5 space-y-4 scrollbar-thin scrollbar-thumb-white/10 relative">
               {messages.length === 0 ? (
                 <div className="h-full flex flex-col items-start justify-center max-w-sm mx-auto w-full">
                   <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight leading-tight">Hello,</h1>
@@ -268,7 +267,7 @@ export function GlobalAiWidget() {
             </div>
 
             {/* Input Area */}
-            <div className="p-3 md:p-4 bg-[#0f0f0f] border-t border-white/5">
+            <div className="p-2 md:p-4 bg-[#0f0f0f] border-t border-white/5 shrink-0 z-10 w-full">
               {files.length > 0 && (
                  <div className="mb-3 flex flex-wrap items-center gap-2">
                    {files.map((f, idx) => (
@@ -343,8 +342,8 @@ export function GlobalAiWidget() {
                   <div className="absolute inset-0 rounded-2xl pointer-events-none border border-transparent group-focus-within:border-pink-500/20 shadow-[0_0_10px_transparent] group-focus-within:shadow-[0_0_15px_rgba(236,72,153,0.1)] transition-all"></div>
                 </div>
 
-                <div className="text-center mt-1">
-                  <p className="text-[11px] text-gray-500">
+                <div className="text-center mt-0.5 md:mt-1">
+                  <p className="text-[10px] md:text-[11px] text-gray-500">
                     AI can make mistakes, so double-check it. <a href="#" className="text-blue-400 hover:underline hover:text-blue-300 transition-colors">Learn more</a>
                   </p>
                 </div>
@@ -362,7 +361,7 @@ export function GlobalAiWidget() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setWidgetState('chat')}
-            className="group relative w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-tr from-pink-600 to-purple-600 shadow-[0_0_30px_rgba(236,72,153,0.3)] flex items-center justify-center hover:scale-105 transition-transform overflow-hidden"
+            className="group relative w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-tr from-pink-600 to-purple-600 shadow-[0_0_30px_rgba(236,72,153,0.3)] flex items-center justify-center hover:scale-105 transition-transform overflow-hidden pointer-events-auto"
           >
             <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity">
                {/* Tiny 3D orb inside the button */}

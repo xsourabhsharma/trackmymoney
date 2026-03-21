@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Syne, Space_Grotesk, JetBrains_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -31,6 +31,13 @@ export const metadata: Metadata = {
   title: "Track My Money | Finance Tracker",
   description: "AI-Powered Personal Finance Tracker",
   manifest: "/manifest.json",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false, // Prevents zoooooming in on input focus on iOS
 };
 
 export default function RootLayout({
