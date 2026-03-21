@@ -137,7 +137,7 @@ export function GlobalAiWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex flex-col items-end">
       <AnimatePresence>
         {widgetState !== 'minimized' && (
           <motion.div
@@ -146,12 +146,12 @@ export function GlobalAiWidget() {
               opacity: 1, 
               y: 0, 
               scale: 1,
-              width: widgetState === 'expanded' ? '800px' : '400px',
-              height: widgetState === 'expanded' ? '80vh' : '650px',
+              width: widgetState === 'expanded' ? 'min(800px, calc(100vw - 2rem))' : 'min(400px, calc(100vw - 2rem))',
+              height: widgetState === 'expanded' ? 'min(80vh, calc(100dvh - 6rem))' : 'min(650px, calc(100dvh - 6rem))',
             }}
             exit={{ opacity: 0, y: 50, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden mb-4"
+            className="bg-[#0f0f0f] border border-white/10 rounded-2xl md:rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden mb-4"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-[#0f0f0f]">
@@ -173,31 +173,31 @@ export function GlobalAiWidget() {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-4 scrollbar-thin scrollbar-thumb-white/10">
+            <div className="flex-1 overflow-y-auto p-4 md:p-5 space-y-4 scrollbar-thin scrollbar-thumb-white/10">
               {messages.length === 0 ? (
                 <div className="h-full flex flex-col items-start justify-center max-w-sm mx-auto w-full">
-                  <h1 className="text-3xl font-bold text-white tracking-tight leading-tight">Hello,</h1>
-                  <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent mb-6 tracking-tight">Nice to meet you!</h2>
+                  <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight leading-tight">Hello,</h1>
+                  <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent mb-4 md:mb-6 tracking-tight">Nice to meet you!</h2>
                   
-                  <p className="text-[15px] text-gray-100 font-medium mb-6 leading-relaxed">
+                  <p className="text-[14px] md:text-[15px] text-gray-100 font-medium mb-4 md:mb-6 leading-relaxed">
                     Hello! I'm <Sparkles className="w-4 h-4 text-orange-300 inline mr-0.5" /> AI Advisor, your financial partner.
                   </p>
                   
-                  <p className="text-[15px] text-gray-100 mb-3">I can help you with:</p>
-                  <ul className="text-[15px] text-gray-300 space-y-2 mb-8 ml-5 list-disc marker:text-gray-100 w-full font-light">
+                  <p className="text-[14px] md:text-[15px] text-gray-100 mb-2 md:mb-3">I can help you with:</p>
+                  <ul className="text-[14px] md:text-[15px] text-gray-300 space-y-2 mb-6 md:mb-8 ml-5 list-disc marker:text-gray-100 w-full font-light">
                     <li>Adding & tracking <strong className="text-white font-medium">transactions</strong></li>
                     <li>Managing your <strong className="text-white font-medium">subscriptions</strong></li>
                     <li>Setting new <strong className="text-white font-medium">budgets and goals</strong></li>
                     <li><strong className="text-white font-medium">Insights and info</strong> about your finances</li>
                   </ul>
                   
-                  <p className="text-[15px] text-gray-100">Ask a question to get started.</p>
+                  <p className="text-[14px] md:text-[15px] text-gray-100">Ask a question to get started.</p>
                 </div>
               ) : (
                 messages.map((m) => (
                   <div key={m.id} className={cn("flex w-full", m.role === 'user' ? "justify-end" : "justify-start")}>
                     <div className={cn(
-                      "max-w-[85%] rounded-2xl p-4 text-[15px]",
+                      "max-w-[90%] md:max-w-[85%] rounded-2xl p-3 md:p-4 text-[14px] md:text-[15px]",
                       m.role === 'user' 
                         ? "bg-[#272727] text-white rounded-br-sm" 
                         : "bg-transparent text-gray-100 pr-0"
@@ -268,7 +268,7 @@ export function GlobalAiWidget() {
             </div>
 
             {/* Input Area */}
-            <div className="p-4 bg-[#0f0f0f] border-t border-white/5">
+            <div className="p-3 md:p-4 bg-[#0f0f0f] border-t border-white/5">
               {files.length > 0 && (
                  <div className="mb-3 flex flex-wrap items-center gap-2">
                    {files.map((f, idx) => (
@@ -294,9 +294,9 @@ export function GlobalAiWidget() {
                     type="button" 
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isLoading}
-                    className="w-10 h-10 flex items-center justify-center bg-[#272727] hover:bg-[#333] text-gray-200 rounded-full transition-colors flex-shrink-0 disabled:opacity-50 disabled:hover:bg-[#272727]"
+                    className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-[#272727] hover:bg-[#333] text-gray-200 rounded-full transition-colors flex-shrink-0 disabled:opacity-50 disabled:hover:bg-[#272727]"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="md:w-5 md:h-5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                   </button>
                   <input 
                     type="file" 
@@ -312,7 +312,7 @@ export function GlobalAiWidget() {
                     value={myInput}
                     onChange={(e) => setMyInput(e.target.value)}
                     placeholder="Ask something"
-                    className="flex-1 bg-transparent text-white text-[15px] outline-none placeholder:text-gray-500 px-2 min-w-0"
+                    className="flex-1 bg-transparent text-white text-[14px] md:text-[15px] outline-none placeholder:text-gray-500 px-1 md:px-2 min-w-0"
                     disabled={isLoading}
                   />
 
@@ -323,11 +323,11 @@ export function GlobalAiWidget() {
                       onClick={toggleListening}
                       disabled={isLoading}
                       className={cn(
-                        "w-10 h-10 flex items-center justify-center rounded-full transition-all flex-shrink-0 disabled:opacity-50",
+                        "w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full transition-all flex-shrink-0 disabled:opacity-50",
                         isListening ? "bg-red-500/20 text-red-500 animate-pulse" : "bg-transparent text-gray-500 hover:text-white"
                       )}
                     >
-                      {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                      {isListening ? <MicOff className="w-4 h-4 md:w-5 md:h-5" /> : <Mic className="w-4 h-4 md:w-5 md:h-5" />}
                     </button>
                   )}
                   
@@ -335,9 +335,9 @@ export function GlobalAiWidget() {
                   <button 
                     type="submit" 
                     disabled={isLoading || (!(myInput || '').trim() && files.length === 0)}
-                    className="w-10 h-10 flex items-center justify-center bg-[#272727] hover:bg-[#333] text-white rounded-full transition-colors disabled:opacity-30 disabled:hover:bg-[#272727] flex-shrink-0"
+                    className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-[#272727] hover:bg-[#333] text-white rounded-full transition-colors disabled:opacity-30 disabled:hover:bg-[#272727] flex-shrink-0"
                   >
-                    <Send className="w-4 h-4 mr-0.5 mt-0.5" />
+                    <Send className="w-3 h-3 md:w-4 md:h-4 mr-0.5 mt-0.5" />
                   </button>
 
                   <div className="absolute inset-0 rounded-2xl pointer-events-none border border-transparent group-focus-within:border-pink-500/20 shadow-[0_0_10px_transparent] group-focus-within:shadow-[0_0_15px_rgba(236,72,153,0.1)] transition-all"></div>
@@ -362,13 +362,13 @@ export function GlobalAiWidget() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setWidgetState('chat')}
-            className="group relative w-16 h-16 rounded-full bg-gradient-to-tr from-pink-600 to-purple-600 shadow-[0_0_30px_rgba(236,72,153,0.3)] flex items-center justify-center hover:scale-105 transition-transform overflow-hidden"
+            className="group relative w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-tr from-pink-600 to-purple-600 shadow-[0_0_30px_rgba(236,72,153,0.3)] flex items-center justify-center hover:scale-105 transition-transform overflow-hidden"
           >
             <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity">
                {/* Tiny 3D orb inside the button */}
                <AiOrb3D state="neutral" />
             </div>
-            <Sparkles className="w-6 h-6 text-white relative z-10 drop-shadow-md" />
+            <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-white relative z-10 drop-shadow-md" />
           </motion.button>
         )}
       </AnimatePresence>
