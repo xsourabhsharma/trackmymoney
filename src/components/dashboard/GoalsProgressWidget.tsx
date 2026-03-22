@@ -34,9 +34,9 @@ export async function GoalsProgressWidget() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-sm">{goal.icon}</span>
-                  <span className="text-[10px] font-black uppercase tracking-widest truncate max-w-[80px]">{goal.name}</span>
+                  <span className="text-[12px] font-black uppercase tracking-widest truncate max-w-[80px]">{goal.name}</span>
                 </div>
-                <span className="text-[10px] font-black">{percentage}%</span>
+                <span className="text-[12px] font-black">{percentage}%</span>
               </div>
               <Progress value={percentage} className="h-1.5 bg-gray-100" indicatorColor="bg-[#141414]" />
             </div>

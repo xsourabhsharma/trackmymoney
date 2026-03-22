@@ -81,7 +81,7 @@ export function DataPrivacySettingsSection({ settings, onSave }: Props) {
         <div className="flex items-center justify-between py-1 px-1 group cursor-pointer select-none" onClick={handleToggleAI}>
           <div className="flex flex-col gap-0.5">
             <span className="text-[12px] font-bold text-[var(--text-main)] uppercase tracking-tight">AI Learning Flow</span>
-            <span className="text-[9px] font-medium text-[var(--text-muted)] uppercase tracking-widest">Help improve categorization models</span>
+            <span className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-widest">Help improve categorization models</span>
           </div>
           <button 
             type="button"
@@ -97,7 +97,7 @@ export function DataPrivacySettingsSection({ settings, onSave }: Props) {
             onClick={handleArchive}
             disabled={isArchiving}
             variant="outline" 
-            className="w-full h-10 rounded-xl text-[10px] font-bold uppercase tracking-widest border-[var(--border-light)] hover:bg-[var(--bg-surface)] flex gap-2 shadow-sm transition-all"
+            className="w-full h-10 rounded-xl text-[12px] font-bold uppercase tracking-widest border-[var(--border-light)] hover:bg-[var(--bg-surface)] flex gap-2 shadow-sm transition-all"
           >
             {isArchiving ? <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" /> : <Download className="w-3.5 h-3.5" />} 
             {isArchiving ? "Packaging..." : "Full Ledger Archive"}
@@ -106,13 +106,13 @@ export function DataPrivacySettingsSection({ settings, onSave }: Props) {
           <Button 
             onClick={handleTerminate}
             disabled={isDeleting}
-            className="w-full h-10 bg-[var(--expense-red)]/5 text-[var(--expense-red)] hover:bg-[var(--expense-red)] hover:text-white border border-[var(--expense-red)]/20 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm"
+            className="w-full h-10 bg-[var(--expense-red)]/5 text-[var(--expense-red)] hover:bg-[var(--expense-red)] hover:text-white border border-[var(--expense-red)]/20 rounded-xl text-[12px] font-bold uppercase tracking-widest transition-all shadow-sm"
           >
             {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Terminate Node Account'}
           </Button>
         </div>
 
-        <p className="text-[9px] font-medium text-[var(--text-muted)] uppercase tracking-widest text-center leading-relaxed italic px-2 opacity-60">
+        <p className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-widest text-center leading-relaxed italic px-2 opacity-60">
           End-to-end encryption active. Zero third-party data sharing protocols detected.
         </p>
       </div>

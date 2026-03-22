@@ -20,7 +20,7 @@ export function DefaultsSettingsSection({ settings, onSave }: Props) {
       
       <div className="space-y-4">
         <div className="space-y-1.5 px-1">
-          <Label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Default Landing Hub</Label>
+          <Label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Default Landing Hub</Label>
           <div className="relative group">
             <select 
               value={settings.default_landing}
@@ -36,7 +36,7 @@ export function DefaultsSettingsSection({ settings, onSave }: Props) {
         </div>
         
         <div className="space-y-1.5 px-1">
-          <Label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Default Date Spectrum</Label>
+          <Label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Default Date Spectrum</Label>
           <div className="relative group">
             <select 
               value={settings.default_date_spectrum}
@@ -51,21 +51,7 @@ export function DefaultsSettingsSection({ settings, onSave }: Props) {
           </div>
         </div>
         
-        <div className="space-y-1.5 px-1">
-          <Label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Default Account Scope</Label>
-          <div className="relative group">
-            <select 
-              value={settings.default_account_scope}
-              onChange={e => onSave({ default_account_scope: e.target.value as AccountScope })}
-              className="w-full pl-3 pr-8 py-2.5 bg-[var(--bg-base)] border border-[var(--border-light)] rounded-xl text-[11px] font-bold appearance-none outline-none focus:border-[var(--border-dark)] cursor-pointer uppercase tracking-tight"
-            >
-              <option value="all">All Accounts (Global)</option>
-              <option value="personal">Personal Nodes Only</option>
-              <option value="business">Business Nodes Only</option>
-            </select>
-            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[var(--text-muted)] pointer-events-none" />
-          </div>
-        </div>
+
       </div>
     </div>
   )

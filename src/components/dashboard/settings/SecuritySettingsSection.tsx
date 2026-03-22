@@ -50,12 +50,12 @@ export function SecuritySettingsSection() {
           <div className="flex items-center justify-between py-2 group cursor-pointer hover:bg-[var(--bg-surface)] px-2 -mx-2 rounded-xl transition-all">
             <div className="flex flex-col gap-0.5">
               <span className="text-[13px] font-bold text-[var(--text-main)] uppercase tracking-tight">Change Password</span>
-              <span className="text-[10px] font-medium text-[var(--text-muted)] uppercase tracking-widest">Update your node access key</span>
+              <span className="text-[12px] font-medium text-[var(--text-muted)] uppercase tracking-widest">Update your node access key</span>
             </div>
             <Button 
               onClick={() => setIsChangingPassword(true)}
               variant="ghost" 
-              className="h-8 px-3 rounded-full text-[9px] font-bold uppercase tracking-widest border border-[var(--border-light)] hover:bg-white shadow-sm transition-all"
+              className="h-8 px-3 rounded-full text-[11px] font-bold uppercase tracking-widest border border-[var(--border-light)] hover:bg-white shadow-sm transition-all"
             >
               Update
             </Button>
@@ -74,8 +74,8 @@ export function SecuritySettingsSection() {
               <Button 
                 onClick={handlePasswordChange}
                 disabled={isPending || isSuccess}
-                className={`h-9 px-4 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${
-                  isSuccess ? 'bg-[var(--income-green)] text-white hover:bg-[var(--income-green)]' : 'bg-[var(--text-main)] text-[var(--bg-base)] hover:bg-[var(--bg-surface-dark)]'
+                className={`h-9 px-4 rounded-xl text-[12px] font-bold uppercase tracking-widest transition-all ${
+                  isSuccess ? 'bg-[var(--income-green)] text-white hover:bg-[var(--income-green)]' : 'bg-[var(--text-main)] text-[var(--bg-base)] hover:opacity-90'
                 }`}
               >
                 {isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : isSuccess ? <Check className="w-3.5 h-3.5" /> : 'Save'}
@@ -87,7 +87,7 @@ export function SecuritySettingsSection() {
         <div className="flex items-center justify-between py-2 group cursor-pointer hover:bg-[var(--bg-surface)] px-2 -mx-2 rounded-xl transition-all border-t border-[var(--border-light)]/50">
           <div className="flex flex-col gap-0.5">
             <span className="text-[13px] font-bold text-[var(--text-main)] uppercase tracking-tight">Two-Factor Auth</span>
-            <span className="text-[10px] font-medium text-[var(--text-muted)] uppercase tracking-widest">Biometric / OTP Verification</span>
+            <span className="text-[12px] font-medium text-[var(--text-muted)] uppercase tracking-widest">Biometric / OTP Verification</span>
           </div>
           <button 
             onClick={() => setTwoFactorEnabled(!twoFactorEnabled)}
@@ -100,7 +100,7 @@ export function SecuritySettingsSection() {
         <div className="flex items-center justify-between py-2 group cursor-pointer hover:bg-[var(--bg-surface)] px-2 -mx-2 rounded-xl transition-all border-t border-[var(--border-light)]/50">
           <div className="flex flex-col gap-0.5">
             <span className="text-[13px] font-bold text-[var(--text-main)] uppercase tracking-tight">Login Alerts</span>
-            <span className="text-[10px] font-medium text-[var(--text-muted)] uppercase tracking-widest">Push notification on new connection</span>
+            <span className="text-[12px] font-medium text-[var(--text-muted)] uppercase tracking-widest">Push notification on new connection</span>
           </div>
           <button 
             onClick={() => setLoginAlerts(!loginAlerts)}
@@ -111,7 +111,7 @@ export function SecuritySettingsSection() {
         </div>
 
         <div className="pt-4 border-t border-[var(--border-light)]">
-          <span className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] mb-4 block px-1">Recent Sessions</span>
+          <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] mb-4 block px-1">Recent Sessions</span>
           <div className="flex flex-col gap-2">
             {[
               { device: 'Current Session (Web)', meta: 'Active now', current: true, icon: <Monitor className="w-4 h-4" /> },
@@ -121,9 +121,9 @@ export function SecuritySettingsSection() {
                 <div className="w-8 h-8 rounded-lg bg-[var(--bg-base)] flex items-center justify-center text-[var(--text-muted)] shadow-sm">{s.icon}</div>
                 <div className="flex-grow min-w-0">
                   <div className="text-[11px] font-bold text-[var(--text-main)] uppercase tracking-tight truncate">{s.device}</div>
-                  <div className="text-[9px] font-medium text-[var(--text-muted)] uppercase tracking-widest truncate">{s.meta}</div>
+                  <div className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-widest truncate">{s.meta}</div>
                 </div>
-                {s.current && <span className="px-2 py-0.5 bg-green-50 text-[var(--income-green)] border border-green-100 rounded text-[8px] font-bold uppercase">Current</span>}
+                {s.current && <span className="px-2 py-0.5 bg-green-50 text-[var(--income-green)] border border-green-100 rounded text-[11px] font-bold uppercase">Current</span>}
               </div>
             ))}
           </div>

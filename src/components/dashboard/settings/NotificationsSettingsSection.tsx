@@ -27,7 +27,7 @@ export function NotificationsSettingsSection({ settings, onSave }: Props) {
       
       <div className="space-y-6">
         <div className="space-y-3">
-          <span className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] block px-1">Active Alerts</span>
+          <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] block px-1">Active Alerts</span>
           <div className="space-y-3 px-1">
             {alerts.map(n => (
               <label 
@@ -47,7 +47,7 @@ export function NotificationsSettingsSection({ settings, onSave }: Props) {
         </div>
 
         <div className="space-y-1.5 pt-4 border-t border-[var(--border-light)]/50">
-          <Label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-1">
+          <Label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-1">
             Intelligence Frequency
           </Label>
           <div className="relative group">

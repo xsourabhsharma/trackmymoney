@@ -27,7 +27,9 @@ const PERIOD_OPTIONS = [
 ]
 
 export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Props) {
-  const expenseCategories = categories.filter(c => c.type === 'expense')
+  const expenseCategories = categories
+    .filter(c => c.type === 'expense')
+    .filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
   const isEdit = !!editBudget
 
   const [form, setForm] = useState({
@@ -102,7 +104,7 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
               <h2 className="text-[13px] font-bold text-[var(--text-main)] uppercase tracking-tighter">
                 {isEdit ? 'Edit Budget' : 'Set Budget Limit'}
               </h2>
-              <p className="text-[10px] text-[var(--text-muted)]">
+              <p className="text-[12px] text-[var(--text-muted)]">
                 {isEdit ? `Editing ${editBudget?.categoryName}` : 'Create a monthly spending cap for a category'}
               </p>
             </div>
@@ -120,7 +122,7 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
           {/* Category Select */}
           {!isEdit && (
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
+              <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
                 Category
               </label>
               <select
@@ -141,7 +143,7 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
 
           {/* Amount */}
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
+            <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
               Budget Limit
             </label>
             <div className="relative">
@@ -161,7 +163,7 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
 
           {/* Period */}
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
+            <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
               Period
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -170,7 +172,7 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
                   key={p.value}
                   type="button"
                   onClick={() => handleChange('periodType', p.value)}
-                  className={`py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wide transition-all border ${
+                  className={`py-2.5 rounded-xl text-[12px] font-bold uppercase tracking-wide transition-all border ${
                     form.periodType === p.value
                       ? 'bg-[var(--text-main)] text-[var(--bg-base)] border-[var(--text-main)] shadow-sm'
                       : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-light)] hover:border-[var(--border-dark)]'
@@ -195,7 +197,7 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
             </button>
             <div>
               <p className="text-[11px] font-bold text-[var(--text-main)] uppercase tracking-tight">Enable Rollover</p>
-              <p className="text-[9px] text-[var(--text-muted)]">Carry unused budget to the next period</p>
+              <p className="text-[11px] text-[var(--text-muted)]">Carry unused budget to the next period</p>
             </div>
           </div>
 
@@ -211,14 +213,14 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] text-[var(--text-muted)] rounded-xl text-[10px] font-bold uppercase tracking-widest hover:border-[var(--border-dark)] hover:text-[var(--text-main)] transition-all"
+              className="flex-1 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] text-[var(--text-muted)] rounded-xl text-[12px] font-bold uppercase tracking-widest hover:border-[var(--border-dark)] hover:text-[var(--text-main)] transition-all"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="flex-1 py-3 bg-[var(--text-main)] text-[var(--bg-base)] rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+              className="flex-1 py-3 bg-[var(--text-main)] text-[var(--bg-base)] rounded-xl text-[12px] font-bold uppercase tracking-widest shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
             >
               {isPending ? (
                 <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving...</>

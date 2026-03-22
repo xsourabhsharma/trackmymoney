@@ -57,7 +57,7 @@ export default function DashboardLayoutClient({ user, initialTheme, initialCurre
   }
 
   const navLinks = [
-    { name: 'Overview', href: '/dashboard/overview' },
+    { name: 'Overview', href: '/dashboard' },
     { name: 'AI Auto-Parse', href: '/dashboard/auto-parse' },
     { name: 'Transactions', href: '/dashboard/transactions' },
     { name: 'Subscriptions', href: '/dashboard/subscriptions' },
@@ -67,6 +67,14 @@ export default function DashboardLayoutClient({ user, initialTheme, initialCurre
     { name: 'Settings', href: '/dashboard/settings' },
   ]
 
+  const isLinkActive = (href: string) => {
+    if (href === '/dashboard') {
+      return pathname === '/dashboard'
+    }
+    return pathname.startsWith(href)
+  }
+
+
   const avatarUrl = user.user_metadata?.avatar_url as string | undefined
   const initials = (user.email ?? 'U').charAt(0).toUpperCase()
 
@@ -74,13 +82,6 @@ export default function DashboardLayoutClient({ user, initialTheme, initialCurre
     <div className="app-container min-h-screen bg-[var(--bg-base)]">
       <header className="sticky top-0 z-50 bg-[var(--bg-base)] border-b border-[var(--border-light)] px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <button
-            className="lg:hidden p-2 text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
-            onClick={() => setIsMobileMenuOpen(prev => !prev)}
-            aria-label="Toggle menu"
-          >
-            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
 
           <Link href="/dashboard" className="flex items-center gap-2 text-lg font-bold uppercase tracking-wider text-[var(--text-main)]">
             <Image src="/logo.svg" alt="TrackMyMoney" width={24} height={24} className="w-6 h-6" />
@@ -94,7 +95,7 @@ export default function DashboardLayoutClient({ user, initialTheme, initialCurre
                   <Link
                     href={link.href}
                     className={`text-[11px] font-bold uppercase tracking-widest transition-colors ${
-                      pathname === link.href ? 'text-[var(--text-main)]' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                      pathname === link.href || isLinkActive(link.href) ? 'text-[var(--text-main)]' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
                     }`}
                   >
                     {link.name}
@@ -115,7 +116,7 @@ export default function DashboardLayoutClient({ user, initialTheme, initialCurre
               <span className="text-[11px] font-bold text-[var(--text-main)] truncate max-w-[150px]">{user.email}</span>
               <button
                 onClick={handleSignOut}
-                className="text-[10px] font-medium text-[var(--text-muted)] hover:text-[var(--expense-red)] transition-colors underline underline-offset-2"
+                className="text-[12px] font-medium text-[var(--text-muted)] hover:text-[var(--expense-red)] transition-colors underline underline-offset-2"
               >
                 Sign Out
               </button>
@@ -131,34 +132,32 @@ export default function DashboardLayoutClient({ user, initialTheme, initialCurre
         </div>
       </header>
 
-      {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-[73px] bg-[var(--bg-base)] z-40 p-6 overflow-y-auto animate-in slide-in-from-left duration-200">
-          <ul className="flex flex-col gap-6">
-            {navLinks.map(link => (
-              <li key={link.href}>
+      {/* Ultra-Premium Mobile Bottom Navigation */}
+      <nav className="lg:hidden fixed bottom-4 left-4 right-4 z-50 bg-[var(--bg-base)]/80 backdrop-blur-3xl border border-[var(--border-light)] rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] p-2">
+        <ul className="flex items-center overflow-x-auto hide-scrollbar gap-2 snap-x snap-mandatory">
+          {navLinks.map(link => {
+            const active = pathname === link.href || isLinkActive(link.href)
+            return (
+              <li key={link.href} className="flex-shrink-0 snap-start">
                 <Link
                   href={link.href}
-                  className={`block text-xs font-bold uppercase tracking-widest ${
-                    pathname === link.href ? 'text-[var(--text-main)]' : 'text-[var(--text-muted)]'
+                  className={`flex flex-col items-center justify-center px-5 py-3 rounded-2xl transition-all active:scale-95 ${
+                    active 
+                      ? 'bg-[var(--text-main)] text-[var(--bg-base)] shadow-md' 
+                      : 'text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]'
                   }`}
                 >
-                  {link.name}
+                  <span className="text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
+                    {link.name}
+                  </span>
                 </Link>
               </li>
-            ))}
-            <li className="pt-6 border-t border-[var(--border-light)] mt-4">
-              <button
-                onClick={handleSignOut}
-                className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[var(--expense-red)]"
-              >
-                <LogOut className="h-4 w-4" /> Sign Out
-              </button>
-            </li>
-          </ul>
-        </div>
-      )}
+            )
+          })}
+        </ul>
+      </nav>
 
-      <main className="max-w-[1440px] mx-auto w-full p-4 md:p-6 lg:p-10 flex flex-col gap-6 md:gap-8">
+      <main className="max-w-[1440px] mx-auto w-full p-4 pb-32 md:p-6 lg:p-10 flex flex-col gap-6 md:gap-8">
         <ToastProvider>
           {children}
         </ToastProvider>

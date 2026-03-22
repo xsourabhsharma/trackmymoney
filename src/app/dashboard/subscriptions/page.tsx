@@ -1,6 +1,12 @@
 import React from 'react'
+import { Metadata } from 'next'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
+
+export const metadata: Metadata = {
+  title: 'Subscriptions',
+  description: 'Manage recurring bills, subscriptions, and upcoming charges.',
+}
 import { loadSubscriptionsPageData, type SubscriptionsFilter, type SubscriptionStatus } from './data'
 import { SubscriptionsOverview } from '@/components/dashboard/SubscriptionsOverview'
 import { SubscriptionHealthPanel } from '@/components/dashboard/SubscriptionHealthPanel'

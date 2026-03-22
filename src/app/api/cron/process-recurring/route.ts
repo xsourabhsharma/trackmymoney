@@ -4,7 +4,7 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 export async function GET(request: Request) {
   // Simple security check to prevent unauthorized triggering if not using Vercel Cron natively
   const authHeader = request.headers.get('authorization')
-  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

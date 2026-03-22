@@ -57,7 +57,7 @@ export function TransactionDrillDown({ isOpen, onClose, categoryName, transactio
                 <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--accent)] mb-1 flex items-center gap-2">
                   Analytics <ArrowRight className="w-3 h-3" /> {categoryName}
                 </h3>
-                <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest leading-loose">
+                <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest leading-loose">
                   Detailed transaction history for this category
                 </p>
               </div>
@@ -73,11 +73,11 @@ export function TransactionDrillDown({ isOpen, onClose, categoryName, transactio
             <div className="p-6 bg-gradient-to-br from-[var(--bg-surface)] to-[var(--bg-base)] border-b border-[var(--border-light)]">
                <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <p className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-[0.1em]">Target Allocation Spent</p>
+                    <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-[0.1em]">Target Allocation Spent</p>
                     <p className="text-2xl font-bold tracking-tighter text-[var(--text-main)]">${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-[0.1em]">Data Points</p>
+                    <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-[0.1em]">Data Points</p>
                     <p className="text-xl font-bold tracking-tighter text-[var(--text-main)]">{filtered.length}</p>
                   </div>
                </div>
@@ -88,7 +88,7 @@ export function TransactionDrillDown({ isOpen, onClose, categoryName, transactio
               {filtered.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-48 opacity-40">
                    <Receipt className="w-10 h-10 mb-3" />
-                   <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)]">No historical entries</p>
+                   <p className="text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)]">No historical entries</p>
                 </div>
               ) : (
                 filtered.map((t) => (
@@ -105,10 +105,10 @@ export function TransactionDrillDown({ isOpen, onClose, categoryName, transactio
                         <div className="space-y-1">
                           <p className="text-xs font-bold text-[var(--text-main)] uppercase tracking-tight">{t.merchant || t.categories?.name || 'Unknown'}</p>
                           <div className="flex items-center gap-3">
-                            <span className="flex items-center gap-1 text-[9px] font-bold text-[var(--text-muted)] uppercase">
+                            <span className="flex items-center gap-1 text-[11px] font-bold text-[var(--text-muted)] uppercase">
                               <Calendar className="w-3 h-3" /> {format(new Date(t.date), 'MMM dd, yyyy')}
                             </span>
-                            <span className="flex items-center gap-1 text-[9px] font-bold text-[var(--text-muted)] uppercase opacity-60">
+                            <span className="flex items-center gap-1 text-[11px] font-bold text-[var(--text-muted)] uppercase opacity-60">
                               <Tag className="w-3 h-3" /> {t.categories?.name}
                             </span>
                           </div>

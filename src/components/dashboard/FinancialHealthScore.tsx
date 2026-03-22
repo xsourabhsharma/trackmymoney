@@ -27,11 +27,11 @@ export function FinancialHealthScore({ details }: Props) {
   if (isNewUser) {
     return (
       <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm flex flex-col items-center gap-4">
-        <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] self-start">Financial Health</h3>
+        <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] self-start">Financial Health</h3>
         <div className="py-6 text-center flex flex-col items-center gap-3">
           <div className="text-3xl opacity-40">💪</div>
-          <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Not enough data yet</p>
-          <p className="text-[9px] text-[var(--text-muted)] max-w-[200px] leading-relaxed">
+          <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Not enough data yet</p>
+          <p className="text-[11px] text-[var(--text-muted)] max-w-[200px] leading-relaxed">
             Start by adding income, expenses, and setting a budget to get your health score
           </p>
         </div>
@@ -41,7 +41,7 @@ export function FinancialHealthScore({ details }: Props) {
 
   return (
     <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm flex flex-col items-center gap-4">
-      <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] self-start">Financial Health</h3>
+      <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] self-start">Financial Health</h3>
       
       {/* Circular Score */}
       <div className="relative w-36 h-36">
@@ -60,11 +60,11 @@ export function FinancialHealthScore({ details }: Props) {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className={`text-3xl font-bold tabular-nums tracking-tighter ${grade.color}`}>{validScore}</span>
-          <span className="text-[8px] font-bold text-[var(--text-muted)] uppercase tracking-widest">/100</span>
+          <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">/100</span>
         </div>
       </div>
 
-      <span className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${grade.bg} ${grade.color} border ${grade.border}`}>
+      <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest ${grade.bg} ${grade.color} border ${grade.border}`}>
         {label}
       </span>
 
@@ -77,7 +77,7 @@ export function FinancialHealthScore({ details }: Props) {
           { label: 'Debt Management', value: debtManagementScore, weight: '20%' },
         ].map((item) => (
           <div key={item.label} className="flex flex-col gap-1">
-            <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest">
+            <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest">
               <span className="text-[var(--text-muted)]">{item.label}</span>
               <span className="text-[var(--text-main)] tabular-nums">{item.value}%</span>
             </div>

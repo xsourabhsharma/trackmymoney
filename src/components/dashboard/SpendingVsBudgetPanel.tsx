@@ -23,7 +23,7 @@ export function SpendingVsBudgetPanel({ points }: Props) {
       {overallPoint && (
         <div className="p-4 bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-light)]">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Overall</span>
+            <span className="text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Overall</span>
             <span className="text-[11px] font-bold tabular-nums text-[var(--text-main)]">
               {fmt(overallPoint.spentAmount)} / {fmt(overallPoint.budgetAmount)}
             </span>
@@ -39,7 +39,7 @@ export function SpendingVsBudgetPanel({ points }: Props) {
             )}
             {/* Spent bar */}
             <div
-              className={`h-full rounded-md transition-all duration-700 flex items-center justify-end pr-2 text-[9px] font-bold text-white ${
+              className={`h-full rounded-md transition-all duration-700 flex items-center justify-end pr-2 text-[11px] font-bold text-white ${
                 overallPoint.spentAmount > overallPoint.budgetAmount ? 'bg-[var(--expense-red)]' : 'bg-[var(--income-green)]'
               }`}
               style={{
@@ -64,7 +64,7 @@ export function SpendingVsBudgetPanel({ points }: Props) {
 
             return (
               <div key={point.label} className="flex items-center gap-3">
-                <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase min-w-[80px] truncate">{point.label}</span>
+                <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase min-w-[80px] truncate">{point.label}</span>
                 <div className="flex-1 flex flex-col gap-1">
                   {/* Budget bar */}
                   <div className="h-2.5 bg-[var(--bg-surface)] rounded-lg overflow-hidden">
@@ -82,8 +82,8 @@ export function SpendingVsBudgetPanel({ points }: Props) {
                   </div>
                 </div>
                 <div className="text-right min-w-[70px]">
-                  <div className="text-[10px] font-bold tabular-nums text-[var(--text-main)]">{fmt(point.spentAmount)}</div>
-                  <div className="text-[9px] font-bold tabular-nums text-[var(--text-muted)]">/ {fmt(point.budgetAmount)}</div>
+                  <div className="text-[12px] font-bold tabular-nums text-[var(--text-main)]">{fmt(point.spentAmount)}</div>
+                  <div className="text-[11px] font-bold tabular-nums text-[var(--text-muted)]">/ {fmt(point.budgetAmount)}</div>
                 </div>
               </div>
             )
@@ -101,11 +101,11 @@ export function SpendingVsBudgetPanel({ points }: Props) {
       <div className="flex gap-4 justify-end">
         <div className="flex items-center gap-2">
           <div className="w-3 h-2 rounded-sm bg-[var(--accent)]/40" />
-          <span className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Budget</span>
+          <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Budget</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-2 rounded-sm bg-[var(--income-green)]" />
-          <span className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Actual</span>
+          <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Actual</span>
         </div>
       </div>
     </div>

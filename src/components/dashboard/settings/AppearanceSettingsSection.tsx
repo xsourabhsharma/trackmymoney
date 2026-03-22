@@ -28,13 +28,13 @@ export function AppearanceSettingsSection({ settings, onSave }: Props) {
       
       <div className="space-y-8">
         <div className="space-y-3">
-          <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest block px-1">Visual Theme (Persisted)</span>
+          <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest block px-1">Visual Theme (Persisted)</span>
           <div className="flex gap-2 p-1 bg-[var(--bg-surface)] rounded-xl border border-[var(--border-light)] shadow-inner">
             {(['system', 'light', 'dark'] as Theme[]).map((t) => (
               <button 
                 key={t}
                 onClick={() => handleThemeChange(t)}
-                className={`flex-1 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+                className={`flex-1 py-2 rounded-lg text-[12px] font-bold uppercase tracking-wider transition-all ${
                   settings.theme === t 
                     ? 'bg-[var(--bg-base)] text-[var(--text-main)] shadow-sm border border-[var(--border-light)]/50' 
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -47,13 +47,13 @@ export function AppearanceSettingsSection({ settings, onSave }: Props) {
         </div>
         
         <div className="space-y-3">
-          <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest block px-1">Interface Density</span>
+          <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest block px-1">Interface Density</span>
           <div className="flex gap-2 p-1 bg-[var(--bg-surface)] rounded-xl border border-[var(--border-light)]">
             {(['comfortable', 'compact'] as Density[]).map((d) => (
               <button 
                 key={d} 
                 onClick={() => onSave({ density: d })}
-                className={`flex-1 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+                className={`flex-1 py-2 rounded-lg text-[12px] font-bold uppercase tracking-wider transition-all ${
                   settings.density === d 
                     ? 'bg-[var(--bg-base)] text-[var(--text-main)] shadow-sm border border-[var(--border-light)]/50' 
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -66,13 +66,13 @@ export function AppearanceSettingsSection({ settings, onSave }: Props) {
         </div>
         
         <div className="space-y-3 pt-4 border-t border-[var(--border-light)]/50">
-          <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest block px-1">Dashboard Strategy</span>
+          <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest block px-1">Dashboard Strategy</span>
           <div className="flex flex-wrap gap-2">
             {(['standard', 'analytics', 'minimal'] as DashboardStrategy[]).map((s) => (
               <button 
                 key={s} 
                 onClick={() => onSave({ dashboard_strategy: s })}
-                className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${
+                className={`px-4 py-2 rounded-full text-[12px] font-bold uppercase tracking-widest border transition-all ${
                   settings.dashboard_strategy === s 
                     ? 'bg-[var(--text-main)] text-[var(--bg-base)] border-[var(--text-main)]' 
                     : 'bg-white text-[var(--text-muted)] border-[var(--border-light)] hover:border-[var(--border-dark)]'
@@ -87,7 +87,7 @@ export function AppearanceSettingsSection({ settings, onSave }: Props) {
         <div className="flex items-center justify-between pt-4 border-t border-[var(--border-light)]/50">
           <div className="flex flex-col gap-0.5">
             <span className="text-[13px] font-bold text-[var(--text-main)] uppercase tracking-tight">Show AI Panels</span>
-            <span className="text-[10px] font-medium text-[var(--text-muted)] uppercase tracking-widest">Active intelligence monitoring</span>
+            <span className="text-[12px] font-medium text-[var(--text-muted)] uppercase tracking-widest">Active intelligence monitoring</span>
           </div>
           <button 
             onClick={() => onSave({ show_ai_panels: !settings.show_ai_panels })}

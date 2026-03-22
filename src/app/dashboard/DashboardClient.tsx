@@ -86,7 +86,7 @@ export default function DashboardClient({ initialData }: Props) {
               <h3 className="text-sm font-bold uppercase tracking-[0.1em] text-[var(--text-main)] flex items-center gap-2 mb-1">
                 <Activity className="w-4 h-4" /> Intelligence Hub
               </h3>
-              <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase tracking-wider block mt-1">
+              <span className="text-[12px] font-mono text-[var(--text-muted)] uppercase tracking-wider block mt-1">
                 Live · Synced with your accounts
               </span>
             </div>
@@ -97,7 +97,7 @@ export default function DashboardClient({ initialData }: Props) {
                   <button 
                     key={p.val} 
                     onClick={() => handleRangeChange(p.val)}
-                    className={`px-3 py-1.5 rounded-full text-[9px] font-bold transition-all border ${
+                    className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all border ${
                       range === p.val 
                         ? 'bg-[var(--text-main)] text-[var(--bg-base)] border-[var(--text-main)] shadow-sm' 
                         : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-light)] hover:border-[var(--border-dark)]'
@@ -111,7 +111,7 @@ export default function DashboardClient({ initialData }: Props) {
                 
                 <button
                   onClick={toggleCurrency}
-                  className="px-3 py-1.5 rounded-full text-[9px] font-bold transition-all border bg-[var(--bg-surface)] text-[var(--accent)] border-[var(--border-light)] hover:border-[var(--text-main)]"
+                  className="px-3 py-1.5 rounded-full text-[11px] font-bold transition-all border bg-[var(--bg-surface)] text-[var(--accent)] border-[var(--border-light)] hover:border-[var(--text-main)]"
                 >
                   View in {currency === 'USD' ? 'INR' : 'USD'}
                 </button>
@@ -204,7 +204,7 @@ export default function DashboardClient({ initialData }: Props) {
             <h2 className="text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-[var(--income-green)]" /> Recent Activity
             </h2>
-            <Link href="/dashboard/transactions" className="text-[10px] font-bold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors uppercase tracking-widest border border-[var(--border-light)] px-3 py-1 rounded-full">View All</Link>
+            <Link href="/dashboard/transactions" className="text-[12px] font-bold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors uppercase tracking-widest border border-[var(--border-light)] px-3 py-1 rounded-full">View All</Link>
           </div>
           
           <div className="flex flex-col divide-y divide-[var(--border-light)]">
@@ -212,7 +212,7 @@ export default function DashboardClient({ initialData }: Props) {
               <div className="py-20 text-center flex flex-col items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-[var(--bg-surface)] flex items-center justify-center text-xl">🔍</div>
                 <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">No transactions for this period</p>
-                <p className="text-[10px] text-[var(--text-muted)] max-w-[250px]">Add your first transaction to start tracking your finances</p>
+                <p className="text-[12px] text-[var(--text-muted)] max-w-[250px]">Add your first transaction to start tracking your finances</p>
               </div>
             ) : (
               data.recentTransactions.map((tx: any) => (
@@ -222,9 +222,9 @@ export default function DashboardClient({ initialData }: Props) {
                   </div>
                   <div className="flex flex-col gap-0.5 overflow-hidden">
                     <span className="text-[13px] font-bold truncate text-[var(--text-main)] uppercase tracking-tight">{tx.merchant || tx.description || 'Transaction'}</span>
-                    <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">{tx.categories?.name || 'Uncategorized'}</span>
+                    <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">{tx.categories?.name || 'Uncategorized'}</span>
                   </div>
-                  <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-tighter text-right hidden sm:block">
+                  <div className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-tighter text-right hidden sm:block">
                     {format(new Date(tx.date), 'MMM dd, yyyy')}
                   </div>
                   <div className={`text-[13px] font-bold tabular-nums text-right min-w-[90px] ${tx.type === 'income' ? 'text-[var(--income-green)]' : 'text-[var(--text-main)]'}`}>
@@ -240,14 +240,14 @@ export default function DashboardClient({ initialData }: Props) {
         <div className="flex flex-col gap-6">
           {/* Upcoming Subscriptions */}
           <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm">
-            <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] mb-6 flex items-center gap-2">
+            <h2 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] mb-6 flex items-center gap-2">
               <Calendar className="w-3.5 h-3.5" /> Upcoming Charges
             </h2>
             {data.upcomingCharges.length === 0 ? (
               <div className="text-center py-4 flex flex-col items-center gap-2">
                 <div className="text-2xl opacity-40">🔔</div>
-                <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest opacity-60">No upcoming charges</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Add subscriptions to track recurring payments</p>
+                <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest opacity-60">No upcoming charges</p>
+                <p className="text-[11px] text-[var(--text-muted)]">Add subscriptions to track recurring payments</p>
               </div>
             ) : (
               <div className="flex flex-col gap-3">
@@ -256,7 +256,7 @@ export default function DashboardClient({ initialData }: Props) {
                       <span className="text-2xl group-hover:scale-110 transition-transform">{sub.icon || '💳'}</span>
                       <div className="flex-grow">
                         <div className="text-xs font-bold text-[var(--text-main)] uppercase tracking-tight">{sub.merchant}</div>
-                        <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
+                        <div className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
                           {format(new Date(sub.nextChargeDate), 'MMM dd, yyyy')}
                         </div>
                       </div>
@@ -267,19 +267,19 @@ export default function DashboardClient({ initialData }: Props) {
                 ))}
               </div>
             )}
-            <Link href="/dashboard/subscriptions" className="block text-center mt-4 text-[9px] font-bold text-[var(--accent)] uppercase tracking-widest hover:underline">Manage Subscriptions</Link>
+            <Link href="/dashboard/subscriptions" className="block text-center mt-4 text-[11px] font-bold text-[var(--accent)] uppercase tracking-widest hover:underline">Manage Subscriptions</Link>
           </div>
 
           {/* Top Spending Categories */}
           <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm">
-            <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] mb-6 flex items-center gap-2">
+            <h2 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] mb-6 flex items-center gap-2">
               <PieChartIcon className="w-3.5 h-3.5" /> Top Spending
             </h2>
             {data.topSpending.length === 0 ? (
               <div className="text-center py-4 flex flex-col items-center gap-2">
                 <div className="text-2xl opacity-40">📊</div>
-                <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest opacity-60">No spending data yet</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Start adding expenses to see your top categories</p>
+                <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest opacity-60">No spending data yet</p>
+                <p className="text-[11px] text-[var(--text-muted)]">Start adding expenses to see your top categories</p>
               </div>
             ) : (
               <div className="flex flex-col gap-4">
@@ -325,12 +325,12 @@ function MetricCard({ label, value, hint, icon, color }: {
 }) {
   return (
     <div className="p-4 bg-[var(--bg-base)] border border-[var(--border-light)] rounded-xl text-center shadow-sm hover:shadow-md transition-all group">
-      <div className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest mb-2 flex items-center justify-center gap-1.5">
+      <div className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest mb-2 flex items-center justify-center gap-1.5">
         <span className="opacity-60 group-hover:opacity-100 transition-opacity">{icon}</span>
         {label}
       </div>
       <div className={`text-lg font-bold tabular-nums mb-1 tracking-tighter ${color || 'text-[var(--text-main)]'}`}>{value}</div>
-      <div className="text-[8px] font-bold text-[var(--text-muted)] uppercase tracking-tighter opacity-60 truncate">{hint}</div>
+      <div className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-tighter opacity-60 truncate">{hint}</div>
     </div>
   )
 }

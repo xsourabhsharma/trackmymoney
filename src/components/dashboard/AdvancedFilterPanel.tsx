@@ -53,7 +53,7 @@ export function AdvancedFilterPanel({ categories }: { categories: any[] }) {
       {isOpen && (
         <div className="p-6 border-t-4 border-[#141414] grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-top-2 duration-200">
           <div className="space-y-2">
-            <Label className="font-ui font-black uppercase text-[10px] tracking-widest">Entry Type</Label>
+            <Label className="font-ui font-black uppercase text-[12px] tracking-widest">Entry Type</Label>
             <Select value={filters.type} onValueChange={(val) => setFilters({...filters, type: val ?? 'all'})}>
               <SelectTrigger className="border-2 border-[#141414] rounded-none font-bold">
                 <SelectValue placeholder="All Types" />
@@ -67,7 +67,7 @@ export function AdvancedFilterPanel({ categories }: { categories: any[] }) {
           </div>
 
           <div className="space-y-2">
-            <Label className="font-ui font-black uppercase text-[10px] tracking-widest">Category Segment</Label>
+            <Label className="font-ui font-black uppercase text-[12px] tracking-widest">Category Segment</Label>
             <Select value={filters.cat} onValueChange={(val) => setFilters({...filters, cat: val ?? ''})}>
               <SelectTrigger className="border-2 border-[#141414] rounded-none font-bold">
                 <SelectValue placeholder="All Categories" />
@@ -82,7 +82,7 @@ export function AdvancedFilterPanel({ categories }: { categories: any[] }) {
           </div>
 
           <div className="space-y-2">
-            <Label className="font-ui font-black uppercase text-[10px] tracking-widest">Amount Range ($)</Label>
+            <Label className="font-ui font-black uppercase text-[12px] tracking-widest">Amount Range ($)</Label>
             <div className="flex items-center gap-2">
               <Input 
                 placeholder="MIN" 
@@ -103,10 +103,10 @@ export function AdvancedFilterPanel({ categories }: { categories: any[] }) {
           </div>
 
           <div className="md:col-span-2 space-y-2">
-            <Label className="font-ui font-black uppercase text-[10px] tracking-widest">Temporal Window</Label>
+            <Label className="font-ui font-black uppercase text-[12px] tracking-widest">Temporal Window</Label>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-[10px] uppercase opacity-50">FROM:</span>
+                <span className="font-bold text-[12px] uppercase opacity-50">FROM:</span>
                 <Input 
                   type="date" 
                   value={filters.from} 
@@ -115,7 +115,7 @@ export function AdvancedFilterPanel({ categories }: { categories: any[] }) {
                 />
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-[10px] uppercase opacity-50">TO:</span>
+                <span className="font-bold text-[12px] uppercase opacity-50">TO:</span>
                 <Input 
                   type="date" 
                   value={filters.to} 
@@ -127,7 +127,7 @@ export function AdvancedFilterPanel({ categories }: { categories: any[] }) {
           </div>
 
           <div className="flex items-end gap-2">
-            <Button onClick={applyFilters} className="flex-1 bg-[#141414] text-white border-2 border-[#141414] hover:bg-[#fe4d00] rounded-none font-black uppercase tracking-widest h-10">
+            <Button onClick={applyFilters} className="flex-1 bg-[var(--text-main)] text-[var(--bg-base)] border-2 border-[var(--text-main)] hover:bg-[var(--accent)] hover:border-[var(--accent)] rounded-none font-black uppercase tracking-widest h-10 transition-colors">
               DEPLOY FILTERS
             </Button>
             <Button onClick={clearFilters} variant="outline" className="border-2 border-[#141414] rounded-none hover:bg-gray-100 h-10 px-3">

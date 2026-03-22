@@ -139,7 +139,7 @@ export default function UpdatePasswordPage() {
             </button>
           </form>
 
-          <div className="mt-auto pt-12 flex justify-between items-center text-[10px] font-medium text-[var(--text-muted)] tracking-wider uppercase">
+          <div className="mt-auto pt-12 flex justify-between items-center text-[12px] font-medium text-[var(--text-muted)] tracking-wider uppercase">
             <div className="flex gap-4">
               <Link href="/privacy" className="hover:text-[var(--text-main)] transition-colors">Privacy Policy</Link>
               <Link href="/terms" className="hover:text-[var(--text-main)] transition-colors">Terms</Link>

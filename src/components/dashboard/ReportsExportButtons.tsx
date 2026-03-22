@@ -86,7 +86,7 @@ export function ReportsExportButtons({ transactions }: ReportsExportButtonsProps
         variant="outline" 
         onClick={handleExportCSV}
         disabled={isExportingCSV}
-        className="h-9 px-4 rounded-full text-[10px] font-bold uppercase tracking-widest border-[var(--border-light)] flex gap-2 w-[85px] justify-center"
+        className="h-9 px-4 rounded-full text-[12px] font-bold uppercase tracking-widest border-[var(--border-light)] flex gap-2 w-[85px] justify-center"
       >
         {isExportingCSV ? (
            <span className="w-3 h-3 rounded-full border-2 border-t-transparent border-[var(--text-main)] animate-spin" />
@@ -98,7 +98,7 @@ export function ReportsExportButtons({ transactions }: ReportsExportButtonsProps
         variant="outline"
         onClick={handleExportPDF}
         disabled={isExportingPDF}
-        className="h-9 px-4 rounded-full text-[10px] font-bold uppercase tracking-widest border-[var(--border-light)] flex gap-2 w-[85px] justify-center"
+        className="h-9 px-4 rounded-full text-[12px] font-bold uppercase tracking-widest border-[var(--border-light)] flex gap-2 w-[85px] justify-center"
       >
         {isExportingPDF ? (
            <span className="w-3 h-3 rounded-full border-2 border-t-transparent border-[var(--text-main)] animate-spin" />

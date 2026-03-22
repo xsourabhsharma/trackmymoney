@@ -116,7 +116,7 @@ export function simulateDebtPayoff(
     }))
 
     // Step 2: apply minimum payments
-    let remainingExtra = extraMonthlyPayment
+    const remainingExtra = extraMonthlyPayment
     balances = balances.map(d => {
       if (d.remaining <= 0) return d
       const payment = Math.min(d.minimumPayment, d.remaining)

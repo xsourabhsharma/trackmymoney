@@ -56,7 +56,7 @@ export default function DemoSection() {
             <span className="w-[10px] h-[10px] rounded-full bg-[#FF6B6B]" />
             <span className="w-[10px] h-[10px] rounded-full bg-[#FFD93D]" />
             <span className="w-[10px] h-[10px] rounded-full bg-[#6BCB77]" />
-            <span className="ml-3 text-[10px] text-[var(--text-muted)] font-medium tracking-wide">Dashboard · March 2026</span>
+            <span className="ml-3 text-[12px] text-[var(--text-muted)] font-medium tracking-wide">Dashboard · March 2026</span>
           </div>
 
           <div className="p-5 md:p-8">
@@ -71,7 +71,7 @@ export default function DemoSection() {
                   key={c.label}
                   className="p-5 bg-[var(--bg-base)] rounded-2xl border border-[var(--border-light)]"
                 >
-                  <div className="text-[10px] uppercase tracking-widest font-bold text-[var(--text-muted)] mb-2">
+                  <div className="text-[12px] uppercase tracking-widest font-bold text-[var(--text-muted)] mb-2">
                     {c.label}
                   </div>
                   <div className="text-2xl md:text-3xl font-bold tracking-tight" style={{ color: c.color }}>
@@ -86,7 +86,7 @@ export default function DemoSection() {
 
             {/* Income vs Expenses bar */}
             <div className="bg-[var(--bg-base)] rounded-2xl border border-[var(--border-light)] p-5 mb-6">
-              <div className="text-[10px] uppercase tracking-widest font-bold text-[var(--text-muted)] mb-4">
+              <div className="text-[12px] uppercase tracking-widest font-bold text-[var(--text-muted)] mb-4">
                 Income vs Expenses · March
               </div>
               <div className="space-y-3">
@@ -111,7 +111,7 @@ export default function DemoSection() {
             <div className="grid md:grid-cols-2 gap-6">
               {/* Transactions */}
               <div className="bg-[var(--bg-base)] rounded-2xl border border-[var(--border-light)] p-5">
-                <div className="text-[10px] uppercase tracking-widest font-bold text-[var(--text-muted)] mb-3">
+                <div className="text-[12px] uppercase tracking-widest font-bold text-[var(--text-muted)] mb-3">
                   Recent Transactions
                 </div>
                 <div className="flex flex-col gap-2">
@@ -122,7 +122,7 @@ export default function DemoSection() {
                       </span>
                       <div className="flex-grow min-w-0">
                         <div className="font-medium truncate">{tx.name}</div>
-                        <div className="text-[10px] text-[var(--text-muted)]">{tx.cat} · {tx.date}</div>
+                        <div className="text-[12px] text-[var(--text-muted)]">{tx.cat} · {tx.date}</div>
                       </div>
                       <span className="font-semibold shrink-0" style={{ color: tx.color }}>
                         {tx.amount}
@@ -134,7 +134,7 @@ export default function DemoSection() {
 
               {/* Budgets */}
               <div className="bg-[var(--bg-base)] rounded-2xl border border-[var(--border-light)] p-5">
-                <div className="text-[10px] uppercase tracking-widest font-bold text-[var(--text-muted)] mb-3">
+                <div className="text-[12px] uppercase tracking-widest font-bold text-[var(--text-muted)] mb-3">
                   Budget Progress
                 </div>
                 <div className="flex flex-col gap-4">

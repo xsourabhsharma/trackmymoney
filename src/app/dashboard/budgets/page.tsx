@@ -1,4 +1,10 @@
+import { Metadata } from 'next'
 import { createClient } from '@/utils/supabase/server'
+
+export const metadata: Metadata = {
+  title: 'Budgets',
+  description: 'Set spending limits, track category budgets, and stay on top of your money.',
+}
 import { createAdminClient } from '@/utils/supabase/admin'
 import { DashboardSubNav } from '@/components/dashboard/DashboardSubNav'
 import { BudgetsClientOrchestrator } from '@/app/dashboard/budgets/client-orchestrator'

@@ -65,7 +65,7 @@ export function BudgetAlertsPanel({ alerts }: Props) {
               <p className={`text-[11px] font-bold uppercase tracking-tight leading-tight ${c.titleColor}`}>
                 {titleMap[alert.type]}
               </p>
-              <p className="text-[10px] font-medium text-[var(--text-muted)] leading-relaxed">
+              <p className="text-[12px] font-medium text-[var(--text-muted)] leading-relaxed">
                 {alert.message}
               </p>
             </div>

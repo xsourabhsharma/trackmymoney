@@ -1,5 +1,11 @@
+import { Metadata } from 'next'
 import { createClient } from '@/utils/supabase/server'
 import { DashboardSubNav } from '@/components/dashboard/DashboardSubNav'
+
+export const metadata: Metadata = {
+  title: 'Reports',
+  description: 'Detailed analytics, spending trends, and financial breakdown reports.',
+}
 import { ReportsClientOrchestrator } from '@/app/dashboard/reports/client-orchestrator'
 import { loadReportsPageData } from '@/app/dashboard/reports/data'
 

@@ -1,4 +1,10 @@
+import { Metadata } from 'next'
 import { loadTransactionsPageData, TransactionFilter, TransactionType } from './data'
+
+export const metadata: Metadata = {
+  title: 'Transactions',
+  description: 'View, filter, and manage all your tracked income and expenses.',
+}
 import { TransactionsPeriod } from '@/lib/date-utils'
 import { createClient } from '@/utils/supabase/server'
 import { DashboardSubNav } from '@/components/dashboard/DashboardSubNav'
@@ -67,7 +73,7 @@ export default async function TransactionsPage({
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm overflow-hidden flex flex-col gap-6">
           <div className="pb-4 border-b border-[var(--border-light)] flex justify-between items-center">
             <h3 className="text-sm font-bold uppercase tracking-widest text-[var(--text-main)]">Ledger</h3>
-            <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
+            <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
               {pageData.totalCount} matching records
             </span>
           </div>

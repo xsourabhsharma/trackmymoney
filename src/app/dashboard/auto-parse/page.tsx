@@ -1,5 +1,11 @@
+import { Metadata } from 'next'
 import { DashboardSubNav } from '@/components/dashboard/DashboardSubNav'
 import { getActiveImportJob } from '@/app/dashboard/auto-parse/actions'
+
+export const metadata: Metadata = {
+  title: 'AI Auto-Parse',
+  description: 'Upload bank statements and receipts to automatically extract transactions using AI.',
+}
 import { AutoParseClientWrapper } from './AutoParseClientWrapper'
 import { createClient } from '@/utils/supabase/server'
 

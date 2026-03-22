@@ -1,4 +1,4 @@
-'use client'
+// Server-rendered landing page — individual sections use 'use client' as needed
 
 import LandingNav from '@/components/LandingNav'
 import HeroSection from '@/components/landing/HeroSection'

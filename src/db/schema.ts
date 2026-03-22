@@ -89,7 +89,9 @@ export const budgets = pgTable("budgets", {
   rollover: boolean("rollover").default(false),
   updatedAt: timestamp("updated_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (t) => ({
+  userIdx: index("idx_budgets_user").on(t.userId),
+}));
 
 export const goals = pgTable("goals", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -104,7 +106,9 @@ export const goals = pgTable("goals", {
   icon: text("icon").default("🎯"),
   updatedAt: timestamp("updated_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (t) => ({
+  userStatusIdx: index("idx_goals_user_status").on(t.userId, t.status),
+}));
 
 export const subscriptions = pgTable("subscriptions", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -159,7 +163,9 @@ export const chatMessages = pgTable("chat_messages", {
   role: text("role").notNull(), // "user" or "assistant"
   content: text("content").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (t) => ({
+  userIdx: index("idx_chat_messages_user_created").on(t.userId, t.createdAt),
+}));
 
 export const debts = pgTable("debts", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -172,7 +178,9 @@ export const debts = pgTable("debts", {
   dueDate: timestamp("due_date"),
   updatedAt: timestamp("updated_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (t) => ({
+  userIdx: index("idx_debts_user").on(t.userId),
+}));
 
 export const aiInsights = pgTable("ai_insights", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -216,3 +224,8 @@ export const importRows = pgTable("import_rows", {
   errorMessage: text("error_message"),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// ────────────────────────────────────────────────
+// Performance Indexes
+// ────────────────────────────────────────────────
+// Indexes are declared directly inside the table definitions above.

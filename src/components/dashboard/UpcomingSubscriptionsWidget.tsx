@@ -34,12 +34,12 @@ export async function UpcomingSubscriptionsWidget() {
                 <div className="text-xl">{sub.categories?.icon || '💳'}</div>
                 <div>
                   <p className="text-xs font-black uppercase tracking-tighter truncate max-w-[100px]">{sub.merchant}</p>
-                  <p className="text-[10px] font-bold text-gray-500">{format(new Date(sub.next_due_date), 'MMM dd')}</p>
+                  <p className="text-[12px] font-bold text-gray-500">{format(new Date(sub.next_due_date), 'MMM dd')}</p>
                 </div>
               </div>
               <div className="text-right">
                 <p className="text-xs font-black">${parseFloat(sub.amount).toFixed(2)}</p>
-                <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded-sm ${daysLeft <= 3 ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
+                <span className={`text-[11px] font-black uppercase px-1.5 py-0.5 rounded-sm ${daysLeft <= 3 ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
                   {daysLeft} days
                 </span>
               </div>

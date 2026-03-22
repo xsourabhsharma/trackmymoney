@@ -100,7 +100,7 @@ export function IntegrationsSettingsSection({ integrations }: Props) {
               </div>
               <div className="flex-grow min-w-0">
                 <div className="text-[11px] font-bold text-[var(--text-main)] uppercase tracking-tight truncate">{acc.name}</div>
-                <div className={`text-[9px] font-bold uppercase tracking-widest ${isActive ? 'text-[var(--income-green)]' : 'text-[var(--text-muted)]'}`}>
+                <div className={`text-[11px] font-bold uppercase tracking-widest ${isActive ? 'text-[var(--income-green)]' : 'text-[var(--text-muted)]'}`}>
                   {isActive ? (localConnected[acc.id] !== undefined ? '1 Connected' : acc.status) : 'Offline'}
                 </div>
               </div>
@@ -108,7 +108,7 @@ export function IntegrationsSettingsSection({ integrations }: Props) {
                 onClick={() => handleManage(acc.id)}
                 disabled={isLoading}
                 variant="ghost" 
-                className="h-8 px-3 rounded-full text-[9px] font-bold uppercase tracking-widest border border-transparent hover:border-[var(--border-light)] hover:bg-[var(--bg-base)] shadow-sm transition-all"
+                className="h-8 px-3 rounded-full text-[11px] font-bold uppercase tracking-widest border border-transparent hover:border-[var(--border-light)] hover:bg-[var(--bg-base)] shadow-sm transition-all"
               >
                 {isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : (isActive ? 'Manage' : 'Connect')}
               </Button>

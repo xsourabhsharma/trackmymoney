@@ -1,5 +1,11 @@
+import { Metadata } from 'next'
 import { createClient } from '@/utils/supabase/server'
 import { DashboardSubNav } from '@/components/dashboard/DashboardSubNav'
+
+export const metadata: Metadata = {
+  title: 'Settings',
+  description: 'Manage your profile, preferences, formats, and API keys.',
+}
 import { loadSettingsPageData } from '@/app/dashboard/settings/data'
 import { SettingsClientOrchestrator } from '@/components/dashboard/settings/SettingsClientOrchestrator'
 

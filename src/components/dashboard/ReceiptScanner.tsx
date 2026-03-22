@@ -93,7 +93,7 @@ export function ReceiptScanner() {
         {(image || result) && (
           <button 
             onClick={handleClear}
-            className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wider hover:text-[var(--expense-red)] transition-colors"
+            className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider hover:text-[var(--expense-red)] transition-colors"
           >
             Reset
           </button>
@@ -185,33 +185,33 @@ export function ReceiptScanner() {
             >
               <div className="bg-[var(--bg-surface)] rounded-[16px] border border-[var(--border-light)] p-6 space-y-6">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">Extracted Data</h4>
-                  <div className="px-3 py-1 bg-[var(--income-green)]/10 text-[var(--income-green)] rounded-full text-[9px] font-bold uppercase">
+                  <h4 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">Extracted Data</h4>
+                  <div className="px-3 py-1 bg-[var(--income-green)]/10 text-[var(--income-green)] rounded-full text-[11px] font-bold uppercase">
                     {Math.round(result.confidence * 100)}% Confidence
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <p className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-1.5">
+                    <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-1.5">
                       <Receipt className="w-3 h-3" /> Merchant
                     </p>
                     <p className="text-sm font-bold text-[var(--text-main)]">{result.merchant}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-1.5">
+                    <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-1.5">
                       <DollarSign className="w-3 h-3" /> Amount
                     </p>
                     <p className="text-sm font-bold text-[var(--text-main)]">${result.amount.toFixed(2)}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-1.5">
+                    <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-1.5">
                       <Calendar className="w-3 h-3" /> Date
                     </p>
                     <p className="text-sm font-bold text-[var(--text-main)]">{result.date}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-1.5">
+                    <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-1.5">
                       <Tag className="w-3 h-3" /> Category
                     </p>
                     <p className="text-sm font-bold text-[var(--text-main)]">{result.category}</p>

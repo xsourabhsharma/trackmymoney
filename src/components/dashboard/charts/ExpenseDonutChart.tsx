@@ -30,8 +30,8 @@ export function ExpenseDonutChart({ data, total, onSectorClick }: Props) {
             <span className="text-2xl opacity-40">📊</span>
           </div>
         </div>
-        <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">No expense data yet</p>
-        <p className="text-[9px] text-[var(--text-muted)] text-center max-w-[200px]">
+        <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">No expense data yet</p>
+        <p className="text-[11px] text-[var(--text-muted)] text-center max-w-[200px]">
           Add your first expense to see spending patterns here
         </p>
       </div>
@@ -71,7 +71,7 @@ export function ExpenseDonutChart({ data, total, onSectorClick }: Props) {
                 return (
                   <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-xl px-3 py-2 shadow-lg">
                     <div className="text-[11px] font-bold text-[var(--text-main)] uppercase">{d.icon} {d.name}</div>
-                    <div className="text-[10px] font-bold text-[var(--text-muted)] tabular-nums">$ {d.value.toLocaleString(undefined, { minimumFractionDigits: 2 })} · {pct}%</div>
+                    <div className="text-[12px] font-bold text-[var(--text-muted)] tabular-nums">$ {d.value.toLocaleString(undefined, { minimumFractionDigits: 2 })} · {pct}%</div>
                   </div>
                 )
               }}
@@ -81,7 +81,7 @@ export function ExpenseDonutChart({ data, total, onSectorClick }: Props) {
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="text-center">
             <div className="text-xl font-bold tracking-tighter">${total.toLocaleString()}</div>
-            <div className="text-[8px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Total</div>
+            <div className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Total</div>
           </div>
         </div>
       </div>
@@ -89,8 +89,8 @@ export function ExpenseDonutChart({ data, total, onSectorClick }: Props) {
         {data.slice(0, 6).map((item, i) => (
           <div key={item.name} className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.color || FALLBACK_COLORS[i % FALLBACK_COLORS.length] }} />
-            <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase truncate">{item.name}</span>
-            <span className="text-[9px] font-bold text-[var(--text-muted)] tabular-nums ml-auto opacity-60">
+            <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase truncate">{item.name}</span>
+            <span className="text-[11px] font-bold text-[var(--text-muted)] tabular-nums ml-auto opacity-60">
               {total > 0 ? ((item.value / total) * 100).toFixed(0) : 0}%
             </span>
           </div>

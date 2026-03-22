@@ -110,10 +110,10 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
           onChange={handleAvatarChange}
         />
 
-        <p className="text-[10px] font-medium text-[var(--text-muted)]">Click avatar to change · Max 2 MB</p>
+        <p className="text-[12px] font-medium text-[var(--text-muted)]">Click avatar to change · Max 2 MB</p>
 
         {avatarError && (
-          <p className="text-[10px] font-bold text-[var(--expense-red)] flex items-center gap-1">
+          <p className="text-[12px] font-bold text-[var(--expense-red)] flex items-center gap-1">
             <AlertCircle className="w-3 h-3" /> {avatarError}
           </p>
         )}
@@ -121,7 +121,7 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
 
       <div className="space-y-4 flex-grow">
         <div className="space-y-1.5">
-          <Label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-1">Full Name</Label>
+          <Label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-1">Full Name</Label>
           <Input
             value={formData.full_name}
             onChange={e => setFormData({ ...formData, full_name: e.target.value })}
@@ -130,7 +130,7 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
           />
         </div>
         <div className="space-y-1.5">
-          <Label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-1">Email Address</Label>
+          <Label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-1">Email Address</Label>
           <Input
             value={email}
             disabled
@@ -139,7 +139,7 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-1">Time Zone</Label>
+            <Label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-1">Time Zone</Label>
             <div className="relative">
               <select
                 value={formData.timezone}
@@ -155,7 +155,7 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-1">Currency</Label>
+            <Label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-1">Currency</Label>
             <div className="relative">
               <select
                 value={formData.currency}
@@ -179,7 +179,7 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
             className={`w-full h-12 rounded-full text-xs font-bold uppercase tracking-widest shadow-xl active:scale-[0.98] transition-all ${
               isSuccess
                 ? 'bg-[var(--income-green)] text-white hover:bg-[var(--income-green)]'
-                : 'bg-[var(--text-main)] text-[var(--bg-base)] hover:bg-[var(--bg-surface-dark)]'
+                : 'bg-[var(--text-main)] text-[var(--bg-base)] hover:opacity-90'
             }`}
           >
             {isPending ? (

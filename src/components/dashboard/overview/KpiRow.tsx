@@ -70,12 +70,12 @@ export function KpiRow({ metrics, accountsCount }: KpiRowProps) {
           <div className="group relative flex flex-col p-4 bg-white border border-[var(--border-main)] rounded-2xl shadow-sm h-full w-full cursor-default text-center">
             <div className="flex items-center justify-center gap-1.5 mb-2 opacity-60">
               <kpi.icon className="w-3.5 h-3.5" strokeWidth={2} />
-              <span className="text-[9px] font-black uppercase tracking-widest">{kpi.label}</span>
+              <span className="text-[11px] font-black uppercase tracking-widest">{kpi.label}</span>
             </div>
             <div className={`text-xl font-black tracking-tighter ${kpi.colorClass}`}>
               {kpi.value}
             </div>
-            <div className="mt-2 text-[8px] font-bold text-[var(--text-muted)] uppercase tracking-widest opacity-60">
+            <div className="mt-2 text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest opacity-60">
               {kpi.subtext}
             </div>
           </div>

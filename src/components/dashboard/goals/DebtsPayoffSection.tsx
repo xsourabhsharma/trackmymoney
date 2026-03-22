@@ -43,7 +43,7 @@ export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeS
       {/* Strategy Selector */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Payoff Strategy</span>
+          <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Payoff Strategy</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {(Object.keys(STRATEGY_CONFIG) as PayoffStrategy[]).map(s => {
@@ -53,7 +53,7 @@ export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeS
               <div key={s} className="relative group/tip">
                 <button
                   onClick={() => onChangeStrategy(s)}
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest border transition-all ${
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest border transition-all ${
                     isActive
                       ? 'bg-[var(--text-main)] text-[var(--bg-base)] border-[var(--text-main)] shadow-md'
                       : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-light)] hover:border-[var(--border-dark)]'
@@ -63,7 +63,7 @@ export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeS
                   {cfg.label}
                 </button>
                 {/* Tooltip */}
-                <div className="absolute bottom-full left-0 mb-2 w-48 bg-[var(--text-main)] text-[var(--bg-base)] text-[9px] font-bold rounded-xl px-3 py-2 opacity-0 group-hover/tip:opacity-100 pointer-events-none transition-opacity z-10 shadow-xl">
+                <div className="absolute bottom-full left-0 mb-2 w-48 bg-[var(--text-main)] text-[var(--bg-base)] text-[11px] font-bold rounded-xl px-3 py-2 opacity-0 group-hover/tip:opacity-100 pointer-events-none transition-opacity z-10 shadow-xl">
                   {cfg.tooltip}
                 </div>
               </div>
@@ -82,7 +82,7 @@ export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeS
             <p className="text-[11px] font-bold text-[var(--text-main)] uppercase tracking-tight">
               Debt-free in <span className="text-[var(--income-green)]">{countdown.monthsToDebtFree} months</span> — by {countdown.debtFreeDate}
             </p>
-            <p className="text-[9px] text-[var(--text-muted)] mt-0.5 uppercase tracking-widest">
+            <p className="text-[11px] text-[var(--text-muted)] mt-0.5 uppercase tracking-widest">
               Using {countdown.strategy} strategy · assuming current minimum payments
             </p>
           </div>
@@ -105,7 +105,7 @@ export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeS
           </div>
           <button
             onClick={onAddDebt}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[var(--text-main)] text-[var(--bg-base)] rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all"
+            className="flex items-center gap-2 px-5 py-2.5 bg-[var(--text-main)] text-[var(--bg-base)] rounded-full text-[12px] font-bold uppercase tracking-widest shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
             <Plus className="w-3.5 h-3.5" />
             Add Your First Debt
@@ -114,7 +114,7 @@ export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeS
       ) : (
         <div className="border border-[var(--border-light)] rounded-[20px] overflow-hidden shadow-sm">
           {/* Header */}
-          <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-3 p-4 bg-[var(--bg-surface)] border-b border-[var(--border-light)] text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
+          <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-3 p-4 bg-[var(--bg-surface)] border-b border-[var(--border-light)] text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
             <span>Debt / Creditor</span>
             <span>Balance</span>
             <span>Rate</span>
@@ -134,12 +134,12 @@ export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeS
                 <div className="flex flex-col gap-1 min-w-0">
                   <span className="text-[12px] font-bold text-[var(--text-main)] uppercase tracking-tight truncate">{debt.name}</span>
                   {debt.creditor && (
-                    <span className="text-[8px] font-bold text-[var(--text-muted)] uppercase tracking-widest truncate opacity-70">{debt.creditor}</span>
+                    <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest truncate opacity-70">{debt.creditor}</span>
                   )}
                   <div className="h-1 bg-[var(--bg-surface)] rounded-full overflow-hidden mt-1">
                     <div className="h-full bg-[var(--income-green)] rounded-full" style={{ width: `${paidPct}%` }} />
                   </div>
-                  <span className="text-[8px] text-[var(--text-muted)]">{paidPct}% paid off</span>
+                  <span className="text-[11px] text-[var(--text-muted)]">{paidPct}% paid off</span>
                 </div>
                 <div>
                   <span className="text-[12px] font-bold tabular-nums text-[var(--expense-red)] tracking-tighter">

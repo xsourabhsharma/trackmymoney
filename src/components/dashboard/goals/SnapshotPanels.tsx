@@ -42,7 +42,7 @@ export function GoalProgressSnapshotPanel({ snapshot }: SnapshotProps) {
         <p className="text-[11px] font-bold text-[var(--text-main)] uppercase leading-relaxed px-2">
           You've saved ${fmt(snapshot.totalSaved)} out of ${fmt(snapshot.totalTarget)} in savings goals.
         </p>
-        <span className={`px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-widest inline-block shadow-sm border ${
+        <span className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest inline-block shadow-sm border ${
           pct >= 75 ? 'bg-green-50 text-[var(--income-green)] border-green-100' :
           pct >= 40 ? 'bg-blue-50 text-blue-600 border-blue-100' :
           'bg-orange-50 text-orange-600 border-orange-100'
@@ -68,7 +68,7 @@ export function DebtFreeCountdownPanel({ countdown, totalDebt }: CountdownProps)
         <div className="text-4xl">🎉</div>
         <div>
           <p className="text-[13px] font-bold text-[var(--income-green)] uppercase tracking-tight">Debt-Free!</p>
-          <p className="text-[10px] text-[var(--text-muted)] mt-1">You have no tracked debts. Amazing!</p>
+          <p className="text-[12px] text-[var(--text-muted)] mt-1">You have no tracked debts. Amazing!</p>
         </div>
       </div>
     )
@@ -92,7 +92,7 @@ export function DebtFreeCountdownPanel({ countdown, totalDebt }: CountdownProps)
         <div className="text-4xl font-bold tracking-tighter text-[var(--income-green)] mb-1">
           {countdown.monthsToDebtFree} mo
         </div>
-        <p className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest leading-relaxed max-w-[200px] mx-auto">
+        <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest leading-relaxed max-w-[200px] mx-auto">
           Debt-free by {countdown.debtFreeDate} (assuming current minimum payments)
         </p>
       </div>
@@ -104,13 +104,13 @@ export function DebtFreeCountdownPanel({ countdown, totalDebt }: CountdownProps)
             style={{ width: `${progressPct}%` }}
           />
         </div>
-        <div className="flex justify-between text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-1">
+        <div className="flex justify-between text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-1">
           <span>Now</span>
           <span>{countdown.debtFreeDate}</span>
         </div>
       </div>
 
-      <div className="text-[9px] text-[var(--text-muted)] px-2 py-1 bg-[var(--bg-surface)] rounded-xl border border-[var(--border-light)]">
+      <div className="text-[11px] text-[var(--text-muted)] px-2 py-1 bg-[var(--bg-surface)] rounded-xl border border-[var(--border-light)]">
         Strategy: <span className="font-bold uppercase">{countdown.strategy}</span>
       </div>
     </div>

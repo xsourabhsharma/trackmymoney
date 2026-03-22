@@ -84,7 +84,7 @@ export function detectSubscriptionsFromTransactions(transactions: any[]): Detect
 
     if (interval) {
       const lastCharge = new Date(sorted[sorted.length - 1].date);
-      let nextCharge = new Date(lastCharge);
+      const nextCharge = new Date(lastCharge);
       
       if (interval === 'weekly') nextCharge.setDate(nextCharge.getDate() + 7);
       if (interval === 'monthly') nextCharge.setMonth(nextCharge.getMonth() + 1);

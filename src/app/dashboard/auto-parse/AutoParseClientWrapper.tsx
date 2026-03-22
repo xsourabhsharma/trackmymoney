@@ -94,7 +94,7 @@ export function AutoParseClientWrapper({
                     <h4 className="text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider mb-1">
                       {activeTab === 'csv' ? '1. Export' : '1. Capture'}
                     </h4>
-                    <p className="text-[10px] font-medium text-[var(--text-muted)] leading-loose">
+                    <p className="text-[12px] font-medium text-[var(--text-muted)] leading-loose">
                       {activeTab === 'csv' ? 'Download a CSV from your banking portal.' : 'Take a clear photo of your receipt.'}
                     </p>
                   </div>
@@ -105,7 +105,7 @@ export function AutoParseClientWrapper({
                   </div>
                   <div>
                     <h4 className="text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider mb-1">2. Process</h4>
-                    <p className="text-[10px] font-medium text-[var(--text-muted)] leading-loose">
+                    <p className="text-[12px] font-medium text-[var(--text-muted)] leading-loose">
                       {activeTab === 'csv' ? 'Drag the file into the parsing zone.' : 'Upload the image for AI analysis.'}
                     </p>
                   </div>
@@ -116,7 +116,7 @@ export function AutoParseClientWrapper({
                   </div>
                   <div>
                     <h4 className="text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider mb-1">3. Automate</h4>
-                    <p className="text-[10px] font-medium text-[var(--text-muted)] leading-loose">The AI categorizes everything and saves it directly to your history.</p>
+                    <p className="text-[12px] font-medium text-[var(--text-muted)] leading-loose">The AI categorizes everything and saves it directly to your history.</p>
                   </div>
                 </div>
               </div>
@@ -161,7 +161,7 @@ export function AutoParseClientWrapper({
       {/* Recent Imports Section */}
       {recentJobs.length > 0 && (
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
-          <h3 className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+          <h3 className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
             <Clock className="w-3.5 h-3.5" /> Recent Imports
           </h3>
           <div className="divide-y divide-[var(--border-light)]">
@@ -178,15 +178,15 @@ export function AutoParseClientWrapper({
                   </div>
                   <div>
                     <span className="text-[12px] font-bold text-[var(--text-main)]">{job.file_path || 'Unknown file'}</span>
-                    <span className="text-[10px] text-[var(--text-muted)] ml-2">{job.row_count} rows</span>
+                    <span className="text-[12px] text-[var(--text-muted)] ml-2">{job.row_count} rows</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="text-[10px] font-medium text-[var(--text-muted)]">
+                  <span className="text-[12px] font-medium text-[var(--text-muted)]">
                     {new Date(job.created_at).toLocaleDateString()}
                   </span>
                   {job.status === 'completed' && (
-                    <a href="/dashboard/transactions" className="text-[10px] font-bold text-[var(--accent)] hover:underline uppercase tracking-wider">
+                    <a href="/dashboard/transactions" className="text-[12px] font-bold text-[var(--accent)] hover:underline uppercase tracking-wider">
                       View
                     </a>
                   )}

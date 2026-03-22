@@ -23,7 +23,6 @@ export function GlobalAiWidget() {
 
   // @ts-ignore
   const { messages, isLoading } = chatHook
-  const appendMessage = (chatHook as any).append || (chatHook as any).sendMessage
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -41,6 +40,21 @@ export function GlobalAiWidget() {
     }
   }, [messages, widgetState])
 
+  // Keyboard shortcuts: Escape to close, Cmd/Ctrl+K to toggle
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && widgetState !== 'minimized') {
+        setWidgetState('minimized')
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setWidgetState(prev => prev === 'minimized' ? 'chat' : 'minimized')
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [widgetState])
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (isLoading) return // Hard blocking preventing submission while generating...
@@ -49,6 +63,9 @@ export function GlobalAiWidget() {
     if (!safeInput.trim() && files.length === 0) return
 
     try {
+      const appendFn = (chatHook as any).append || (chatHook as any).sendMessage;
+      const safeAppend = appendFn ? appendFn.bind(chatHook) : null;
+
       if (files.length > 0) {
         try {
           // Read all selected files concurrently
@@ -61,10 +78,10 @@ export function GlobalAiWidget() {
             }))
           )
             
-          if (appendMessage) {
+          if (safeAppend) {
             let submitSuccess = false;
             try {
-               await appendMessage(
+               await safeAppend(
                  {
                    role: 'user',
                    content: myInput || 'Please analyze these images.',
@@ -79,7 +96,7 @@ export function GlobalAiWidget() {
                console.error("Network append failed on try 1:", networkErr);
                // Try fallback payload without embedding data inside message to avoid strict SDK signature checks
                try {
-                 await appendMessage(
+                 await safeAppend(
                    { role: 'user', content: myInput || 'Please analyze these images.' },
                    { data: { imageUrls: base64Images } }
                  )
@@ -96,26 +113,14 @@ export function GlobalAiWidget() {
           setFiles([])
         }
       } else {
-        if (appendMessage) {
-          // Try passing it as an object first
-          let success = false
+        if (safeAppend) {
           try {
-            await appendMessage({ role: 'user', content: myInput })
-            success = true
+            await safeAppend({ role: 'user', content: myInput })
           } catch (e) {
-            console.warn("Object signature failed, trying string signature...", e)
-          }
-          
-          if (!success) {
-            try {
-              // Fallback if the signature is just a string
-              await appendMessage(myInput)
-            } catch (err) {
-              console.error("Both message signatures failed:", err)
-            }
+            console.error("Append message failed:", e)
           }
         } else {
-          console.error("appendMessage is undefined!", Object.keys(chatHook))
+          console.error("safeAppend is undefined!", Object.keys(chatHook))
         }
         setMyInput('')
       }
@@ -343,7 +348,7 @@ export function GlobalAiWidget() {
                 </div>
 
                 <div className="text-center mt-0.5 md:mt-1">
-                  <p className="text-[10px] md:text-[11px] text-gray-500">
+                  <p className="text-[12px] md:text-[11px] text-gray-500">
                     AI can make mistakes, so double-check it. <a href="#" className="text-blue-400 hover:underline hover:text-blue-300 transition-colors">Learn more</a>
                   </p>
                 </div>

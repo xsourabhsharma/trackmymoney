@@ -73,14 +73,14 @@ export function SubscriptionsFilterBar({ initialStatus, initialSearch, onAddSubC
       <div className="flex flex-wrap items-center gap-3">
         <Button 
           variant="outline"
-          className="bg-[var(--bg-muted)] hover:bg-[var(--border-light)] text-[var(--text-main)] border border-[var(--border-light)] text-[10px] font-bold uppercase tracking-widest px-4 py-2 h-auto rounded-xl flex items-center gap-2 transition-all shadow-sm"
+          className="bg-[var(--bg-muted)] hover:bg-[var(--border-light)] text-[var(--text-main)] border border-[var(--border-light)] text-[12px] font-bold uppercase tracking-widest px-4 py-2 h-auto rounded-xl flex items-center gap-2 transition-all shadow-sm"
         >
           <Monitor className="w-4 h-4 text-[var(--accent)]" />
           Import from Bank
         </Button>
         <Button 
           onClick={onAddSubClick}
-          className="bg-[var(--text-main)] hover:bg-[var(--text-main)]/90 text-[var(--bg-base)] text-[10px] font-bold uppercase tracking-widest px-4 py-2 h-auto rounded-xl flex items-center gap-2 shadow-sm transition-all shadow-[var(--border-light)]/50 border border-transparent"
+          className="bg-[var(--text-main)] hover:bg-[var(--text-main)]/90 text-[var(--bg-base)] text-[12px] font-bold uppercase tracking-widest px-4 py-2 h-auto rounded-xl flex items-center gap-2 shadow-sm transition-all shadow-[var(--border-light)]/50 border border-transparent"
         >
           <Plus className="w-4 h-4" />
           Add Subscription

@@ -47,10 +47,10 @@ export function InteractiveChartsManager({ donutData, donutTotal, cashFlowData, 
         {/* Expense Breakdown */}
         <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm flex flex-col items-center justify-between min-h-[400px]">
           <div className="w-full flex items-center justify-between mb-4">
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] flex items-center gap-2">
+            <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] flex items-center gap-2">
               <PieChartIcon className="w-3.5 h-3.5" /> Expense Breakdown
             </h3>
-            <Link href="/dashboard/reports" className="text-[9px] font-bold text-[var(--accent)] uppercase tracking-widest hover:underline">
+            <Link href="/dashboard/reports" className="text-[11px] font-bold text-[var(--accent)] uppercase tracking-widest hover:underline">
               Full Report →
             </Link>
           </div>
@@ -60,7 +60,7 @@ export function InteractiveChartsManager({ donutData, donutTotal, cashFlowData, 
             onSectorClick={handleSectorClick}
           />
           {donutData.length > 0 && (
-            <p className="mt-4 text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest text-center opacity-60">
+            <p className="mt-4 text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest text-center opacity-60">
               Click any segment to drill down into category details
             </p>
           )}
@@ -69,17 +69,17 @@ export function InteractiveChartsManager({ donutData, donutTotal, cashFlowData, 
         {/* Capital Flow */}
         <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm flex flex-col min-h-[400px]">
           <div className="w-full flex items-center justify-between mb-8">
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] flex items-center gap-2">
+            <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] flex items-center gap-2">
               <TrendingUp className="w-3.5 h-3.5" /> Cash Flow
             </h3>
             <div className="flex gap-3 items-center">
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-[var(--income-green)]" />
-                <span className="text-[8px] font-bold text-[var(--text-muted)] uppercase">Income</span>
+                <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase">Income</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-[var(--expense-red)] opacity-60" />
-                <span className="text-[8px] font-bold text-[var(--text-muted)] uppercase">Expense</span>
+                <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase">Expense</span>
               </div>
             </div>
           </div>

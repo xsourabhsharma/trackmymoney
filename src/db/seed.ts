@@ -16,7 +16,7 @@ async function seed() {
   console.log('Seeding data...');
 
   // 1. Ensure a user exists
-  let userProfiles = await db.select().from(schema.profiles).limit(1);
+  const userProfiles = await db.select().from(schema.profiles).limit(1);
   let userId: string;
 
   if (userProfiles.length === 0) {

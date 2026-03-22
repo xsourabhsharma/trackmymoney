@@ -98,7 +98,7 @@ export function SubscriptionsTable({
                 size="sm" 
                 onClick={handleBulkPause}
                 disabled={isPending}
-                className="h-7 rounded-full border-[var(--border-light)] text-[#FF9800] hover:bg-[#FF9800]/10 text-[10px] font-bold uppercase tracking-widest px-3"
+                className="h-7 rounded-full border-[var(--border-light)] text-[#FF9800] hover:bg-[#FF9800]/10 text-[12px] font-bold uppercase tracking-widest px-3"
               >
                 <Pause className="w-3 h-3 mr-1" />
                 Pause
@@ -109,7 +109,7 @@ export function SubscriptionsTable({
                 size="sm" 
                 onClick={handleBulkDelete}
                 disabled={isPending}
-                className="h-7 rounded-full border-[var(--expense-red)] text-[var(--expense-red)] hover:bg-[var(--expense-red)] hover:text-white text-[10px] font-bold uppercase tracking-widest px-3"
+                className="h-7 rounded-full border-[var(--expense-red)] text-[var(--expense-red)] hover:bg-[var(--expense-red)] hover:text-white text-[12px] font-bold uppercase tracking-widest px-3"
               >
                 <Trash2 className="w-3 h-3 mr-1" />
                 Delete
@@ -123,7 +123,7 @@ export function SubscriptionsTable({
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-[var(--border-light)] text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
+            <tr className="border-b border-[var(--border-light)] text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
               <th className="py-4 px-4 w-12"></th>
               <th className="py-4 px-4 whitespace-nowrap min-w-[200px]">Service</th>
               <th className="py-4 px-4 whitespace-nowrap text-right">Cost</th>
@@ -169,7 +169,7 @@ export function SubscriptionsTable({
                             {sub.serviceName || sub.merchant}
                           </p>
                           {sub.categoryName && (
-                            <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">{sub.categoryName}</p>
+                            <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-wider">{sub.categoryName}</p>
                           )}
                         </div>
                       </div>
@@ -180,12 +180,12 @@ export function SubscriptionsTable({
                       </p>
                     </td>
                     <td className="py-4 px-4">
-                      <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider truncate max-w-[120px]">
+                      <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-wider truncate max-w-[120px]">
                         {sub.interval}
                       </p>
                     </td>
                     <td className="py-4 px-4">
-                      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border ${
+                      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest border ${
                         sub.status === 'active' ? 'bg-[var(--income-green)]/10 text-[var(--income-green)] border-[var(--income-green)]/30' : 
                         sub.status === 'paused' ? 'bg-[#FF9800]/10 text-[#FF9800] border-[#FF9800]/30' : 
                         'bg-[var(--border-light)] text-[var(--text-muted)] border-[var(--border-light)]'

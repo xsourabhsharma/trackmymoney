@@ -18,7 +18,7 @@ export function CashFlowChartSection({ points, comparison }: Props) {
       <div className="py-16 text-center flex flex-col items-center gap-3 border-2 border-dashed border-[var(--border-light)] rounded-[20px] bg-[var(--bg-surface)]/30">
         <span className="text-3xl">📈</span>
         <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">No cash flow data for this period.</p>
-        <p className="text-[10px] text-[var(--text-muted)]">Add transactions or expand your date range to see activity here.</p>
+        <p className="text-[12px] text-[var(--text-muted)]">Add transactions or expand your date range to see activity here.</p>
       </div>
     )
   }
@@ -83,7 +83,7 @@ export function CashFlowChartSection({ points, comparison }: Props) {
         {/* X axis labels */}
         <div className="flex justify-between px-4 mt-2">
           {points.map((p, i) => (
-            <span key={i} className="text-[8px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
+            <span key={i} className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
               {p.date}
             </span>
           ))}
@@ -99,14 +99,14 @@ export function CashFlowChartSection({ points, comparison }: Props) {
         ].map(l => (
           <div key={l.label} className="flex items-center gap-1.5">
             <div className={`h-0.5 w-5 ${l.color} ${l.dashed ? 'opacity-60' : ''} rounded-full`} />
-            <span className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest">{l.label}</span>
+            <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">{l.label}</span>
           </div>
         ))}
       </div>
 
       {/* Caption */}
       <div className="bg-[var(--bg-surface)] p-4 rounded-xl text-center border border-[var(--border-light)]/50">
-        <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase leading-relaxed tracking-wide">
+        <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase leading-relaxed tracking-wide">
           In this period, your net cash flow is{' '}
           <span className={`font-black ${netCurrent >= 0 ? 'text-[var(--income-green)]' : 'text-[var(--expense-red)]'}`}>
             ${Math.abs(netCurrent).toLocaleString(undefined, { minimumFractionDigits: 2 })}

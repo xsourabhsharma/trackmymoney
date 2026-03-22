@@ -1,5 +1,11 @@
+import { Metadata } from 'next'
 import { createClient } from '@/utils/supabase/server'
 import { DashboardSubNav } from '@/components/dashboard/DashboardSubNav'
+
+export const metadata: Metadata = {
+  title: 'Goals & Debt',
+  description: 'Track your savings goals and manage debt payoff plans.',
+}
 import { GoalsDebtsClientOrchestrator } from '@/app/dashboard/goals/client-orchestrator'
 import { loadGoalsDebtsPageData } from '@/app/dashboard/goals/data'
 

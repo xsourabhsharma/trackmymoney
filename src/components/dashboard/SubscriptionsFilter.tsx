@@ -63,7 +63,7 @@ export function SubscriptionsFilter() {
               setStatus(e.target.value)
               createQueryString('status', e.target.value)
             }}
-            className="pl-3 pr-8 py-1.5 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-lg text-[10px] font-bold uppercase tracking-tight appearance-none outline-none focus:border-[var(--text-main)] transition-colors cursor-pointer disabled:opacity-50"
+            className="pl-3 pr-8 py-1.5 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-lg text-[12px] font-bold uppercase tracking-tight appearance-none outline-none focus:border-[var(--text-main)] transition-colors cursor-pointer disabled:opacity-50"
             disabled={isPending}
           >
             <option value="all">All Status</option>
@@ -81,7 +81,7 @@ export function SubscriptionsFilter() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search subscriptions..." 
-            className="w-full pl-8 pr-3 py-1.5 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-lg text-[10px] font-bold uppercase tracking-tight outline-none focus:border-[var(--text-main)] transition-colors"
+            className="w-full pl-8 pr-3 py-1.5 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-lg text-[12px] font-bold uppercase tracking-tight outline-none focus:border-[var(--text-main)] transition-colors"
           />
         </div>
       </div>
@@ -92,13 +92,13 @@ export function SubscriptionsFilter() {
             variant="ghost" 
             size="sm"
             onClick={handleReset}
-            className="h-8 rounded-full border-[var(--border-light)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface)] text-[10px] font-bold uppercase tracking-widest transition-colors"
+            className="h-8 rounded-full border-[var(--border-light)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface)] text-[12px] font-bold uppercase tracking-widest transition-colors"
           >
             Reset
           </Button>
         )}
-        <Button variant="outline" size="sm" className="h-8 rounded-full border-[var(--border-light)] text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest">Pause Selected</Button>
-        <Button variant="outline" size="sm" className="h-8 rounded-full border-[var(--border-light)] text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest">Export CSV</Button>
+        <Button variant="outline" size="sm" className="h-8 rounded-full border-[var(--border-light)] text-[var(--text-muted)] text-[12px] font-bold uppercase tracking-widest">Pause Selected</Button>
+        <Button variant="outline" size="sm" className="h-8 rounded-full border-[var(--border-light)] text-[var(--text-muted)] text-[12px] font-bold uppercase tracking-widest">Export CSV</Button>
       </div>
     </div>
   )

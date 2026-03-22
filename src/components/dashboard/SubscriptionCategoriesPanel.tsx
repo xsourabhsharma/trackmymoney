@@ -14,7 +14,7 @@ export function SubscriptionCategoriesPanel({ categories }: SubscriptionCategori
           <LayoutGrid className="w-5 h-5 text-[var(--text-muted)] opacity-50" />
         </div>
         <p className="text-[11px] font-bold text-[var(--text-main)] uppercase tracking-widest mb-1">No Categorization Data</p>
-        <p className="text-[10px] text-[var(--text-muted)] max-w-[200px]">We need active subscriptions to map their portfolio footprint.</p>
+        <p className="text-[12px] text-[var(--text-muted)] max-w-[200px]">We need active subscriptions to map their portfolio footprint.</p>
       </div>
     )
   }
@@ -30,7 +30,7 @@ export function SubscriptionCategoriesPanel({ categories }: SubscriptionCategori
         </div>
         <div>
           <h2 className="text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider">Spend by Category</h2>
-          <p className="text-[10px] text-[var(--text-muted)] font-medium">Monthly normalized allocations</p>
+          <p className="text-[12px] text-[var(--text-muted)] font-medium">Monthly normalized allocations</p>
         </div>
       </div>
 
@@ -44,7 +44,7 @@ export function SubscriptionCategoriesPanel({ categories }: SubscriptionCategori
               <div className="flex justify-between items-end mb-2">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: color }}></div>
-                  <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
+                  <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
                     {category.categoryName} <span className="opacity-50 ml-1">{percentage.toFixed(0)}%</span>
                   </p>
                 </div>
@@ -67,7 +67,7 @@ export function SubscriptionCategoriesPanel({ categories }: SubscriptionCategori
 
         {categories.length > 4 && (
           <div className="mt-2 text-center">
-            <button className="text-[9px] font-bold text-[var(--text-muted)] hover:text-[var(--text-main)] uppercase tracking-widest transition-colors bg-[var(--bg-muted)] px-3 py-1.5 rounded-full border border-[var(--border-light)]">
+            <button className="text-[11px] font-bold text-[var(--text-muted)] hover:text-[var(--text-main)] uppercase tracking-widest transition-colors bg-[var(--bg-muted)] px-3 py-1.5 rounded-full border border-[var(--border-light)]">
               +{categories.length - 4} More Categories
             </button>
           </div>

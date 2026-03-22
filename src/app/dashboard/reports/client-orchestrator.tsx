@@ -71,7 +71,7 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
           <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-5">
             <Tag className="w-3.5 h-3.5 text-[var(--text-muted)]" />
             <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-main)]">Top Categories</h2>
-            <span className="ml-auto text-[9px] font-bold text-[var(--text-muted)] bg-[var(--bg-surface)] px-2 py-0.5 rounded-full border border-[var(--border-light)]">
+            <span className="ml-auto text-[11px] font-bold text-[var(--text-muted)] bg-[var(--bg-surface)] px-2 py-0.5 rounded-full border border-[var(--border-light)]">
               This Period
             </span>
           </div>

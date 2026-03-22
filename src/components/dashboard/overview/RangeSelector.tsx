@@ -33,9 +33,9 @@ export function RangeSelector() {
           <button
             key={range.value}
             onClick={() => handleRangeChange(range.value)}
-            className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all border ${
+            className={`px-3 py-1 text-[12px] font-bold uppercase tracking-widest rounded-full transition-all border ${
               isActive 
-                ? 'bg-black text-white border-black shadow-sm' 
+                ? 'bg-[var(--text-main)] text-[var(--bg-base)] border-[var(--text-main)] shadow-sm' 
                 : 'bg-transparent text-gray-500 border-gray-200 hover:bg-gray-50'
             }`}
           >

@@ -119,7 +119,7 @@ export default function ForgotPasswordPage() {
         )}
 
         {/* Footer */}
-        <div className="mt-10 flex justify-between items-center text-[10px] font-semibold text-[var(--text-muted)] tracking-widest uppercase">
+        <div className="mt-10 flex justify-between items-center text-[12px] font-semibold text-[var(--text-muted)] tracking-widest uppercase">
           <div className="flex gap-5">
             <Link href="/privacy" className="hover:text-[var(--text-main)] transition-colors">Privacy</Link>
             <Link href="/terms" className="hover:text-[var(--text-main)] transition-colors">Terms</Link>

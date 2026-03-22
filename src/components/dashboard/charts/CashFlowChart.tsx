@@ -22,8 +22,8 @@ export function CashFlowChart({ data }: Props) {
           <path d="M10 90 Q50 75 80 70 T150 60 T190 55" stroke="var(--border-dark)" strokeWidth="2" strokeDasharray="6 4" />
           <line x1="10" y1="95" x2="190" y2="95" stroke="var(--border-dark)" strokeWidth="1" />
         </svg>
-        <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">No cash flow data yet</p>
-        <p className="text-[9px] text-[var(--text-muted)] text-center max-w-[220px]">
+        <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">No cash flow data yet</p>
+        <p className="text-[11px] text-[var(--text-muted)] text-center max-w-[220px]">
           Track income & expenses over time to visualize your cash flow trends
         </p>
       </div>
@@ -63,7 +63,7 @@ export function CashFlowChart({ data }: Props) {
                 if (!payload || payload.length === 0) return null
                 return (
                   <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-xl px-4 py-3 shadow-lg">
-                    <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest mb-2">{label}</div>
+                    <div className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest mb-2">{label}</div>
                     {payload.map((p) => (
                       <div key={p.name} className="flex items-center justify-between gap-4 text-[11px] font-bold tabular-nums">
                         <span className="flex items-center gap-2">

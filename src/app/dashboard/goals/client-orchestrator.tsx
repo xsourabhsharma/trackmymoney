@@ -60,7 +60,7 @@ export function GoalsDebtsClientOrchestrator({ initialData }: Props) {
                 <Target className="w-4 h-4 text-[var(--income-green)]" />
                 <h3 className="text-sm font-bold uppercase tracking-widest text-[var(--text-main)]">Savings Goals</h3>
               </div>
-              <span className="text-[10px] font-bold text-[var(--text-muted)] bg-[var(--bg-surface)] px-3 py-1 rounded-full border border-[var(--border-light)]">
+              <span className="text-[12px] font-bold text-[var(--text-muted)] bg-[var(--bg-surface)] px-3 py-1 rounded-full border border-[var(--border-light)]">
                 {data.savingsGoals.length} goal{data.savingsGoals.length !== 1 ? 's' : ''}
               </span>
             </div>
@@ -83,7 +83,7 @@ export function GoalsDebtsClientOrchestrator({ initialData }: Props) {
                 <h3 className="text-sm font-bold uppercase tracking-widest text-[var(--text-main)]">Debts & Payoff Plan</h3>
               </div>
               {data.debts.length > 0 && (
-                <span className="text-[10px] font-bold text-[var(--text-muted)] bg-[var(--bg-surface)] px-3 py-1 rounded-full border border-[var(--border-light)]">
+                <span className="text-[12px] font-bold text-[var(--text-muted)] bg-[var(--bg-surface)] px-3 py-1 rounded-full border border-[var(--border-light)]">
                   {data.debts.length} debt{data.debts.length !== 1 ? 's' : ''}
                 </span>
               )}
@@ -107,7 +107,7 @@ export function GoalsDebtsClientOrchestrator({ initialData }: Props) {
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
           <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-5">
             <Activity className="w-3.5 h-3.5 text-[var(--text-muted)]" />
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">Goal Progress Snapshot</h3>
+            <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">Goal Progress Snapshot</h3>
           </div>
           <GoalProgressSnapshotPanel snapshot={data.goalProgressSnapshot} />
         </div>
@@ -116,7 +116,7 @@ export function GoalsDebtsClientOrchestrator({ initialData }: Props) {
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
           <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-5">
             <TrendingDown className="w-3.5 h-3.5 text-[var(--text-muted)]" />
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">Debt-Free Countdown</h3>
+            <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">Debt-Free Countdown</h3>
           </div>
           <DebtFreeCountdownPanel
             countdown={data.debtFreeCountdown}
@@ -128,7 +128,7 @@ export function GoalsDebtsClientOrchestrator({ initialData }: Props) {
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
           <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-4">
             <Sparkles className="w-3.5 h-3.5 text-[var(--accent)]" />
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">AI Goal & Debt Tips</h3>
+            <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">AI Goal & Debt Tips</h3>
           </div>
           <AiGoalDebtTipsPanel suggestions={data.aiSuggestions} />
         </div>

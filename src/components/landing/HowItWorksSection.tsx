@@ -89,7 +89,7 @@ export default function HowItWorksSection() {
               <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 ${bgClass}`}>
                 <Icon className={`w-6 h-6 ${iconClass}`} />
               </div>
-              <div className={`text-[10px] font-bold tracking-widest uppercase mb-3 inline-block px-2.5 py-1 rounded-full ${bgClass} ${iconClass}`}>
+              <div className={`text-[12px] font-bold tracking-widest uppercase mb-3 inline-block px-2.5 py-1 rounded-full ${bgClass} ${iconClass}`}>
                 Step {step}
               </div>
               <h3 className="text-lg font-bold mb-2 tracking-tight text-[var(--text-main)]">{title}</h3>

@@ -33,15 +33,15 @@ export function AiGoalDebtTipsPanel({ suggestions }: Props) {
           <Sparkles className="w-4 h-4 text-[var(--text-muted)]" />
         </div>
         <div>
-          <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">No tips yet</p>
-          <p className="text-[9px] text-[var(--text-muted)] mt-1 opacity-70">AI tips appear based on your goals and spending patterns</p>
+          <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">No tips yet</p>
+          <p className="text-[11px] text-[var(--text-muted)] mt-1 opacity-70">AI tips appear based on your goals and spending patterns</p>
         </div>
       </div>
     )
   }
 
   if (visible.length === 0) {
-    return <p className="text-[10px] font-bold text-[var(--income-green)] text-center uppercase tracking-widest py-4">✓ All tips addressed</p>
+    return <p className="text-[12px] font-bold text-[var(--income-green)] text-center uppercase tracking-widest py-4">✓ All tips addressed</p>
   }
 
   const ACCENT_COLORS = ['border-l-[var(--accent)]', 'border-l-[var(--income-green)]', 'border-l-purple-400', 'border-l-orange-400']
@@ -63,14 +63,14 @@ export function AiGoalDebtTipsPanel({ suggestions }: Props) {
             <button
               onClick={() => handleApply(tip.id)}
               disabled={isPending}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--text-main)] text-[var(--bg-base)] rounded-lg text-[9px] font-bold uppercase tracking-widest shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--text-main)] text-[var(--bg-base)] rounded-lg text-[11px] font-bold uppercase tracking-widest shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
             >
               <Check className="w-3 h-3" /> Apply Plan
             </button>
             <button
               onClick={() => handleDismiss(tip.id)}
               disabled={isPending}
-              className="flex items-center gap-1.5 px-3 py-1.5 border border-[var(--border-light)] text-[var(--text-muted)] rounded-lg text-[9px] font-bold uppercase tracking-widest hover:text-[var(--text-main)] transition-all disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-[var(--border-light)] text-[var(--text-muted)] rounded-lg text-[11px] font-bold uppercase tracking-widest hover:text-[var(--text-main)] transition-all disabled:opacity-50"
             >
               <X className="w-3 h-3" /> Dismiss
             </button>

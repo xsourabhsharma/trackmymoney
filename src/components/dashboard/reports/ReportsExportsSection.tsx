@@ -111,7 +111,7 @@ export function ReportsExportsSection({ filter }: Props) {
             </div>
             <div className="min-w-0">
               <h4 className="text-[12px] font-bold text-[var(--text-main)] uppercase tracking-tight truncate">{card.name}</h4>
-              <p className="text-[9px] font-medium text-[var(--text-muted)] uppercase tracking-wider leading-relaxed">{card.desc}</p>
+              <p className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider leading-relaxed">{card.desc}</p>
             </div>
           </div>
 
@@ -120,7 +120,7 @@ export function ReportsExportsSection({ filter }: Props) {
               <select
                 value={formats[card.id]}
                 onChange={e => setFormat(card.id, e.target.value as ExportFormat)}
-                className="pl-3 pr-7 py-2 bg-[var(--bg-base)] border border-[var(--border-light)] rounded-lg text-[10px] font-bold uppercase appearance-none outline-none focus:border-[var(--border-dark)] cursor-pointer transition-all"
+                className="pl-3 pr-7 py-2 bg-[var(--bg-base)] border border-[var(--border-light)] rounded-lg text-[12px] font-bold uppercase appearance-none outline-none focus:border-[var(--border-dark)] cursor-pointer transition-all"
               >
                 <option value="csv">CSV</option>
                 <option value="pdf">PDF</option>
@@ -130,7 +130,7 @@ export function ReportsExportsSection({ filter }: Props) {
             <button
               onClick={() => handleGenerate(card)}
               disabled={loading[card.id]}
-              className={`flex items-center gap-1.5 h-9 px-4 rounded-lg text-[10px] font-bold uppercase tracking-widest shadow-sm transition-all ${
+              className={`flex items-center gap-1.5 h-9 px-4 rounded-lg text-[12px] font-bold uppercase tracking-widest shadow-sm transition-all ${
                 done[card.id]
                   ? 'bg-[var(--income-green)] text-white'
                   : 'bg-[var(--text-main)] text-[var(--bg-base)] hover:scale-[1.01] active:scale-[0.99]'

@@ -178,7 +178,7 @@ export function TransactionsTable({
                 size="sm" 
                 onClick={handleBulkDelete} 
                 disabled={isDeleting}
-                className="h-8 rounded-full border-[var(--expense-red)] text-[var(--expense-red)] hover:bg-[var(--expense-red)] hover:text-white text-[10px] font-bold uppercase tracking-widest"
+                className="h-8 rounded-full border-[var(--expense-red)] text-[var(--expense-red)] hover:bg-[var(--expense-red)] hover:text-white text-[12px] font-bold uppercase tracking-widest"
               >
                 <Trash2 className="w-3 h-3 mr-1.5" />
                 {isDeleting ? "Wiping..." : "Delete Selected"}
@@ -189,7 +189,7 @@ export function TransactionsTable({
                 size="sm" 
                 onClick={handleExportSelected}
                 disabled={isExporting}
-                className="h-8 rounded-full border-[var(--border-light)] bg-[var(--text-main)] text-[var(--bg-base)] text-[10px] font-bold uppercase tracking-widest hover:bg-[var(--text-main)]/90"
+                className="h-8 rounded-full border-[var(--border-light)] bg-[var(--text-main)] text-[var(--bg-base)] text-[12px] font-bold uppercase tracking-widest hover:bg-[var(--text-main)]/90"
               >
                 <Download className="w-3 h-3 mr-1.5" />
                 {isExporting ? "Exporting..." : "Export CSV"}
@@ -207,27 +207,27 @@ export function TransactionsTable({
               <TableRow className="bg-[var(--bg-surface)] border-b border-[var(--border-light)] hover:bg-[var(--bg-surface)]">
                 <TableHead className="w-[40px]"></TableHead>
                 <TableHead 
-                  className="p-4 cursor-pointer hover:text-[var(--text-main)] transition-colors text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)]"
+                  className="p-4 cursor-pointer hover:text-[var(--text-main)] transition-colors text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)]"
                   onClick={() => handleSort('date')}
                 >
                   <div className="flex items-center gap-2">Date <SortIcon col="date" /></div>
                 </TableHead>
                 <TableHead 
-                  className="p-4 cursor-pointer hover:text-[var(--text-main)] transition-colors text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)]"
+                  className="p-4 cursor-pointer hover:text-[var(--text-main)] transition-colors text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)]"
                   onClick={() => handleSort('merchant')}
                 >
                   <div className="flex items-center gap-2">Merchant / Description <SortIcon col="merchant" /></div>
                 </TableHead>
-                <TableHead className="p-4 text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Category</TableHead>
-                <TableHead className="p-4 text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Type</TableHead>
-                <TableHead className="p-4 text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Account</TableHead>
+                <TableHead className="p-4 text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Category</TableHead>
+                <TableHead className="p-4 text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Type</TableHead>
+                <TableHead className="p-4 text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Account</TableHead>
                 <TableHead 
-                  className="p-4 text-right cursor-pointer hover:text-[var(--text-main)] transition-colors text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)]"
+                  className="p-4 text-right cursor-pointer hover:text-[var(--text-main)] transition-colors text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)]"
                   onClick={() => handleSort('amount')}
                 >
                   <div className="flex items-center justify-end gap-2">Amount <SortIcon col="amount" /></div>
                 </TableHead>
-                <TableHead className="p-4 text-right text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Actions</TableHead>
+                <TableHead className="p-4 text-right text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -236,11 +236,11 @@ export function TransactionsTable({
                   <TableCell colSpan={8} className="h-40 text-center">
                     <div className="flex flex-col items-center gap-4 py-8">
                       <div className="text-3xl opacity-30">📭</div>
-                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">No transactions match your filters</span>
+                      <span className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">No transactions match your filters</span>
                       <div className="flex items-center gap-3 mt-2">
                         <button 
                           onClick={() => router.push('/dashboard/transactions')}
-                          className="px-4 py-2 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-[var(--text-main)] transition-colors"
+                          className="px-4 py-2 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-[var(--text-main)] transition-colors"
                         >
                           Clear Filters
                         </button>
@@ -270,24 +270,24 @@ export function TransactionsTable({
                         <div className="flex flex-col overflow-hidden max-w-[180px]">
                           <span className="text-[12px] font-bold truncate text-[var(--text-main)] uppercase tracking-tight">{tx.merchant}</span>
                           {tx.description && (
-                            <span className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest truncate">{tx.description}</span>
+                            <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest truncate">{tx.description}</span>
                           )}
                         </div>
                       </div>
                     </TableCell>
                     <TableCell className="p-4">
                       <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-lg">
-                        <span className="text-[10px] font-bold text-[var(--text-main)] uppercase tracking-widest">{tx.categories?.name || 'General'}</span>
+                        <span className="text-[12px] font-bold text-[var(--text-main)] uppercase tracking-widest">{tx.categories?.name || 'General'}</span>
                       </div>
                     </TableCell>
                     <TableCell className="p-4">
-                      <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-tighter border ${
+                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-tighter border ${
                         tx.type === 'income' ? 'bg-green-50 text-[var(--income-green)] border-green-100' : 'bg-red-50 text-[var(--expense-red)] border-red-100'
                       }`}>
                         {tx.type}
                       </span>
                     </TableCell>
-                    <TableCell className="p-4 text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
+                    <TableCell className="p-4 text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
                       {tx.accountName || '—'}
                     </TableCell>
                     <TableCell className={`p-4 text-right text-[13px] font-bold tabular-nums tracking-tighter ${
@@ -316,7 +316,7 @@ export function TransactionsTable({
 
       {/* Pagination Container */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 mt-2">
-        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">
+        <div className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">
           Showing {((currentPage - 1) * pageSize) + 1}–{Math.min(currentPage * pageSize, totalCount)} of {totalCount} nodes
         </div>
         

@@ -43,7 +43,9 @@ export function AddTransactionButton({
   
   const merchantInputRef = useRef<HTMLInputElement>(null)
   
-  const availableCategories = categories.filter(c => c.type === transactionType || c.type === 'expense' && transactionType === 'transfer')
+  const availableCategories = categories
+    .filter(c => c.type === transactionType || c.type === 'expense' && transactionType === 'transfer')
+    .filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
   useEffect(() => {
     if (open) {
@@ -72,7 +74,7 @@ export function AddTransactionButton({
     const amount = Number(formData.get('amount'))
     const merchant = formData.get('merchant') as string
     
-    let newErrors: { amount?: string; merchant?: string; category?: string; account?: string } = {}
+    const newErrors: { amount?: string; merchant?: string; category?: string; account?: string } = {}
     
     if (!amount || amount <= 0) {
       newErrors.amount = "Required"
@@ -82,9 +84,6 @@ export function AddTransactionButton({
     }
     if (!selectedCategory && transactionType !== 'transfer') {
       newErrors.category = "Required"
-    }
-    if (!selectedAccount) {
-      newErrors.account = "Required"
     }
     
     if (Object.keys(newErrors).length > 0) {
@@ -107,7 +106,6 @@ export function AddTransactionButton({
       await addTransaction(formData)
       setOpen(false)
       setSelectedCategory('')
-      setSelectedAccount('')
       if (merchantInputRef.current) merchantInputRef.current.value = ''
       setErrors({})
       router.refresh()
@@ -145,7 +143,7 @@ export function AddTransactionButton({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button suppressHydrationWarning className="inline-flex items-center justify-center gap-2 rounded-full bg-black px-5 py-2 text-sm font-medium text-white shadow hover:bg-gray-800 transition-colors h-10">
+          <Button suppressHydrationWarning className="btn-primary gap-2 h-10 px-5 text-sm">
             <Plus className="h-4 w-4" />
             {buttonLabel}
           </Button>
@@ -194,7 +192,7 @@ export function AddTransactionButton({
                 onKeyDown={handleAmountKeyDown}
                 required
               />
-              {errors.amount && <span className="absolute -bottom-4 right-0 text-[10px] text-red-500">{errors.amount}</span>}
+              {errors.amount && <span className="absolute -bottom-4 right-0 text-[12px] text-red-500">{errors.amount}</span>}
             </div>
           </div>
           
@@ -235,7 +233,7 @@ export function AddTransactionButton({
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div className="flex flex-col gap-2">
               <Label className="text-xs font-semibold text-[var(--text-muted)] tracking-wider uppercase">Category</Label>
               <select
@@ -246,20 +244,6 @@ export function AddTransactionButton({
                 <option value="">Select category</option>
                 {availableCategories.map(c => (
                   <option key={c.id} value={c.id}>{c.icon ? `${c.icon} ` : ''}{c.name}</option>
-                ))}
-              </select>
-            </div>
-            
-            <div className="flex flex-col gap-2">
-              <Label className="text-xs font-semibold text-[var(--text-muted)] tracking-wider uppercase">Account</Label>
-              <select
-                value={selectedAccount}
-                onChange={(e) => { setSelectedAccount(e.target.value); setErrors(prev => { const { account, ...rest } = prev; return rest }) }}
-                className={`h-10 w-full rounded-lg border bg-[var(--bg-surface)] text-[var(--text-main)] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/30 border-[var(--border-light)] ${errors.account ? 'border-red-500' : ''}`}
-              >
-                <option value="">Select account</option>
-                {accounts.map(a => (
-                  <option key={a.id} value={a.id}>{a.name}</option>
                 ))}
               </select>
             </div>

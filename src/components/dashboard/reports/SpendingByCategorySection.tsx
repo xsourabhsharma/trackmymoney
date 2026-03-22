@@ -19,7 +19,7 @@ export function SpendingByCategorySection({ data }: Props) {
       <div className="py-12 text-center flex flex-col items-center gap-3 border-2 border-dashed border-[var(--border-light)] rounded-[20px] bg-[var(--bg-surface)]/30">
         <span className="text-3xl">🗂️</span>
         <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">No spending by category for this period.</p>
-        <p className="text-[10px] text-[var(--text-muted)]">Add transactions with categories to see breakdowns here.</p>
+        <p className="text-[12px] text-[var(--text-muted)]">Add transactions with categories to see breakdowns here.</p>
       </div>
     )
   }
@@ -34,7 +34,7 @@ export function SpendingByCategorySection({ data }: Props) {
           <button
             key={m}
             onClick={() => setMode(m)}
-            className={`px-3 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider transition-all ${mode === m ? 'bg-[var(--bg-base)] shadow-sm text-[var(--text-main)]' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'}`}
+            className={`px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider transition-all ${mode === m ? 'bg-[var(--bg-base)] shadow-sm text-[var(--text-main)]' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'}`}
           >
             {m}
           </button>
@@ -68,7 +68,7 @@ export function SpendingByCategorySection({ data }: Props) {
                 />
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   {cat.categoryIcon && <span className="text-sm">{cat.categoryIcon}</span>}
-                  <span className="text-[10px] font-bold text-[var(--text-main)] uppercase truncate">{cat.categoryName}</span>
+                  <span className="text-[12px] font-bold text-[var(--text-main)] uppercase truncate">{cat.categoryName}</span>
                 </div>
                 <div className="flex-1 h-1.5 bg-[var(--bg-surface)] rounded-full overflow-hidden">
                   <div
@@ -76,8 +76,8 @@ export function SpendingByCategorySection({ data }: Props) {
                     style={{ width: `${cat.percentOfTotal}%`, backgroundColor: PALETTE[i % PALETTE.length] }}
                   />
                 </div>
-                <span className="text-[10px] font-bold tabular-nums text-[var(--text-muted)] w-12 text-right">{cat.percentOfTotal}%</span>
-                <span className="text-[10px] font-bold tabular-nums text-[var(--text-main)] w-20 text-right">
+                <span className="text-[12px] font-bold tabular-nums text-[var(--text-muted)] w-12 text-right">{cat.percentOfTotal}%</span>
+                <span className="text-[12px] font-bold tabular-nums text-[var(--text-main)] w-20 text-right">
                   ${cat.amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                 </span>
               </div>
@@ -113,7 +113,7 @@ export function SpendingByCategorySection({ data }: Props) {
               <circle cx="50" cy="50" r="25" fill="var(--bg-base)" />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center flex-col">
-              <span className="text-[10px] font-bold text-[var(--text-main)]">${(totalAmount / 1000).toFixed(1)}k</span>
+              <span className="text-[12px] font-bold text-[var(--text-main)]">${(totalAmount / 1000).toFixed(1)}k</span>
               <span className="text-[7px] text-[var(--text-muted)] uppercase">total</span>
             </div>
           </div>
@@ -121,8 +121,8 @@ export function SpendingByCategorySection({ data }: Props) {
             {data.slice(0, 6).map((cat, i) => (
               <div key={cat.categoryName} className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-[2px] flex-shrink-0" style={{ backgroundColor: PALETTE[i % PALETTE.length] }} />
-                <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase truncate flex-1">{cat.categoryName}</span>
-                <span className="text-[10px] font-bold tabular-nums text-[var(--text-main)]">{cat.percentOfTotal}%</span>
+                <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase truncate flex-1">{cat.categoryName}</span>
+                <span className="text-[12px] font-bold tabular-nums text-[var(--text-main)]">{cat.percentOfTotal}%</span>
               </div>
             ))}
           </div>

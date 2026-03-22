@@ -50,10 +50,10 @@ export function AiAutomationSettingsSection({ settings, onSave }: Props) {
 
         <div className="pt-4 border-t border-[var(--border-light)]/50 px-1">
           <div className="flex justify-between items-center mb-3">
-            <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
+            <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
               Anomaly Detection Sensitivity
             </span>
-            <span className="text-[9px] font-bold bg-[var(--bg-surface)] px-2 py-0.5 rounded border border-[var(--border-light)] capitalize">
+            <span className="text-[11px] font-bold bg-[var(--bg-surface)] px-2 py-0.5 rounded border border-[var(--border-light)] capitalize">
               {settings.anomaly_sensitivity}
             </span>
           </div>

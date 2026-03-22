@@ -26,13 +26,13 @@ export function ReportsFilterBar({ filter, onChangeFilter }: Props) {
     <div className="flex flex-wrap items-center gap-6">
       {/* Date Spectrum */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em]">Date Spectrum</span>
+        <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em]">Date Spectrum</span>
         <div className="flex gap-1 p-1 bg-[var(--bg-surface)] rounded-full border border-[var(--border-light)] shadow-inner">
           {PERIODS.map(p => (
             <button
               key={p.key}
               onClick={() => onChangeFilter({ period: p.key })}
-              className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-tight transition-all ${
+              className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-tight transition-all ${
                 filter.period === p.key
                   ? 'bg-[var(--text-main)] text-[var(--bg-base)] shadow-sm'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -46,12 +46,12 @@ export function ReportsFilterBar({ filter, onChangeFilter }: Props) {
 
       {/* Scope */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em]">Scope</span>
+        <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em]">Scope</span>
         <div className="relative">
           <select
             value={filter.scope}
             onChange={e => onChangeFilter({ scope: e.target.value as ReportsScope })}
-            className="pl-3 pr-8 py-2 bg-[var(--bg-base)] border border-[var(--border-light)] rounded-xl text-[10px] font-bold uppercase appearance-none outline-none focus:border-[var(--border-dark)] cursor-pointer transition-all"
+            className="pl-3 pr-8 py-2 bg-[var(--bg-base)] border border-[var(--border-light)] rounded-xl text-[12px] font-bold uppercase appearance-none outline-none focus:border-[var(--border-dark)] cursor-pointer transition-all"
           >
             <option value="all">All Accounts</option>
             <option value="bank">Bank Accounts</option>
@@ -63,13 +63,13 @@ export function ReportsFilterBar({ filter, onChangeFilter }: Props) {
 
       {/* View Mode */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em]">View</span>
+        <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em]">View</span>
         <div className="flex gap-1 p-1 bg-[var(--bg-surface)] rounded-full border border-[var(--border-light)] shadow-inner">
           {VIEWS.map(v => (
             <button
               key={v.key}
               onClick={() => onChangeFilter({ view: v.key })}
-              className={`px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-tight transition-all ${
+              className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-tight transition-all ${
                 filter.view === v.key
                   ? 'bg-[var(--text-main)] text-[var(--bg-base)] shadow-sm'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'

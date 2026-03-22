@@ -60,7 +60,7 @@ function GoalCard({ goal, onEdit }: { goal: SavingsGoalRow; onEdit: () => void }
               <span className="text-[13px] font-bold text-[var(--text-main)] uppercase tracking-tight block">
                 {goal.name}
               </span>
-              <span className={`text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${STATUS_COLORS[goal.status]}`}>
+              <span className={`text-[11px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${STATUS_COLORS[goal.status]}`}>
                 {goal.status}
                 {goal.priority === 1 && <span className="ml-1">⚡</span>}
               </span>
@@ -90,7 +90,7 @@ function GoalCard({ goal, onEdit }: { goal: SavingsGoalRow; onEdit: () => void }
             </span>
           </div>
           {goal.targetDate && (
-            <div className="flex items-center gap-1 text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-tight">
+            <div className="flex items-center gap-1 text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-tight">
               <Clock className="w-3 h-3" />
               {format(new Date(goal.targetDate), 'MMM yyyy')}
             </div>
@@ -99,7 +99,7 @@ function GoalCard({ goal, onEdit }: { goal: SavingsGoalRow; onEdit: () => void }
 
         {/* Remaining */}
         {!isCompleted && (
-          <div className="text-[10px] text-[var(--text-muted)] font-bold">
+          <div className="text-[12px] text-[var(--text-muted)] font-bold">
             💡 ${(goal.targetAmount - goal.currentAmount).toLocaleString()} to go
           </div>
         )}
@@ -119,7 +119,7 @@ export function SavingsGoalsSection({ goals, activeTab, onTabChange, onAddGoal, 
           <button
             key={tab}
             onClick={() => onTabChange(tab)}
-            className={`px-3 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider transition-all ${
+            className={`px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider transition-all ${
               activeTab === tab
                 ? 'bg-[var(--bg-base)] shadow-sm text-[var(--text-main)]'
                 : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -149,7 +149,7 @@ export function SavingsGoalsSection({ goals, activeTab, onTabChange, onAddGoal, 
           {activeTab !== 'completed' && (
             <button
               onClick={onAddGoal}
-              className="flex items-center gap-2 px-5 py-2.5 bg-[var(--text-main)] text-[var(--bg-base)] rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="flex items-center gap-2 px-5 py-2.5 bg-[var(--text-main)] text-[var(--bg-base)] rounded-full text-[12px] font-bold uppercase tracking-widest shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               <Plus className="w-3.5 h-3.5" />
               Add Your First Goal

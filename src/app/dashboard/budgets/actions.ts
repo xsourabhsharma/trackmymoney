@@ -2,17 +2,12 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
-
-function getAdmin() {
-  return createAdminClient()
-}
 
 async function getAuthUser() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
-  return user
+  return { user, supabase }
 }
 
 export interface CreateBudgetInput {
@@ -31,13 +26,12 @@ export interface UpdateBudgetInput {
 }
 
 export async function createBudget(payload: CreateBudgetInput): Promise<void> {
-  const user = await getAuthUser()
-  const admin = getAdmin()
+  const { user, supabase } = await getAuthUser()
 
   const periodStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
   const periodEnd = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0, 23, 59, 59).toISOString()
 
-  const { error } = await admin.from('budgets').insert({
+  const { error } = await supabase.from('budgets').insert({
     user_id: user.id,
     category_id: payload.categoryId,
     limit_amount: payload.limitAmount,
@@ -51,15 +45,14 @@ export async function createBudget(payload: CreateBudgetInput): Promise<void> {
 
   if (error) {
     console.error('createBudget error:', error.message)
-    throw new Error('Failed to create budget')
+    throw new Error('Failed to create budget: ' + error.message)
   }
 
   revalidatePath('/dashboard/budgets', 'page')
 }
 
 export async function updateBudget(id: string, payload: UpdateBudgetInput): Promise<void> {
-  const user = await getAuthUser()
-  const admin = getAdmin()
+  const { user, supabase } = await getAuthUser()
 
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
   if (payload.categoryId !== undefined) updates.category_id = payload.categoryId
@@ -67,37 +60,35 @@ export async function updateBudget(id: string, payload: UpdateBudgetInput): Prom
   if (payload.periodType !== undefined) updates.period_type = payload.periodType
   if (payload.rollover !== undefined) updates.rollover = payload.rollover
 
-  const { error } = await admin.from('budgets').update(updates).eq('id', id).eq('user_id', user.id)
+  const { error } = await supabase.from('budgets').update(updates).eq('id', id).eq('user_id', user.id)
 
   if (error) {
     console.error('updateBudget error:', error.message)
-    throw new Error('Failed to update budget')
+    throw new Error('Failed to update budget: ' + error.message)
   }
 
   revalidatePath('/dashboard/budgets', 'page')
 }
 
 export async function deleteBudget(id: string): Promise<void> {
-  const user = await getAuthUser()
-  const admin = getAdmin()
+  const { user, supabase } = await getAuthUser()
 
-  const { error } = await admin.from('budgets').delete().eq('id', id).eq('user_id', user.id)
+  const { error } = await supabase.from('budgets').delete().eq('id', id).eq('user_id', user.id)
 
   if (error) {
     console.error('deleteBudget error:', error.message)
-    throw new Error('Failed to delete budget')
+    throw new Error('Failed to delete budget: ' + error.message)
   }
 
   revalidatePath('/dashboard/budgets', 'page')
 }
 
 export async function applyBudgetSuggestion(suggestionId: string): Promise<void> {
-  const user = await getAuthUser()
-  const admin = getAdmin()
+  const { user, supabase } = await getAuthUser()
 
   try {
     // Fetch the suggestion
-    const { data: suggestion, error: fetchErr } = await admin
+    const { data: suggestion, error: fetchErr } = await supabase
       .from('budget_ai_suggestions')
       .select('*')
       .eq('id', suggestionId)
@@ -108,7 +99,7 @@ export async function applyBudgetSuggestion(suggestionId: string): Promise<void>
 
     // If linked to a budget, update the budget amount
     if (suggestion.budget_id && suggestion.to_amount) {
-      await admin
+      await supabase
         .from('budgets')
         .update({ limit_amount: suggestion.to_amount, updated_at: new Date().toISOString() })
         .eq('id', suggestion.budget_id)
@@ -116,7 +107,7 @@ export async function applyBudgetSuggestion(suggestionId: string): Promise<void>
     }
 
     // Mark suggestion as applied
-    await admin
+    await supabase
       .from('budget_ai_suggestions')
       .update({ status: 'applied', applied_at: new Date().toISOString() })
       .eq('id', suggestionId)
@@ -129,11 +120,10 @@ export async function applyBudgetSuggestion(suggestionId: string): Promise<void>
 }
 
 export async function dismissBudgetSuggestion(suggestionId: string): Promise<void> {
-  const user = await getAuthUser()
-  const admin = getAdmin()
+  const { user, supabase } = await getAuthUser()
 
   try {
-    await admin
+    await supabase
       .from('budget_ai_suggestions')
       .update({ status: 'dismissed' })
       .eq('id', suggestionId)

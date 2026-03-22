@@ -26,7 +26,9 @@ export function EditTransactionButton({ transaction, categories, accounts = [] }
   const [selectedAccount, setSelectedAccount] = useState<string>(transaction.account_id || transaction.accountId || '')
   const [errors, setErrors] = useState<{ amount?: string; merchant?: string; category?: string }>({})
   
-  const availableCategories = categories.filter(c => c.type === transactionType || c.id === selectedCategory);
+  const availableCategories = categories
+    .filter(c => c.type === transactionType || c.id === selectedCategory)
+    .filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
   const handleTypeChange = (val: 'expense' | 'income') => {
     setTransactionType(val)
@@ -38,7 +40,7 @@ export function EditTransactionButton({ transaction, categories, accounts = [] }
     const amount = Number(formData.get('amount'))
     const merchant = formData.get('merchant') as string
     
-    let newErrors: { amount?: string; merchant?: string; category?: string } = {}
+    const newErrors: { amount?: string; merchant?: string; category?: string } = {}
 
     if (!amount || amount <= 0) {
       newErrors.amount = "Please enter a valid amount greater than 0"
@@ -59,7 +61,6 @@ export function EditTransactionButton({ transaction, categories, accounts = [] }
     
     formData.set('id', transaction.id)
     formData.set('categoryId', selectedCategory)
-    formData.set('accountId', selectedAccount)
     
     setIsLoading(true)
     try {
@@ -178,21 +179,7 @@ export function EditTransactionButton({ transaction, categories, accounts = [] }
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="account" className="text-[var(--text-muted)]">Account</Label>
-              <select
-                value={selectedAccount}
-                onChange={(e) => setSelectedAccount(e.target.value)}
-                className="h-9 w-full rounded-md border bg-[var(--bg-surface)] text-[var(--text-main)] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/30 border-[var(--border-light)]"
-              >
-                <option value="">Select account</option>
-                {accounts.map((a: any) => (
-                  <option key={a.id} value={a.id}>{a.name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
+
 
           <div className="grid gap-2">
               <Label htmlFor="description" className="text-[var(--text-muted)]">Notes (Optional)</Label>
@@ -212,7 +199,7 @@ export function EditTransactionButton({ transaction, categories, accounts = [] }
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading} className="bg-black hover:bg-gray-800">
+            <Button type="submit" disabled={isLoading} className="btn-primary px-6 h-10">
               {isLoading ? "Saving..." : "Update Transaction"}
             </Button>
           </DialogFooter>

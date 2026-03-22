@@ -21,19 +21,19 @@ export function SubscriptionsOverview({ metrics }: SubscriptionsOverviewProps) {
   return (
     <div className="flex flex-col gap-4 mb-8">
       <div className="flex items-center justify-between">
-        <h2 className="text-[10px] font-bold text-[var(--text-muted)] tracking-[0.2em] uppercase">Subscriptions Overview</h2>
+        <h2 className="text-[12px] font-bold text-[var(--text-muted)] tracking-[0.2em] uppercase">Subscriptions Overview</h2>
         
         {/* Toggle Mode */}
         <div className="flex items-center bg-[var(--bg-muted)] p-1 rounded-full border border-[var(--border-light)]">
           <button 
             onClick={() => setViewMode('monthly')}
-            className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${viewMode === 'monthly' ? 'bg-[var(--text-main)] text-[var(--bg-base)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'}`}
+            className={`px-4 py-1.5 rounded-full text-[12px] font-bold uppercase tracking-widest transition-all ${viewMode === 'monthly' ? 'bg-[var(--text-main)] text-[var(--bg-base)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'}`}
           >
             Monthly
           </button>
           <button 
             onClick={() => setViewMode('yearly')}
-            className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${viewMode === 'yearly' ? 'bg-[var(--text-main)] text-[var(--bg-base)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'}`}
+            className={`px-4 py-1.5 rounded-full text-[12px] font-bold uppercase tracking-widest transition-all ${viewMode === 'yearly' ? 'bg-[var(--text-main)] text-[var(--bg-base)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'}`}
           >
             Yearly
           </button>
@@ -46,7 +46,7 @@ export function SubscriptionsOverview({ metrics }: SubscriptionsOverviewProps) {
           <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
             <RefreshCw className="w-24 h-24" />
           </div>
-          <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] mb-2">{viewMode} Outflow</p>
+          <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] mb-2">{viewMode} Outflow</p>
           <div className="flex items-baseline gap-2 mb-4">
             <span className="text-4xl font-light tracking-tight text-[var(--text-main)] animate-count-up">
               {fmt(displayOutflow)}
@@ -54,13 +54,13 @@ export function SubscriptionsOverview({ metrics }: SubscriptionsOverviewProps) {
           </div>
           <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--bg-muted)] border border-[var(--border-light)]">
             <Activity className="w-3 h-3 text-[var(--expense-red)]" />
-            <span className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wider">Recurring Drain</span>
+            <span className="text-[12px] uppercase font-bold text-[var(--text-muted)] tracking-wider">Recurring Drain</span>
           </div>
         </div>
 
         {/* Active Subscriptions Card */}
         <div className="p-6 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-light)] relative overflow-hidden group hover:border-[var(--accent)]/30 transition-colors hover-lift">
-          <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] mb-2">Active Subscriptions</p>
+          <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] mb-2">Active Subscriptions</p>
           <div className="flex items-baseline gap-2 mb-4">
             <span className="text-4xl font-light tracking-tight text-[var(--text-main)]">
               {metrics.activeCount}
@@ -68,7 +68,7 @@ export function SubscriptionsOverview({ metrics }: SubscriptionsOverviewProps) {
           </div>
           <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--bg-muted)] border border-[var(--border-light)]">
             <span className="w-2 h-2 rounded-full bg-[var(--income-green)] animate-pulse"></span>
-            <span className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wider">Tracking Live</span>
+            <span className="text-[12px] uppercase font-bold text-[var(--text-muted)] tracking-wider">Tracking Live</span>
           </div>
         </div>
 
@@ -77,14 +77,14 @@ export function SubscriptionsOverview({ metrics }: SubscriptionsOverviewProps) {
           <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity text-[var(--income-green)]">
             <PiggyBank className="w-24 h-24" />
           </div>
-          <p className="text-[10px] font-bold text-[var(--income-green)] uppercase tracking-[0.2em] mb-2">Potential Savings</p>
+          <p className="text-[12px] font-bold text-[var(--income-green)] uppercase tracking-[0.2em] mb-2">Potential Savings</p>
           <div className="flex items-baseline gap-2 mb-4">
             <span className="text-4xl font-light tracking-tight text-[var(--text-main)] animate-count-up">
               {fmt(displaySavings)}
             </span>
           </div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--income-green)]/10 border border-[var(--income-green)]/20 text-[var(--income-green)] cursor-pointer hover:bg-[var(--income-green)]/20 transition-colors">
-            <span className="text-[10px] uppercase font-bold tracking-wider">Review Underutilized</span>
+            <span className="text-[12px] uppercase font-bold tracking-wider">Review Underutilized</span>
             <ArrowRight className="w-3 h-3" />
           </div>
         </div>

@@ -58,7 +58,7 @@ export function AddBudgetButton({ categories }: { categories: any[] }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button className="inline-flex items-center justify-center gap-2 rounded-md bg-black px-4 py-2 text-sm font-medium text-white shadow hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black">
+          <Button className="btn-primary gap-2 px-4 py-2 text-sm h-10">
             <Plus className="h-4 w-4" />
             Set Budget Limit
           </Button>

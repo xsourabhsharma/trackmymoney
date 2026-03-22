@@ -54,11 +54,11 @@ export function AiAdvisorCard({ insight }: AiAdvisorCardProps) {
               <Sparkles className="w-5 h-5 text-gray-300" />
               AI Advisor
             </h2>
-            <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-wider">
+            <p className="text-[12px] text-gray-400 font-bold mt-1 uppercase tracking-wider">
               Updated just now
             </p>
           </div>
-          <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-[10px] font-bold uppercase tracking-widest text-white border border-white/20 backdrop-blur-md">
+          <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-[12px] font-bold uppercase tracking-widest text-white border border-white/20 backdrop-blur-md">
             <RefreshCw className="w-3 h-3" />
             Refresh
           </button>
@@ -85,7 +85,7 @@ export function AiAdvisorCard({ insight }: AiAdvisorCardProps) {
                 <Link
                   key={i}
                   href={action.href}
-                  className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#d5c5a3] hover:text-white transition-colors"
+                  className="inline-flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-widest text-[#d5c5a3] hover:text-white transition-colors"
                 >
                   <Zap className="w-3 h-3 fill-current" />
                   {action.label}

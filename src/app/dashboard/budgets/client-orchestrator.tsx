@@ -57,13 +57,13 @@ export function BudgetsClientOrchestrator({ initialData, categories }: Props) {
             <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--text-main)]">Budget Overview</h2>
           </div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--bg-surface)] border border-[var(--border-light)] hover:border-[var(--border-dark)] rounded-full text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all">
+            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--bg-surface)] border border-[var(--border-light)] hover:border-[var(--border-dark)] rounded-full text-[11px] font-bold uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all">
               <History className="w-3 h-3" />
               Import History
             </button>
             <button
               onClick={handleOpenAdd}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--text-main)] text-[var(--bg-base)] rounded-full text-[9px] font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--text-main)] text-[var(--bg-base)] rounded-full text-[11px] font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all shadow-sm"
             >
               <Plus className="w-3 h-3" />
               Set Budget Limit
@@ -94,7 +94,7 @@ export function BudgetsClientOrchestrator({ initialData, categories }: Props) {
               {data.categoryBudgets.length > 0 && (
                 <button
                   onClick={handleOpenAdd}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--bg-surface)] border border-[var(--border-light)] hover:border-[var(--border-dark)] rounded-full text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--bg-surface)] border border-[var(--border-light)] hover:border-[var(--border-dark)] rounded-full text-[11px] font-bold uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all"
                 >
                   <Plus className="w-3 h-3" />
                   Add
@@ -125,7 +125,7 @@ export function BudgetsClientOrchestrator({ initialData, categories }: Props) {
           <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
             <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-4">
               <Bell className="w-3.5 h-3.5 text-[var(--text-main)]" />
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">Budget Alerts</h3>
+              <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">Budget Alerts</h3>
               {data.alerts.some(a => a.severity === 'critical') && (
                 <span className="ml-auto w-2 h-2 rounded-full bg-[var(--expense-red)] animate-pulse" />
               )}
@@ -137,7 +137,7 @@ export function BudgetsClientOrchestrator({ initialData, categories }: Props) {
           <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
             <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-4">
               <Sparkles className="w-3.5 h-3.5 text-[var(--accent)]" />
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">AI Budget Suggestions</h3>
+              <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">AI Budget Suggestions</h3>
             </div>
             <AiBudgetSuggestionsPanel suggestions={data.aiSuggestions} />
           </div>

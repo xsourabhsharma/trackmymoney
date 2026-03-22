@@ -93,15 +93,15 @@ function SignUpContent({ searchParamsPromise }: { searchParamsPromise: Promise<{
             <div className="grid grid-cols-3 gap-3 mb-4">
               <div className="bg-white/5 rounded-xl p-3 text-center">
                 <div className="text-white font-bold text-sm tabular-nums">₹1,24,590</div>
-                <div className="text-white/30 text-[9px] uppercase font-semibold tracking-wider mt-0.5">Balance</div>
+                <div className="text-white/30 text-[11px] uppercase font-semibold tracking-wider mt-0.5">Balance</div>
               </div>
               <div className="bg-white/5 rounded-xl p-3 text-center">
                 <div className="text-[#6BCB77] font-bold text-sm tabular-nums">₹70,750</div>
-                <div className="text-white/30 text-[9px] uppercase font-semibold tracking-wider mt-0.5">Income</div>
+                <div className="text-white/30 text-[11px] uppercase font-semibold tracking-wider mt-0.5">Income</div>
               </div>
               <div className="bg-white/5 rounded-xl p-3 text-center">
                 <div className="text-[#FF6B6B]/80 font-bold text-sm tabular-nums">₹29,329</div>
-                <div className="text-white/30 text-[9px] uppercase font-semibold tracking-wider mt-0.5">Expenses</div>
+                <div className="text-white/30 text-[11px] uppercase font-semibold tracking-wider mt-0.5">Expenses</div>
               </div>
             </div>
             <div className="space-y-2">
@@ -110,7 +110,7 @@ function SignUpContent({ searchParamsPromise }: { searchParamsPromise: Promise<{
                 { icon: '💼', name: 'Client Payment', amount: '+₹42,250', neg: false },
               ].map((tx, i) => (
                 <div key={i} className="flex items-center gap-3 bg-white/5 rounded-lg p-2.5 text-[11px]">
-                  <span className="w-6 h-6 rounded-lg bg-white/10 flex items-center justify-center text-[10px]">{tx.icon}</span>
+                  <span className="w-6 h-6 rounded-lg bg-white/10 flex items-center justify-center text-[12px]">{tx.icon}</span>
                   <span className="flex-grow text-white/70 font-medium truncate">{tx.name}</span>
                   <span className={`font-bold ${tx.neg ? 'text-[#FF6B6B]/80' : 'text-[#6BCB77]'}`}>{tx.amount}</span>
                 </div>
@@ -187,7 +187,7 @@ function SignUpContent({ searchParamsPromise }: { searchParamsPromise: Promise<{
             <Link href="/login" className="font-semibold text-[var(--text-main)] hover:underline underline-offset-2">Log in</Link>
           </p>
 
-          <div className="mt-10 flex justify-between items-center text-[10px] font-semibold text-[var(--text-muted)] tracking-widest uppercase">
+          <div className="mt-10 flex justify-between items-center text-[12px] font-semibold text-[var(--text-muted)] tracking-widest uppercase">
             <div className="flex gap-5">
               <Link href="/privacy" className="hover:text-[var(--text-main)] transition-colors">Privacy Policy</Link>
               <Link href="/terms" className="hover:text-[var(--text-main)] transition-colors">Terms</Link>

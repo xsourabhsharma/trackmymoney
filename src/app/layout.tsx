@@ -1,43 +1,46 @@
 import type { Metadata, Viewport } from "next";
-import { Syne, Space_Grotesk, JetBrains_Mono, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
-
-const syne = Syne({
-  variable: "--font-syne",
-  subsets: ["latin"],
-  weight: ["800"],
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  weight: ["500", "700"],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  weight: ["700"],
-});
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"], // Added 800 for heavy headings
 });
 
 export const metadata: Metadata = {
-  title: "Track My Money | Finance Tracker",
-  description: "AI-Powered Personal Finance Tracker",
-  manifest: "/manifest.json",
+  title: {
+    default: 'TrackMyMoney | AI-Powered Personal Finance Tracker',
+    template: '%s | TrackMyMoney',
+  },
+  description: 'Track expenses, manage budgets, set savings goals, and get AI-powered financial insights. Upload receipts, parse bank statements, and take control of your money.',
+  keywords: ['finance tracker', 'expense tracker', 'budget planner', 'savings goals', 'AI finance', 'receipt scanner', 'personal finance'],
+  authors: [{ name: 'TrackMyMoney' }],
+  openGraph: {
+    title: 'TrackMyMoney | AI-Powered Personal Finance Tracker',
+    description: 'Track expenses, manage budgets, set savings goals, and get AI-powered financial insights.',
+    url: '/',
+    siteName: 'TrackMyMoney',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'TrackMyMoney | AI-Powered Personal Finance Tracker',
+    description: 'Track expenses, manage budgets, set savings goals, and get AI-powered financial insights.',
+  },
+  manifest: '/manifest.json',
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export const viewport: Viewport = {
-  width: "device-width",
+  width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false, // Prevents zoooooming in on input focus on iOS
+  // NOTE: Removed maximumScale: 1 and userScalable: false for accessibility (WCAG 1.4.4)
 };
 
 export default function RootLayout({
@@ -48,7 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${syne.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} ${inter.variable} antialiased`}
+        className={`${inter.variable} font-sans antialiased selection:bg-[var(--accent)] selection:text-white transition-colors duration-500`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}

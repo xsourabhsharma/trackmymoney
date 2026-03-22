@@ -69,7 +69,7 @@ export function EditBudgetButton({ budget, categories }: { budget: any, categori
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border-2 border-[#141414]/10">
             <div className="space-y-0.5">
               <Label htmlFor="rollover">Rollover Surplus</Label>
-              <p className="text-[10px] text-gray-500 font-bold uppercase">Carry over unspent funds to next month</p>
+              <p className="text-[12px] text-gray-500 font-bold uppercase">Carry over unspent funds to next month</p>
             </div>
             <Switch id="rollover" checked={rollover} onCheckedChange={setRollover} />
           </div>

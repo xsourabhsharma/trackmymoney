@@ -40,7 +40,7 @@ export function AiBudgetSuggestionsPanel({ suggestions }: Props) {
           <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
             No suggestions yet
           </p>
-          <p className="text-[10px] text-[var(--text-muted)] mt-1 opacity-70">
+          <p className="text-[12px] text-[var(--text-muted)] mt-1 opacity-70">
             AI suggestions appear based on your spending patterns
           </p>
         </div>
@@ -82,7 +82,7 @@ export function AiBudgetSuggestionsPanel({ suggestions }: Props) {
 
           {/* Amount change display */}
           {sug.fromAmount !== null && sug.toAmount !== null && (
-            <div className="flex items-center gap-2 text-[10px] font-bold text-[var(--text-muted)]">
+            <div className="flex items-center gap-2 text-[12px] font-bold text-[var(--text-muted)]">
               <span className="line-through opacity-60">${fmt(sug.fromAmount)}</span>
               <ArrowRight className="w-3 h-3" />
               <span className="text-[var(--income-green)]">${fmt(sug.toAmount)}</span>
@@ -93,7 +93,7 @@ export function AiBudgetSuggestionsPanel({ suggestions }: Props) {
             <button
               onClick={() => handleApply(sug.id)}
               disabled={isPending}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--text-main)] text-[var(--bg-base)] rounded-lg text-[9px] font-bold uppercase tracking-widest shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--text-main)] text-[var(--bg-base)] rounded-lg text-[11px] font-bold uppercase tracking-widest shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
             >
               <Check className="w-3 h-3" />
               Apply
@@ -101,7 +101,7 @@ export function AiBudgetSuggestionsPanel({ suggestions }: Props) {
             <button
               onClick={() => handleDismiss(sug.id)}
               disabled={isPending}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-transparent border border-[var(--border-light)] text-[var(--text-muted)] rounded-lg text-[9px] font-bold uppercase tracking-widest hover:text-[var(--text-main)] transition-all disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-transparent border border-[var(--border-light)] text-[var(--text-muted)] rounded-lg text-[11px] font-bold uppercase tracking-widest hover:text-[var(--text-main)] transition-all disabled:opacity-50"
             >
               <X className="w-3 h-3" />
               Dismiss
@@ -109,7 +109,7 @@ export function AiBudgetSuggestionsPanel({ suggestions }: Props) {
           </div>
         </div>
       ))}
-      <p className="text-[9px] text-[var(--text-muted)] text-center">
+      <p className="text-[11px] text-[var(--text-muted)] text-center">
         Applying a suggestion will update your budget limit for that category.
       </p>
     </div>

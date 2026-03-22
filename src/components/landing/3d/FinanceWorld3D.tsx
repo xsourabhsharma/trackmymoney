@@ -157,8 +157,18 @@ export default function FinanceWorld3D() {
         {/* Floating Particles for a magical atmosphere */}
         <Sparkles count={150} scale={20} size={isDark ? 2 : 4} speed={0.4} opacity={isDark ? 0.5 : 0.8} color="#10B981" />
 
-        {/* Soft environment reflections for the glass material */}
-        <Environment preset="city" />
+        {/* Synthetic local environment to prevent failed network requests */}
+        <Environment resolution={128}>
+          <group rotation={[-Math.PI / 2, 0, 0]}>
+            <spotLight position={[0, 10, 0]} intensity={2} color="#ffffff" />
+            <spotLight position={[5, 5, 5]} intensity={1.5} color="#3B82F6" />
+            <spotLight position={[-5, 5, -5]} intensity={1.5} color="#10B981" />
+            <mesh scale={100}>
+              <sphereGeometry args={[1, 32, 32]} />
+              <meshBasicMaterial color={isDark ? "#020617" : "#FFFFFF"} side={THREE.BackSide} />
+            </mesh>
+          </group>
+        </Environment>
       </Canvas>
     </div>
   )

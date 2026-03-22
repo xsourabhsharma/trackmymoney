@@ -93,7 +93,7 @@ export default function FeaturesSection() {
               <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               
               {freelancer && (
-                <span className="absolute top-4 right-4 text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-light)]">
+                <span className="absolute top-4 right-4 text-[11px] font-bold uppercase tracking-widest px-2 py-1 rounded-full bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-light)]">
                   Freelancer-friendly
                 </span>
               )}

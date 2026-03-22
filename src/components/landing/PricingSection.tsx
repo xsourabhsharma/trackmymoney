@@ -89,7 +89,7 @@ export default function PricingSection() {
               }`}
             >
               {plan.badge && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-[var(--income-green)] text-white text-[10px] font-bold uppercase tracking-widest rounded-full shadow-md">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-[var(--income-green)] text-white text-[12px] font-bold uppercase tracking-widest rounded-full shadow-md">
                   {plan.badge}
                 </span>
               )}

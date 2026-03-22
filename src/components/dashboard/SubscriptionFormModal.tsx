@@ -106,7 +106,7 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
             
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2 relative">
-                <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest pl-2">Merchant <span className="text-[var(--expense-red)]">*</span></label>
+                <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest pl-2">Merchant <span className="text-[var(--expense-red)]">*</span></label>
                 <input 
                   type="text" 
                   value={formData.merchant}
@@ -117,7 +117,7 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
                 />
               </div>
               <div className="flex flex-col gap-2 relative">
-                <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest pl-2">Service Name</label>
+                <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest pl-2">Service Name</label>
                 <input 
                   type="text" 
                   value={formData.serviceName}
@@ -130,7 +130,7 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2 relative">
-                <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest pl-2">Amount <span className="text-[var(--expense-red)]">*</span></label>
+                <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest pl-2">Amount <span className="text-[var(--expense-red)]">*</span></label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] font-light">$</span>
                   <input 
@@ -146,7 +146,7 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
               </div>
               
               <div className="flex flex-col gap-2 relative">
-                <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest pl-2">Category</label>
+                <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest pl-2">Category</label>
                 <select 
                   value={formData.categoryId || ''}
                   onChange={e => setFormData({...formData, categoryId: e.target.value})}
@@ -161,10 +161,10 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
             </div>
 
             <div className="border border-[var(--border-light)] rounded-xl p-4 bg-[var(--bg-muted)]/30 flex flex-col gap-4">
-              <h4 className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest border-b border-[var(--border-light)] pb-2 mb-2">Billing Cycle</h4>
+              <h4 className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest border-b border-[var(--border-light)] pb-2 mb-2">Billing Cycle</h4>
               <div className="grid grid-cols-2 gap-4">
                  <div className="flex flex-col gap-2 relative">
-                  <label className="text-[10px] font-bold text-[var(--text-main)] uppercase tracking-widest pl-2">Interval</label>
+                  <label className="text-[12px] font-bold text-[var(--text-main)] uppercase tracking-widest pl-2">Interval</label>
                   <select 
                     value={formData.interval}
                     onChange={e => setFormData({...formData, interval: e.target.value as any})}
@@ -177,7 +177,7 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
                   </select>
                 </div>
                 <div className="flex flex-col gap-2 relative">
-                  <label className="text-[10px] font-bold text-[var(--text-main)] uppercase tracking-widest pl-2">Next Charge On</label>
+                  <label className="text-[12px] font-bold text-[var(--text-main)] uppercase tracking-widest pl-2">Next Charge On</label>
                   <input 
                     type="date"
                     value={formData.nextChargeDate}
@@ -190,7 +190,7 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
 
             <div className="grid grid-cols-2 gap-4">
                <div className="flex flex-col gap-2 relative">
-                <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest pl-2">Status</label>
+                <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest pl-2">Status</label>
                 <select 
                   value={formData.status}
                   onChange={e => setFormData({...formData, status: e.target.value as any})}
@@ -209,7 +209,7 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
                   </div>
                   <div>
                     <p className="text-[11px] font-bold text-[var(--text-main)] tracking-wider">Flag for Savings</p>
-                    <p className="text-[9px] text-[var(--text-muted)] uppercase tracking-widest">Mark as "rarely used" manually</p>
+                    <p className="text-[11px] text-[var(--text-muted)] uppercase tracking-widest">Mark as "rarely used" manually</p>
                   </div>
                   <input type="checkbox" className="hidden" checked={formData.potentialSavings || false} onChange={e => setFormData({...formData, potentialSavings: e.target.checked})} />
                 </label>
@@ -220,10 +220,10 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
         </div>
 
         <div className="p-6 border-t border-[var(--border-light)] bg-[var(--bg-base)] flex justify-end gap-3 shrink-0">
-          <Button type="button" variant="outline" onClick={onClose} disabled={isPending} className="px-6 py-2.5 h-auto rounded-xl text-[10px] font-bold uppercase tracking-widest border-[var(--border-light)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--border-light)]">
+          <Button type="button" variant="outline" onClick={onClose} disabled={isPending} className="px-6 py-2.5 h-auto rounded-xl text-[12px] font-bold uppercase tracking-widest border-[var(--border-light)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--border-light)]">
             Cancel
           </Button>
-          <Button type="submit" form="sub-form" disabled={isPending} className="px-6 py-2.5 h-auto rounded-xl text-[10px] font-bold uppercase tracking-widest bg-[var(--text-main)] text-[var(--bg-base)] hover:bg-[var(--text-main)]/90 shadow-sm transition-all border border-transparent shadow-black/20">
+          <Button type="submit" form="sub-form" disabled={isPending} className="px-6 py-2.5 h-auto rounded-xl text-[12px] font-bold uppercase tracking-widest bg-[var(--text-main)] text-[var(--bg-base)] hover:bg-[var(--text-main)]/90 shadow-sm transition-all border border-transparent shadow-black/20">
             {isPending ? 'Saving...' : initialData ? 'Update Details' : 'Save Subscription'}
           </Button>
         </div>

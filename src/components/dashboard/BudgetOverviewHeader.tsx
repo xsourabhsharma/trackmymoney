@@ -40,14 +40,14 @@ export function BudgetOverviewHeader({ metrics, filter, onFilterChange }: Props)
             <div className="w-10 h-10 rounded-xl bg-[var(--accent)]/10 flex items-center justify-center">
               <Wallet className="w-5 h-5 text-[var(--accent)]" />
             </div>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] bg-[var(--bg-surface)] px-2 py-1 rounded-full border border-[var(--border-light)]">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-muted)] bg-[var(--bg-surface)] px-2 py-1 rounded-full border border-[var(--border-light)]">
               Budget
             </span>
           </div>
           <div className="text-3xl font-bold tabular-nums text-[var(--text-main)] tracking-tight">
             {fmt(totalBudget)}
           </div>
-          <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-[0.15em] mt-1">
+          <div className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-[0.15em] mt-1">
             Total Monthly Budget
           </div>
           {/* Mini progress bar */}
@@ -57,7 +57,7 @@ export function BudgetOverviewHeader({ metrics, filter, onFilterChange }: Props)
               style={{ width: `${Math.min(pctUsed, 100)}%` }}
             />
           </div>
-          <div className="text-[9px] text-[var(--text-muted)] mt-1 tabular-nums">{Math.round(pctUsed)}% utilized</div>
+          <div className="text-[11px] text-[var(--text-muted)] mt-1 tabular-nums">{Math.round(pctUsed)}% utilized</div>
         </div>
 
         {/* Total Spent */}
@@ -67,18 +67,18 @@ export function BudgetOverviewHeader({ metrics, filter, onFilterChange }: Props)
             <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-orange-500" />
             </div>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] bg-[var(--bg-surface)] px-2 py-1 rounded-full border border-[var(--border-light)]">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-muted)] bg-[var(--bg-surface)] px-2 py-1 rounded-full border border-[var(--border-light)]">
               Spent
             </span>
           </div>
           <div className="text-3xl font-bold tabular-nums text-[var(--text-main)] tracking-tight">
             {fmt(totalSpent)}
           </div>
-          <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-[0.15em] mt-1">
+          <div className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-[0.15em] mt-1">
             Total Spent
           </div>
           <div className="mt-4 h-1 bg-[var(--bg-surface)] rounded-full" />
-          <div className="text-[9px] text-[var(--text-muted)] mt-1">across all budget categories</div>
+          <div className="text-[11px] text-[var(--text-muted)] mt-1">across all budget categories</div>
         </div>
 
         {/* Remaining */}
@@ -88,18 +88,18 @@ export function BudgetOverviewHeader({ metrics, filter, onFilterChange }: Props)
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isOver ? 'bg-red-100' : 'bg-green-100'}`}>
               <TrendingDown className={`w-5 h-5 ${isOver ? 'text-[var(--expense-red)]' : 'text-[var(--income-green)]'}`} />
             </div>
-            <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full border ${isOver ? 'bg-red-50 text-red-600 border-red-100' : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-light)]'}`}>
+            <span className={`text-[11px] font-bold uppercase tracking-widest px-2 py-1 rounded-full border ${isOver ? 'bg-red-50 text-red-600 border-red-100' : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-light)]'}`}>
               {isOver ? 'Over Budget' : 'Remaining'}
             </span>
           </div>
           <div className={`text-3xl font-bold tabular-nums tracking-tight ${isOver ? 'text-[var(--expense-red)]' : 'text-[var(--income-green)]'}`}>
             {isOver ? '-' : ''}{fmt(Math.abs(remaining))}
           </div>
-          <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-[0.15em] mt-1">
+          <div className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-[0.15em] mt-1">
             {isOver ? 'Over Budget' : 'Remaining Balance'}
           </div>
           <div className="mt-4 h-1 bg-[var(--bg-surface)] rounded-full" />
-          <div className="text-[9px] text-[var(--text-muted)] mt-1">{isOver ? '⚠️ exceeded limit' : '✓ within budget'}</div>
+          <div className="text-[11px] text-[var(--text-muted)] mt-1">{isOver ? '⚠️ exceeded limit' : '✓ within budget'}</div>
         </div>
       </div>
 
@@ -111,7 +111,7 @@ export function BudgetOverviewHeader({ metrics, filter, onFilterChange }: Props)
             <button
               key={p.key}
               onClick={() => onFilterChange({ ...filter, period: p.key })}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-all ${
                 filter.period === p.key
                   ? 'bg-[var(--text-main)] text-[var(--bg-base)] shadow-sm'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -129,7 +129,7 @@ export function BudgetOverviewHeader({ metrics, filter, onFilterChange }: Props)
             <button
               key={s.key}
               onClick={() => onFilterChange({ ...filter, scope: s.key })}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-all ${
                 filter.scope === s.key
                   ? 'bg-[var(--text-main)] text-[var(--bg-base)] shadow-sm'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'

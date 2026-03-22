@@ -55,7 +55,7 @@ export function GoalFormModal({ isOpen, onClose, editGoal }: GoalModalProps) {
               <h2 className="text-[13px] font-bold text-[var(--text-main)] uppercase tracking-tighter">
                 {isEdit ? 'Edit Goal' : 'New Savings Goal'}
               </h2>
-              <p className="text-[10px] text-[var(--text-muted)]">
+              <p className="text-[12px] text-[var(--text-muted)]">
                 {isEdit ? `Editing: ${editGoal?.name}` : 'Define a target and start tracking progress'}
               </p>
             </div>
@@ -68,7 +68,7 @@ export function GoalFormModal({ isOpen, onClose, editGoal }: GoalModalProps) {
         <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-5">
           {/* Icon Picker */}
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Icon</label>
+            <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Icon</label>
             <div className="flex flex-wrap gap-2">
               {GOAL_ICONS.map(icon => (
                 <button type="button" key={icon} onClick={() => setSelectedIcon(icon)}
@@ -81,7 +81,7 @@ export function GoalFormModal({ isOpen, onClose, editGoal }: GoalModalProps) {
 
           {/* Name */}
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Goal Name</label>
+            <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Goal Name</label>
             <input name="name" required defaultValue={editGoal?.name || ''} placeholder="e.g. Emergency Fund"
               className="w-full px-4 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[13px] font-medium text-[var(--text-main)] focus:outline-none focus:border-[var(--border-dark)] transition-all" />
           </div>
@@ -89,13 +89,13 @@ export function GoalFormModal({ isOpen, onClose, editGoal }: GoalModalProps) {
           {/* Target / Current */}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Target ($)</label>
+              <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Target ($)</label>
               <input name="targetAmount" type="number" min="1" step="1" required defaultValue={editGoal?.targetAmount || ''}
                 placeholder="5000"
                 className="w-full px-4 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[13px] font-bold text-[var(--text-main)] focus:outline-none focus:border-[var(--border-dark)] transition-all tabular-nums" />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Saved So Far ($)</label>
+              <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Saved So Far ($)</label>
               <input name="currentAmount" type="number" min="0" step="1" defaultValue={editGoal?.currentAmount || 0}
                 placeholder="0"
                 className="w-full px-4 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[13px] font-bold text-[var(--text-main)] focus:outline-none focus:border-[var(--border-dark)] transition-all tabular-nums" />
@@ -104,7 +104,7 @@ export function GoalFormModal({ isOpen, onClose, editGoal }: GoalModalProps) {
 
           {/* Target Date */}
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Target Date (optional)</label>
+            <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Target Date (optional)</label>
             <input name="deadline" type="date" defaultValue={editGoal?.targetDate ? editGoal.targetDate.slice(0, 10) : ''}
               className="w-full px-4 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[13px] text-[var(--text-main)] focus:outline-none focus:border-[var(--border-dark)] transition-all" />
           </div>
@@ -112,8 +112,8 @@ export function GoalFormModal({ isOpen, onClose, editGoal }: GoalModalProps) {
           {error && <p className="text-[11px] font-bold text-[var(--expense-red)] bg-red-50 border border-red-100 rounded-lg px-4 py-3">⚠️ {error}</p>}
 
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] text-[var(--text-muted)] rounded-xl text-[10px] font-bold uppercase tracking-widest hover:border-[var(--border-dark)] transition-all">Cancel</button>
-            <button type="submit" disabled={isPending} className="flex-1 py-3 bg-[var(--text-main)] text-[var(--bg-base)] rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+            <button type="button" onClick={onClose} className="flex-1 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] text-[var(--text-muted)] rounded-xl text-[12px] font-bold uppercase tracking-widest hover:border-[var(--border-dark)] transition-all">Cancel</button>
+            <button type="submit" disabled={isPending} className="flex-1 py-3 bg-[var(--text-main)] text-[var(--bg-base)] rounded-xl text-[12px] font-bold uppercase tracking-widest shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-60 flex items-center justify-center gap-2">
               {isPending ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving...</> : isEdit ? 'Update Goal' : 'Create Goal'}
             </button>
           </div>
@@ -168,7 +168,7 @@ export function DebtFormModal({ isOpen, onClose, editDebt }: DebtModalProps) {
               <h2 className="text-[13px] font-bold text-[var(--text-main)] uppercase tracking-tighter">
                 {isEdit ? 'Edit Debt' : 'Add Debt Record'}
               </h2>
-              <p className="text-[10px] text-[var(--text-muted)]">Track balances, rates, and payments for payoff planning</p>
+              <p className="text-[12px] text-[var(--text-muted)]">Track balances, rates, and payments for payoff planning</p>
             </div>
           </div>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-[var(--bg-surface)] border border-[var(--border-light)] flex items-center justify-center hover:border-[var(--border-dark)] transition-all">
@@ -179,35 +179,35 @@ export function DebtFormModal({ isOpen, onClose, editDebt }: DebtModalProps) {
         <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2 col-span-2">
-              <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Debt Name</label>
+              <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Debt Name</label>
               <input name="name" required defaultValue={editDebt?.name || ''} placeholder="e.g. Credit Card – Chase"
                 className="w-full px-4 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[13px] font-medium text-[var(--text-main)] focus:outline-none focus:border-[var(--border-dark)] transition-all" />
             </div>
             <div className="flex flex-col gap-2 col-span-2">
-              <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Creditor (optional)</label>
+              <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Creditor (optional)</label>
               <input name="creditor" defaultValue={editDebt?.creditor || ''} placeholder="e.g. Chase Bank"
                 className="w-full px-4 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[13px] text-[var(--text-main)] focus:outline-none focus:border-[var(--border-dark)] transition-all" />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Total Amount ($)</label>
+              <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Total Amount ($)</label>
               <input name="totalAmount" type="number" min="1" step="0.01" required defaultValue={editDebt?.originalPrincipal || ''}
                 placeholder="10000"
                 className="w-full px-4 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[13px] font-bold tabular-nums text-[var(--text-main)] focus:outline-none focus:border-[var(--border-dark)] transition-all" />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Remaining ($)</label>
+              <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Remaining ($)</label>
               <input name="remainingAmount" type="number" min="0" step="0.01" required defaultValue={editDebt?.currentBalance || ''}
                 placeholder="8500"
                 className="w-full px-4 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[13px] font-bold tabular-nums text-[var(--text-main)] focus:outline-none focus:border-[var(--border-dark)] transition-all" />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Interest Rate (%)</label>
+              <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Interest Rate (%)</label>
               <input name="interestRate" type="number" min="0" step="0.01" defaultValue={editDebt?.interestRate || 0}
                 placeholder="19.99"
                 className="w-full px-4 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[13px] font-bold tabular-nums text-[var(--text-main)] focus:outline-none focus:border-[var(--border-dark)] transition-all" />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Min. Payment/mo ($)</label>
+              <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Min. Payment/mo ($)</label>
               <input name="minimumPayment" type="number" min="0" step="0.01" defaultValue={editDebt?.minimumPayment || 0}
                 placeholder="250"
                 className="w-full px-4 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[13px] font-bold tabular-nums text-[var(--text-main)] focus:outline-none focus:border-[var(--border-dark)] transition-all" />
@@ -217,8 +217,8 @@ export function DebtFormModal({ isOpen, onClose, editDebt }: DebtModalProps) {
           {error && <p className="text-[11px] font-bold text-[var(--expense-red)] bg-red-50 border border-red-100 rounded-lg px-4 py-3">⚠️ {error}</p>}
 
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] text-[var(--text-muted)] rounded-xl text-[10px] font-bold uppercase tracking-widest hover:border-[var(--border-dark)] transition-all">Cancel</button>
-            <button type="submit" disabled={isPending} className="flex-1 py-3 bg-[var(--text-main)] text-[var(--bg-base)] rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+            <button type="button" onClick={onClose} className="flex-1 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] text-[var(--text-muted)] rounded-xl text-[12px] font-bold uppercase tracking-widest hover:border-[var(--border-dark)] transition-all">Cancel</button>
+            <button type="submit" disabled={isPending} className="flex-1 py-3 bg-[var(--text-main)] text-[var(--bg-base)] rounded-xl text-[12px] font-bold uppercase tracking-widest shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-60 flex items-center justify-center gap-2">
               {isPending ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving...</> : isEdit ? 'Update Debt' : 'Add Debt'}
             </button>
           </div>

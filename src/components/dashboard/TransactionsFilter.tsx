@@ -75,7 +75,7 @@ export function TransactionsFilter({ categories }: TransactionsFilterProps) {
       <div className="flex flex-wrap items-center gap-4">
         {/* Date Filter */}
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Date:</span>
+          <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Date:</span>
           <div className="relative group">
             <select 
               value={dateRange}
@@ -98,7 +98,7 @@ export function TransactionsFilter({ categories }: TransactionsFilterProps) {
 
         {/* Type Filter */}
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Type:</span>
+          <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Type:</span>
           <div className="relative group">
             <select 
               value={type}
@@ -120,7 +120,7 @@ export function TransactionsFilter({ categories }: TransactionsFilterProps) {
 
         {/* Category Filter */}
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Category:</span>
+          <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Category:</span>
           <div className="relative group">
             <select 
               value={categoryId}
@@ -158,7 +158,7 @@ export function TransactionsFilter({ categories }: TransactionsFilterProps) {
             <Button 
               variant="ghost" 
               onClick={handleReset}
-              className="h-9 px-4 rounded-full text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface)] transition-colors"
+              className="h-9 px-4 rounded-full text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface)] transition-colors"
             >
               Reset Filters
             </Button>

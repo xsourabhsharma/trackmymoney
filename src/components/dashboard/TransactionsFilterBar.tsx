@@ -87,17 +87,16 @@ export function TransactionsFilterBar({
 
              {/* Category Select */}
              <div className="relative shrink-0">
-              <select 
+              <select
                 value={currentCategoryId}
                 onChange={(e) => applyFilter('cat', e.target.value)}
                 className="appearance-none pl-4 pr-10 py-2.5 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[11px] font-bold text-[var(--text-main)] uppercase tracking-widest outline-none focus:border-[var(--text-main)] transition-colors cursor-pointer max-w-[180px] truncate"
               >
                 <option value="all">All Categories</option>
-                {categories.map(c => (
+                {categories.filter((v, i, a) => a.findIndex(t => t.name === v.name) === i).map(c => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
+              </select>              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
             </div>
 
             {/* Account Select */}

@@ -2,6 +2,7 @@ import { createGroq } from '@ai-sdk/groq'
 import { streamText, tool, convertToModelMessages } from 'ai'
 import { z } from 'zod'
 import { createClient } from '@/utils/supabase/server'
+import { apiError, unauthorized } from '@/lib/api-errors'
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30
@@ -17,7 +18,7 @@ export async function POST(req: Request) {
   // Authenticate user
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    return new Response('Unauthorized', { status: 401 })
+    return unauthorized()
   }
 
   // 1. Convert frontend UIMessages to standard CoreMessages manually
@@ -143,15 +144,17 @@ If you cannot see any income or expenses natively, advice them: "I don't have ac
         addTransaction: tool({
           description: 'Add a new transaction (expense or income) dynamically. Call this for regular spending or income logs.',
           parameters: z.object({
-            amount: z.number().describe('The cost or amount of the transaction.'),
-            merchant: z.string().describe('The name of the store, person, or merchant.'),
-            category: z.string().describe('General category (e.g. Food, Transport, Rent). Provide "Uncategorized" if none.'),
-            type: z.string().describe('Must be exactly "income" or "expense".'),
-            description: z.string().describe('Short note about the transaction. Provide empty string if none.')
+            amount: z.number().describe('The transaction amount. Must be a positive number.'),
+            merchant: z.string().default('Unknown').describe('Name of the merchant or payee.'),
+            category: z.string().optional().describe('Category name (e.g. Food, Transport).'),
+            type: z.enum(['income', 'expense']).default('expense').describe('Transaction type.'),
+            notes: z.string().optional().describe('Optional description or notes.')
           }),
-          // @ts-ignore
-          execute: async (args: { amount: number, merchant: string, category: string, type: 'income' | 'expense' | string, description: string }) => {
-            const { amount, merchant, category, type, description } = args;
+          // @ts-expect-error — AI SDK tool() overload expects undefined execute when used with streamText
+          execute: async (args: { amount: number; merchant: string; category?: string; type: 'income' | 'expense'; notes?: string }) => {
+            const { amount, merchant, type, notes } = args;
+            const category = args.category || '';
+            if (amount <= 0) return { success: false, error: 'Amount must be greater than zero.' };
             try {
               // 1. Find the default account
               const { data: accounts } = await supabase.from('accounts').select('id, balance').eq('user_id', user.id).limit(1);
@@ -161,26 +164,27 @@ If you cannot see any income or expenses natively, advice them: "I don't have ac
               // 2. Find matching category
               let categoryId = null;
               if (category) {
-                const { data: cats } = await supabase.from('categories').select('id').eq('user_id', user.id).ilike('name', `%${category}%`).limit(1);
+                const { data: cats } = await supabase.from('categories').select('id').or(`user_id.eq.${user.id},user_id.is.null`).ilike('name', `%${category}%`).limit(1);
                 if (cats && cats.length > 0) categoryId = cats[0].id;
               }
 
-              // 3. Insert Database Transaction
+              // 3. Insert Database Transaction (use 'manual' source — 'ai_assistant' is not in the DB enum)
               const { error } = await supabase.from('transactions').insert({
                 user_id: user.id,
-                account_id: accountId, // Required to reflect in UI
+                account_id: accountId,
                 amount,
                 merchant,
                 type,
-                description,
+                description: notes || null,
                 category_id: categoryId,
                 date: new Date().toISOString(),
-                source: 'manual', 
+                source: 'manual',
+                source_metadata: { origin: 'ai_advisor' },
                 is_reviewed: false 
               });
               if (error) throw error;
 
-              // 4. Optionally update the account balance manually if triggers don't exist
+              // 4. Update the account balance
               if (account && accountId) {
                 const diff = type === 'expense' ? -Math.abs(amount) : Math.abs(amount);
                 await supabase.from('accounts').update({ balance: Number(account.balance) + diff }).eq('id', accountId);
@@ -198,21 +202,20 @@ If you cannot see any income or expenses natively, advice them: "I don't have ac
           parameters: z.object({
             limitAmount: z.number().describe('Maximum amount for the budget.'),
             categoryName: z.string().describe('Category name for the budget (e.g. Food).'),
-            periodType: z.string().describe('Must be exactly "monthly" or "yearly".')
+            periodType: z.enum(['monthly', 'quarterly', 'yearly']).default('monthly').describe('Budget period type.')
           }),
-          // @ts-ignore
-          execute: async (args: { limitAmount: number, categoryName: string, periodType: string }) => {
+          // @ts-expect-error — AI SDK tool() overload
+          execute: async (args: { limitAmount: number; categoryName: string; periodType: 'monthly' | 'quarterly' | 'yearly' }) => {
             try {
-              // 1. Find matching category
               let categoryId = null;
-              const { data: cats } = await supabase.from('categories').select('id').eq('user_id', user.id).ilike('name', `%${args.categoryName}%`).limit(1);
+              const { data: cats } = await supabase.from('categories').select('id').or(`user_id.eq.${user.id},user_id.is.null`).ilike('name', `%${args.categoryName}%`).limit(1);
               if (cats && cats.length > 0) categoryId = cats[0].id;
               else return { success: false, error: 'Category not found. Ask user to specify an existing category.' };
 
               const { error } = await supabase.from('budgets').insert({
                 user_id: user.id,
                 category_id: categoryId,
-                period_type: args.periodType || 'monthly',
+                period_type: args.periodType,
                 limit_amount: args.limitAmount,
                 period_start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(),
                 status: 'active'
@@ -230,8 +233,8 @@ If you cannot see any income or expenses natively, advice them: "I don't have ac
             targetAmount: z.number().describe('Target amount to save.'),
             targetDate: z.string().describe('ISO String date when the goal should be met. e.g. "2026-12-31"')
           }),
-          // @ts-ignore
-          execute: async (args: { name: string, targetAmount: number, targetDate: string }) => {
+          // @ts-expect-error — AI SDK tool() overload
+          execute: async (args: { name: string; targetAmount: number; targetDate: string }) => {
             try {
               const { error } = await supabase.from('goals').insert({
                 user_id: user.id,
@@ -252,17 +255,17 @@ If you cannot see any income or expenses natively, advice them: "I don't have ac
           parameters: z.object({
             name: z.string().describe('Name of the debt (e.g. Mortgage, Student Loan).'),
             totalAmount: z.number().describe('Total amount of the debt.'),
-            interestRate: z.number().describe('Interest rate percentage. Put 0 if none.')
+            interestRate: z.number().default(0).describe('Interest rate percentage. Put 0 if none.')
           }),
-          // @ts-ignore
-          execute: async (args: { name: string, totalAmount: number, interestRate: number }) => {
+          // @ts-expect-error — AI SDK tool() overload
+          execute: async (args: { name: string; totalAmount: number; interestRate: number }) => {
             try {
               const { error } = await supabase.from('debts').insert({
                 user_id: user.id,
                 name: args.name,
                 total_amount: args.totalAmount,
                 remaining_amount: args.totalAmount,
-                interest_rate: args.interestRate || 0
+                interest_rate: args.interestRate
               });
               if (error) throw error;
               return { success: true, message: `Successfully added debt "${args.name}" for $${args.totalAmount}.` };
@@ -275,16 +278,16 @@ If you cannot see any income or expenses natively, advice them: "I don't have ac
           parameters: z.object({
             merchant: z.string().describe('Name of the subscription service provider.'),
             amount: z.number().describe('Cost of the subscription.'),
-            interval: z.string().describe('Must be exactly "weekly", "monthly", or "yearly".')
+            interval: z.enum(['weekly', 'monthly', 'yearly']).default('monthly').describe('Billing interval.')
           }),
-          // @ts-ignore
-          execute: async (args: { merchant: string, amount: number, interval: string }) => {
+          // @ts-expect-error — AI SDK tool() overload
+          execute: async (args: { merchant: string; amount: number; interval: 'weekly' | 'monthly' | 'yearly' }) => {
             try {
               const { error } = await supabase.from('subscriptions').insert({
                 user_id: user.id,
                 merchant: args.merchant,
                 amount: args.amount,
-                interval: args.interval || 'monthly',
+                interval: args.interval,
                 status: 'active'
               });
               if (error) throw error;
@@ -292,12 +295,11 @@ If you cannot see any income or expenses natively, advice them: "I don't have ac
             } catch (e: any) { return { success: false, error: e.message }; }
           }
         }),
-        // @ts-ignore
         getSpendingSummary: tool({
            description: 'Get a summary of the user\'s total expenses and income for the current month.',
            parameters: z.object({}),
-           // @ts-ignore
-           execute: async (_args: any) => {
+           // @ts-expect-error — AI SDK tool() overload
+           execute: async () => {
               const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
               const { data } = await supabase
                 .from('transactions')
@@ -322,6 +324,6 @@ If you cannot see any income or expenses natively, advice them: "I don't have ac
     return result.toUIMessageStreamResponse()
   } catch (error) {
     console.error('Chat API Error:', error)
-    return new Response(JSON.stringify({ error: "AI error" }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+    return apiError('AI error', { status: 500 })
   }
 }
