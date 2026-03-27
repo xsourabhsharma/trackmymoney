@@ -4,13 +4,138 @@ import { ArrowLeft } from 'lucide-react'
 
 export const metadata = {
   title: 'Terms of Service | TrackMyMoney',
-  description: 'Terms of Service for TrackMyMoney, the AI-powered personal finance tracker.',
+  description: 'Terms governing access to and use of the TrackMyMoney website, dashboard, and AI-assisted finance features.',
 }
+
+const sections = [
+  {
+    id: 'acceptance',
+    title: '1. Acceptance of Terms',
+    paragraphs: [
+      'By accessing or using TrackMyMoney, you agree to these Terms of Service. If you do not agree, do not use the service.',
+      'These Terms apply to the public website, dashboard, APIs, uploads, exports, AI-assisted features, and any related services we make available.',
+    ],
+  },
+  {
+    id: 'eligibility',
+    title: '2. Eligibility and Accounts',
+    paragraphs: [
+      'You must provide accurate registration information and keep your account credentials secure. You are responsible for activity that occurs under your account.',
+      'You may not share access credentials in a way that compromises the security or integrity of the service.',
+    ],
+  },
+  {
+    id: 'service-description',
+    title: '3. Description of the Service',
+    paragraphs: [
+      'TrackMyMoney is a personal finance web application that helps users organize and review financial information. Features may include transaction tracking, budgeting, goals, debt tracking, subscription monitoring, reporting, data export, and AI-assisted processing of uploaded content.',
+      'We may add, remove, improve, suspend, or change features over time.',
+    ],
+  },
+  {
+    id: 'user-data',
+    title: '4. Your Data and Responsibilities',
+    paragraphs: [
+      'You are responsible for the information and files you upload, enter, or submit through the service.',
+    ],
+    bullets: [
+      'You must have the right to upload and process any documents, statements, receipts, images, or other content you submit.',
+      'You are responsible for reviewing imported, parsed, categorized, or AI-generated outputs before relying on them.',
+      'You should keep backup copies of important records you do not want to lose.',
+      'You remain responsible for financial, tax, accounting, investment, and legal decisions you make using information from the product.',
+    ],
+  },
+  {
+    id: 'ai-features',
+    title: '5. AI Features and No Professional Advice',
+    paragraphs: [
+      'TrackMyMoney may provide AI-assisted categorization, OCR, summaries, insights, and advisor-style responses. These features are offered for convenience and productivity only.',
+      'AI outputs may be inaccurate, incomplete, delayed, or inappropriate for your specific circumstances.',
+      'TrackMyMoney is not a bank, broker, lender, accountant, law firm, tax advisor, or registered investment adviser. Nothing in the service constitutes financial, tax, legal, or investment advice.',
+    ],
+  },
+  {
+    id: 'acceptable-use',
+    title: '6. Acceptable Use',
+    paragraphs: [
+      'You agree not to misuse the service.',
+    ],
+    bullets: [
+      'Do not attempt to access another user\'s data or account.',
+      'Do not upload malicious code, harmful content, or content you do not have permission to use.',
+      'Do not interfere with the service, reverse engineer it, or attempt to bypass security measures.',
+      'Do not use the service for unlawful, fraudulent, deceptive, or abusive purposes.',
+      'Do not overload, scrape, or automate the service in a way that harms availability or stability.',
+    ],
+  },
+  {
+    id: 'ownership',
+    title: '7. Ownership and License',
+    paragraphs: [
+      'As between you and TrackMyMoney, you retain ownership of the content and data you submit to the service.',
+      'You grant us a limited license to host, store, process, reproduce, and transmit your content only as needed to operate, secure, improve, and support the service.',
+      'We retain ownership of the TrackMyMoney application, branding, design, code, documentation, and related intellectual property.',
+    ],
+  },
+  {
+    id: 'availability',
+    title: '8. Availability, Changes, and Termination',
+    paragraphs: [
+      'We do not guarantee that the service will always be available, error-free, or uninterrupted. Maintenance, outages, provider issues, or feature changes may affect access.',
+      'We may suspend or terminate access if we reasonably believe you have violated these Terms, created risk for the service or other users, or used the product unlawfully.',
+      'You may stop using the service at any time. Where available, you may also export data or request account deletion through account-management features.',
+    ],
+  },
+  {
+    id: 'fees',
+    title: '9. Fees and Future Paid Features',
+    paragraphs: [
+      'TrackMyMoney may currently offer free access to some or all features. We may introduce paid features, limits, subscriptions, or pricing in the future.',
+      'If we do, we may update these Terms and provide pricing or billing details separately at the time those features are offered.',
+    ],
+  },
+  {
+    id: 'disclaimers',
+    title: '10. Disclaimers',
+    paragraphs: [
+      'The service is provided "as is" and "as available" to the maximum extent permitted by law.',
+      'We disclaim warranties of any kind, whether express or implied, including implied warranties of merchantability, fitness for a particular purpose, non-infringement, accuracy, or availability.',
+    ],
+  },
+  {
+    id: 'liability',
+    title: '11. Limitation of Liability',
+    paragraphs: [
+      'To the maximum extent permitted by law, TrackMyMoney and its operators will not be liable for indirect, incidental, consequential, special, exemplary, or punitive damages, or for lost profits, revenues, data, business opportunities, or goodwill arising out of or related to your use of the service.',
+      'To the maximum extent permitted by law, our total liability for claims arising out of or related to the service will be limited to the amount you paid us for the service, if any, during the 12 months before the event giving rise to the claim.',
+    ],
+  },
+  {
+    id: 'indemnity',
+    title: '12. Indemnity',
+    paragraphs: [
+      'You agree to indemnify and hold harmless TrackMyMoney and its operators from claims, liabilities, damages, losses, and expenses arising out of your content, your misuse of the service, or your violation of these Terms.',
+    ],
+  },
+  {
+    id: 'changes',
+    title: '13. Changes to These Terms',
+    paragraphs: [
+      'We may revise these Terms from time to time. When we do, we will update the "Last updated" date on this page. Your continued use of the service after the updated Terms become effective means you accept the revised Terms.',
+    ],
+  },
+  {
+    id: 'contact',
+    title: '14. Contact',
+    paragraphs: [
+      'If you have questions about these Terms, contact us at support@trackmymoney.app.',
+    ],
+  },
+] as const
 
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-main)] font-sans antialiased">
-      {}
       <nav className="border-b border-[var(--border-light)] py-4">
         <div className="max-w-[800px] mx-auto px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight group">
@@ -29,119 +154,69 @@ export default function TermsPage() {
         </div>
       </nav>
 
-      {}
-      <main className="max-w-[800px] mx-auto px-6 py-12 md:py-20">
+      <main className="max-w-[1000px] mx-auto px-6 py-12 md:py-20">
         <div className="mb-10">
           <h1 className="text-[2rem] md:text-[2.5rem] font-bold tracking-tight mb-3">Terms of Service</h1>
-          <p className="text-[var(--text-muted)] text-sm">Last updated: March 19, 2026</p>
+          <p className="text-[var(--text-muted)] text-sm">Last updated: March 27, 2026</p>
         </div>
 
-        <div className="prose-custom space-y-8">
-          <section>
-            <h2 className="text-xl font-bold mb-3 tracking-tight">1. Acceptance of Terms</h2>
-            <p className="text-[15px] text-[var(--text-muted)] leading-relaxed">
-              By accessing or using TrackMyMoney (&quot;the Service&quot;), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service. These terms apply to all users, visitors, and others who access the Service.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-bold mb-3 tracking-tight">2. Description of Service</h2>
-            <p className="text-[15px] text-[var(--text-muted)] leading-relaxed">
-              TrackMyMoney is a personal finance tracking application that allows users to upload financial statements, automatically categorize transactions using AI, track budgets, set savings goals, and view financial reports. The Service is provided as a web application accessible through modern web browsers.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-bold mb-3 tracking-tight">3. User Accounts</h2>
-            <p className="text-[15px] text-[var(--text-muted)] leading-relaxed mb-3">
-              To use most features of the Service, you must create an account. You agree to:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-[15px] text-[var(--text-muted)] leading-relaxed pl-2">
-              <li>Provide accurate, current, and complete information during registration.</li>
-              <li>Maintain the security of your password and account credentials.</li>
-              <li>Accept responsibility for all activities that occur under your account.</li>
-              <li>Notify us immediately of any unauthorized use of your account.</li>
+        <div className="flex gap-10">
+          <nav className="hidden lg:block sticky top-24 self-start w-56 shrink-0">
+            <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest mb-3">On this page</p>
+            <ul className="flex flex-col gap-1.5 border-l border-[var(--border-light)] pl-3">
+              {sections.map((section) => (
+                <li key={section.id}>
+                  <a
+                    href={`#${section.id}`}
+                    className="text-[12px] font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors leading-tight block py-0.5"
+                  >
+                    {section.title}
+                  </a>
+                </li>
+              ))}
             </ul>
-          </section>
+          </nav>
 
-          <section>
-            <h2 className="text-xl font-bold mb-3 tracking-tight">4. Financial Data</h2>
-            <p className="text-[15px] text-[var(--text-muted)] leading-relaxed mb-3">
-              The Service allows you to upload and process financial data including bank statements, transaction records, and related documents. You acknowledge that:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-[15px] text-[var(--text-muted)] leading-relaxed pl-2">
-              <li>You are solely responsible for the accuracy of the data you upload.</li>
-              <li>AI-powered categorization and analysis are provided as helpful suggestions, not financial advice.</li>
-              <li>TrackMyMoney is not a financial advisor, bank, or investment service.</li>
-              <li>You should verify all auto-categorized data before making financial decisions.</li>
-            </ul>
-          </section>
+          <div className="flex-1 space-y-8 min-w-0">
+            {sections.map((section) => (
+              <section id={section.id} key={section.id}>
+                <h2 className="text-xl font-bold mb-3 tracking-tight">{section.title}</h2>
 
-          <section>
-            <h2 className="text-xl font-bold mb-3 tracking-tight">5. Acceptable Use</h2>
-            <p className="text-[15px] text-[var(--text-muted)] leading-relaxed mb-3">
-              You agree not to use the Service to:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-[15px] text-[var(--text-muted)] leading-relaxed pl-2">
-              <li>Upload any data you do not have the right to access or process.</li>
-              <li>Attempt to gain unauthorized access to other users&apos; data or accounts.</li>
-              <li>Use the Service for any illegal or fraudulent purposes.</li>
-              <li>Reverse-engineer, decompile, or attempt to extract the source code of the Service.</li>
-              <li>Overload, disrupt, or interfere with the Service&apos;s infrastructure.</li>
-            </ul>
-          </section>
+                {section.paragraphs.map((paragraph) => (
+                  <p key={paragraph} className="text-[15px] text-[var(--text-muted)] leading-relaxed mb-3">
+                    {section.id === 'contact' && paragraph.includes('support@trackmymoney.app') ? (
+                      <>
+                        If you have questions about these Terms, contact us at{' '}
+                        <a
+                          href="mailto:support@trackmymoney.app"
+                          className="text-[var(--text-main)] font-medium underline underline-offset-2 hover:opacity-80 transition-opacity"
+                        >
+                          support@trackmymoney.app
+                        </a>
+                        .
+                      </>
+                    ) : (
+                      paragraph
+                    )}
+                  </p>
+                ))}
 
-          <section>
-            <h2 className="text-xl font-bold mb-3 tracking-tight">6. Free and Paid Plans</h2>
-            <p className="text-[15px] text-[var(--text-muted)] leading-relaxed">
-              TrackMyMoney offers a free tier and may offer paid plans with additional features. Free tier access may be subject to usage limits. We reserve the right to modify pricing, features, or limits with reasonable notice. Paid plan subscribers will be notified of any pricing changes at least 30 days in advance.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-bold mb-3 tracking-tight">7. Data Ownership and Export</h2>
-            <p className="text-[15px] text-[var(--text-muted)] leading-relaxed">
-              You retain full ownership of all financial data you upload to the Service. You may export your data at any time in CSV, Excel, or PDF format. You may also delete your account and all associated data at any time through the Settings page. Upon account deletion, all your data is permanently removed from our systems.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-bold mb-3 tracking-tight">8. Intellectual Property</h2>
-            <p className="text-[15px] text-[var(--text-muted)] leading-relaxed">
-              The Service, including its design, code, AI models, features, and documentation, is owned by TrackMyMoney and protected by intellectual property laws. Your use of the Service does not grant you any rights to our intellectual property beyond what is necessary to use the Service as intended.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-bold mb-3 tracking-tight">9. Limitation of Liability</h2>
-            <p className="text-[15px] text-[var(--text-muted)] leading-relaxed">
-              The Service is provided &quot;as is&quot; and &quot;as available&quot; without warranties of any kind, either express or implied. TrackMyMoney shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the Service, including but not limited to financial losses resulting from reliance on the Service&apos;s data or analysis.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-bold mb-3 tracking-tight">10. Changes to Terms</h2>
-            <p className="text-[15px] text-[var(--text-muted)] leading-relaxed">
-              We may update these Terms from time to time. When we do, we will update the &quot;Last updated&quot; date at the top of this page. Continued use of the Service after changes constitutes acceptance of the updated terms. For material changes, we will notify registered users via email.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-bold mb-3 tracking-tight">11. Contact</h2>
-            <p className="text-[15px] text-[var(--text-muted)] leading-relaxed">
-              If you have questions about these Terms, please contact us at{' '}
-              <a href="mailto:support@trackmymoney.app" className="text-[var(--text-main)] font-medium underline underline-offset-2 hover:opacity-80 transition-opacity">
-                support@trackmymoney.app
-              </a>.
-            </p>
-          </section>
+                {'bullets' in section && section.bullets ? (
+                  <ul className="list-disc list-inside space-y-2 text-[15px] text-[var(--text-muted)] leading-relaxed pl-2">
+                    {section.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                ) : null}
+              </section>
+            ))}
+          </div>
         </div>
       </main>
 
-      {}
       <footer className="border-t border-[var(--border-light)] py-6">
         <div className="max-w-[800px] mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[12px] text-[var(--text-muted)]">
-          <span>© 2026 TrackMyMoney. All rights reserved.</span>
+          <span>&copy; 2026 TrackMyMoney. All rights reserved.</span>
           <div className="flex gap-4">
             <Link href="/privacy" className="hover:text-[var(--text-main)] transition-colors">Privacy Policy</Link>
             <span className="text-[var(--text-main)] font-medium">Terms of Service</span>
