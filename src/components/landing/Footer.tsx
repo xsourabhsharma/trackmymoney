@@ -18,10 +18,12 @@ export default function Footer() {
     <footer className="bg-[var(--bg-base)] pt-16 pb-8 border-t border-[var(--border-light)]">
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-12">
-          {/* Brand */}
+          {}
           <div className="col-span-2">
-            <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight mb-4">
-              <Image src="/logo.svg" alt="TrackMyMoney" width={24} height={24} className="w-6 h-6" />
+            <Link href="/" className="flex items-center gap-2.5 text-lg font-bold tracking-tight mb-4 group">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--text-main)]/5 border border-[var(--border-light)] overflow-hidden">
+                <Image src="/real-logo.png" alt="TrackMyMoney" width={20} height={20} className="w-5 h-5 opacity-90 group-hover:opacity-100 transition-opacity dark:invert" />
+              </div>
               Track<span className="text-[var(--text-muted)]">My</span>Money
             </Link>
             <p className="text-sm text-[var(--text-muted)] max-w-[300px] leading-relaxed">
@@ -29,7 +31,7 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Product */}
+          {}
           <div>
             <h4 className="font-bold mb-4 text-[12px] uppercase tracking-widest">Product</h4>
             <ul className="flex flex-col gap-2.5 text-sm text-[var(--text-muted)]">
@@ -43,7 +45,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Legal */}
+          {}
           <div>
             <h4 className="font-bold mb-4 text-[12px] uppercase tracking-widest">Legal</h4>
             <ul className="flex flex-col gap-2.5 text-sm text-[var(--text-muted)]">
@@ -58,7 +60,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom bar */}
+        {}
         <div className="pt-6 border-t border-[var(--border-light)] flex flex-col md:flex-row items-center justify-between gap-3">
           <div className="text-[12px] text-[var(--text-muted)]">
             © 2026 TrackMyMoney. All rights reserved.

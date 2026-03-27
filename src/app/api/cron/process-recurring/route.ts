@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 
 export async function GET(request: Request) {
-  // Simple security check to prevent unauthorized triggering if not using Vercel Cron natively
+ 
   const authHeader = request.headers.get('authorization')
   if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
 
   const today = new Date().toISOString()
 
-  // Find all active recurring transactions where next_due_date is today or in the past
+ 
   const { data: dueSubscriptions, error: fetchError } = await supabaseAdmin
     .from('recurring_transactions')
     .select('*')
@@ -33,19 +33,19 @@ export async function GET(request: Request) {
   let processedCount = 0
 
   for (const sub of dueSubscriptions) {
-    // 1. Insert the new transaction into the ledger
+   
     const { error: insertError } = await supabaseAdmin
       .from('transactions')
       .insert({
         user_id: sub.user_id,
         amount: sub.amount,
         currency: 'USD',
-        type: 'expense', // Assume expense for now, could be derived from category
+        type: 'expense',
         category_id: sub.category_id,
         merchant: sub.merchant,
         description: 'Auto-generated recurring subscription',
         date: sub.next_due_date,
-        source: 'manual', // System generated
+        source: 'manual',
         is_recurring: true,
         recurring_id: sub.id,
         is_reviewed: true
@@ -56,13 +56,13 @@ export async function GET(request: Request) {
       continue
     }
 
-    // 2. Calculate the next due date
+   
     const nextDue = new Date(sub.next_due_date)
     if (sub.frequency === 'monthly') nextDue.setMonth(nextDue.getMonth() + 1)
     else if (sub.frequency === 'yearly') nextDue.setFullYear(nextDue.getFullYear() + 1)
     else if (sub.frequency === 'weekly') nextDue.setDate(nextDue.getDate() + 7)
 
-    // 3. Update the recurring transaction's next_due_date
+   
     const { error: updateError } = await supabaseAdmin
       .from('recurring_transactions')
       .update({ next_due_date: nextDue.toISOString() })
@@ -75,8 +75,8 @@ export async function GET(request: Request) {
     }
   }
 
-  // NOTE: If Resend API Key is set, we would loop over unique users and send them an email
-  // summary of their auto-charged subscriptions here.
+ 
+ 
 
   return NextResponse.json({ 
     message: `Successfully processed ${processedCount} recurring subscriptions.`,

@@ -21,7 +21,7 @@ export function SubscriptionHealthPanel({ health }: SubscriptionHealthPanelProps
 
       <div className="flex flex-col gap-4 flex-grow">
         
-        {/* Cost vs Income Line */}
+        {}
         <div className="p-4 rounded-xl border border-[var(--border-light)] bg-[var(--bg-muted)]/50">
           <div className="flex justify-between items-end mb-2">
             <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Vs Monthly Income</p>
@@ -35,7 +35,7 @@ export function SubscriptionHealthPanel({ health }: SubscriptionHealthPanelProps
           </div>
         </div>
 
-        {/* Underutilized Flag */}
+        {}
         <div className="flex items-center justify-between p-4 rounded-xl border border-[var(--border-light)] hover:bg-[var(--bg-muted)] transition-colors cursor-pointer group">
           <div className="flex items-center gap-3">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${health.rarelyUsedCount > 0 ? 'bg-[var(--expense-red)]/10 text-[var(--expense-red)]' : 'bg-[var(--border-light)] text-[var(--text-muted)]'}`}>
@@ -51,7 +51,7 @@ export function SubscriptionHealthPanel({ health }: SubscriptionHealthPanelProps
           </div>
         </div>
 
-        {/* Overdue/Failed Payments */}
+        {}
         <div className="flex items-center justify-between p-4 rounded-xl border border-[var(--border-light)] hover:bg-[var(--bg-muted)] transition-colors cursor-pointer group">
           <div className="flex items-center gap-3">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${health.overdueCount > 0 ? 'bg-[#FF9800]/10 text-[#FF9800]' : 'bg-[var(--border-light)] text-[var(--text-muted)]'}`}>

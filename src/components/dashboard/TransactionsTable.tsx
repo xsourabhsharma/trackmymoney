@@ -158,7 +158,7 @@ export function TransactionsTable({
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Bulk Actions Bar */}
+      {}
       <div className="flex flex-wrap items-center justify-between gap-4 py-3 border-b border-[var(--border-light)] mb-2">
         <div className="flex items-center gap-4">
           <label className="flex items-center gap-2 text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-tight cursor-pointer">
@@ -199,7 +199,7 @@ export function TransactionsTable({
         </div>
       </div>
 
-      {/* Table Container */}
+      {}
       <div className="border border-[var(--border-light)] rounded-[20px] overflow-hidden bg-[var(--bg-base)] shadow-sm">
         <div className="overflow-x-auto">
           <Table>
@@ -314,7 +314,7 @@ export function TransactionsTable({
         </div>
       </div>
 
-      {/* Pagination Container */}
+      {}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 mt-2">
         <div className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">
           Showing {((currentPage - 1) * pageSize) + 1}–{Math.min(currentPage * pageSize, totalCount)} of {totalCount} nodes

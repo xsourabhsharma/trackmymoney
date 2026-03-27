@@ -5,8 +5,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { PerspectiveCamera, Stars, Float } from '@react-three/drei'
 import * as THREE from 'three'
 import { useTheme } from 'next-themes'
-
-// Particles forming a futuristic network/neural grid
+
 function NeuralNetwork() {
   const count = 150
   const points = useMemo(() => {
@@ -31,7 +30,7 @@ function NeuralNetwork() {
     }
   })
 
-  // create lines connecting nearby points
+ 
   const indices = useMemo(() => {
     const idx = []
     for (let i = 0; i < count; i++) {
@@ -110,7 +109,7 @@ export default function DeepMindHero3D() {
         <pointLight position={[-10, -10, -10]} intensity={isDark ? 0.5 : 1} color="#3B82F6" />
         
         <NeuralNetwork />
-        {/* <FloatingCube /> */}
+        {}
         <Stars radius={100} depth={50} count={2000} factor={4} saturation={0} fade speed={1} />
       </Canvas>
     </div>

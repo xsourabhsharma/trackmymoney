@@ -19,7 +19,7 @@ export function SubscriptionCategoriesPanel({ categories }: SubscriptionCategori
     )
   }
 
-  // Calculate total for percentage bars
+ 
   const totalAmount = categories.reduce((sum, cat) => sum + cat.amountMonthly, 0)
 
   return (

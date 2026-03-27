@@ -24,7 +24,7 @@ export default async function DashboardLayout({
     theme = settings.theme ?? 'system'
     currency = (settings.currency as 'USD' | 'INR') || 'USD'
   } catch {
-    // Settings table may not exist yet — fall through to defaults
+   
   }
 
   return (

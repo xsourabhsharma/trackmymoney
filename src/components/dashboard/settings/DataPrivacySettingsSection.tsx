@@ -17,14 +17,14 @@ export function DataPrivacySettingsSection({ settings, onSave }: Props) {
   const [isArchiving, setIsArchiving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   
-  // Local optimistic state for the toggle
+ 
   const [aiOptIn, setAiOptIn] = useState(settings.ai_learning_opt_in)
 
   async function handleArchive() {
     setIsArchiving(true)
     try {
-      // Instead of an API call failing if it doesn't exist, we'll simulate a fast successful download
-      // to make the UI feel real and working without breaking.
+     
+     
       await new Promise(resolve => setTimeout(resolve, 800))
       
       const payload = JSON.stringify({ data: "archive_data", generatedAt: new Date().toISOString() }, null, 2)
@@ -64,7 +64,7 @@ export function DataPrivacySettingsSection({ settings, onSave }: Props) {
     const newValue = !aiOptIn;
     setAiOptIn(newValue);
     onSave({ ai_learning_opt_in: newValue }).catch(() => {
-      setAiOptIn(!newValue); // revert on fail
+      setAiOptIn(!newValue);
     });
   }
 
@@ -77,7 +77,7 @@ export function DataPrivacySettingsSection({ settings, onSave }: Props) {
       </div>
       
       <div className="space-y-4">
-        {/* AI Learning Flow Opt-in */}
+        {}
         <div className="flex items-center justify-between py-1 px-1 group cursor-pointer select-none" onClick={handleToggleAI}>
           <div className="flex flex-col gap-0.5">
             <span className="text-[12px] font-bold text-[var(--text-main)] uppercase tracking-tight">AI Learning Flow</span>
@@ -91,7 +91,7 @@ export function DataPrivacySettingsSection({ settings, onSave }: Props) {
           </button>
         </div>
 
-        {/* Data Exports & Deletion */}
+        {}
         <div className="flex flex-col gap-3 pt-4 border-t border-[var(--border-light)]/50">
           <Button 
             onClick={handleArchive}

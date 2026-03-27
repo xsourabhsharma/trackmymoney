@@ -27,7 +27,7 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
   
   const [isPending, startTransition] = useTransition()
 
-  // Reset form when modal opens via parent state
+ 
   useEffect(() => {
     if (initialData) {
       setFormData({
@@ -37,7 +37,7 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
         currency: initialData.currency,
         interval: initialData.interval,
         status: initialData.status,
-        nextChargeDate: initialData.nextChargeDate ? initialData.nextChargeDate.split('T')[0] : '', // format to YYYY-MM-DD for date input
+        nextChargeDate: initialData.nextChargeDate ? initialData.nextChargeDate.split('T')[0] : '',
         categoryId: initialData.categoryId || '',
         potentialSavings: initialData.potentialSavings,
       })
@@ -61,10 +61,10 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     startTransition(async () => {
-      // Validate core fields
+     
       if (!formData.merchant || formData.amount === undefined) return
       
-      // Cleanup payload
+     
       const payload: CreateSubscriptionPayload = {
         merchant: formData.merchant,
         serviceName: formData.serviceName || undefined,

@@ -8,13 +8,13 @@ import { format, parseISO, getDay } from 'date-fns'
 
 export function ReportsCharts({ transactions }: { transactions: any[] }) {
   
-  // 1. Monthly Income vs Expense Trend
+ 
   const monthlyDataMap: Record<string, { month: string, income: number, expense: number }> = {}
   
-  // 2. Category Spending Breakdown
+ 
   const categoryDataMap: Record<string, { name: string, value: number, color: string }> = {}
 
-  // 3. Day of Week Heatmap
+ 
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   const dayDataMap: Record<string, { day: string, amount: number }> = {
     'Sun': { day: 'Sun', amount: 0 },
@@ -26,7 +26,7 @@ export function ReportsCharts({ transactions }: { transactions: any[] }) {
     'Sat': { day: 'Sat', amount: 0 },
   }
 
-  // 4. Income Sources
+ 
   const incomeSourcesMap: Record<string, { name: string, value: number }> = {}
 
   transactions.forEach(t => {
@@ -36,14 +36,14 @@ export function ReportsCharts({ transactions }: { transactions: any[] }) {
     const dayIndex = getDay(dateObj)
     const dayName = daysOfWeek[dayIndex]
 
-    // Monthly Trend
+   
     if (!monthlyDataMap[monthKey]) {
       monthlyDataMap[monthKey] = { month: monthKey, income: 0, expense: 0 }
     }
     if (t.type === 'income') {
       monthlyDataMap[monthKey].income += amt
       
-      // Income sources
+     
       const sourceName = t.source || 'Manual'
       if (!incomeSourcesMap[sourceName]) incomeSourcesMap[sourceName] = { name: sourceName, value: 0 }
       incomeSourcesMap[sourceName].value += amt
@@ -51,25 +51,25 @@ export function ReportsCharts({ transactions }: { transactions: any[] }) {
     } else {
       monthlyDataMap[monthKey].expense += amt
 
-      // Categories
+     
       const catName = t.categories?.name || 'Uncategorized'
       if (!categoryDataMap[catName]) {
         categoryDataMap[catName] = { name: catName, value: 0, color: t.categories?.color || '#8884d8' }
       }
       categoryDataMap[catName].value += amt
 
-      // Day of Week
+     
       dayDataMap[dayName].amount += amt
     }
   })
 
-  // Format Data Arrays
+ 
   const monthlyChartData = Object.values(monthlyDataMap)
   const categoryChartData = Object.values(categoryDataMap).sort((a, b) => b.value - a.value)
   const dayChartData = Object.values(dayDataMap)
   const incomeChartData = Object.values(incomeSourcesMap)
 
-  // Dynamic colors for pie charts if not provided
+ 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
 
   if (transactions.length === 0) {
@@ -87,7 +87,7 @@ export function ReportsCharts({ transactions }: { transactions: any[] }) {
   return (
     <div className="space-y-8">
       
-      {/* Top Row: Income vs Expense & Category Pie */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800 h-[400px]">
@@ -139,7 +139,7 @@ export function ReportsCharts({ transactions }: { transactions: any[] }) {
         </div>
       </div>
 
-      {/* Bottom Row: Day of Week Heatmap & Income Sources */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800 h-[400px]">

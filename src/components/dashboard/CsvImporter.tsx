@@ -33,9 +33,8 @@ export function CsvImporter({
 }) {
   const [job, setJob] = useState<ImportJob | null>(initialJob)
   const [rows, setRows] = useState<ImportRow[]>([])
-  const [selectedAccountId, setSelectedAccountId] = useState<string>('')
   
-  // States
+ 
   const [isUploading, setIsUploading] = useState(false)
   const [isAiRunning, setIsAiRunning] = useState(false)
   const [isCommitting, setIsCommitting] = useState(false)
@@ -43,7 +42,7 @@ export function CsvImporter({
   
   const { addToast } = useToast()
 
-  // Load job data on mount if there's an active job
+ 
   useEffect(() => {
     if (job && job.status !== 'pending' && job.status !== 'failed' && rows.length === 0) {
       loadJobData(job.id)
@@ -166,7 +165,7 @@ export function CsvImporter({
       const res = await fetch('/api/ai/auto-parse/commit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ importJobId: job.id, accountId: selectedAccountId || null }),
+        body: JSON.stringify({ importJobId: job.id, accountId: null }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
@@ -180,7 +179,7 @@ export function CsvImporter({
     }
   }
 
-  // Derived Summary Stats
+ 
   const selectedCount = rows.filter(r => r.is_selected_for_import && !r.has_error).length
   const duplicatesCount = rows.filter(r => r.is_duplicate_guess).length
   const errorsCount = rows.filter(r => r.has_error).length
@@ -213,7 +212,7 @@ export function CsvImporter({
   return (
     <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] overflow-hidden shadow-sm flex flex-col h-full min-h-[600px]">
       
-      {/* Header */}
+      {}
       <div className="p-6 border-b border-[var(--border-light)] bg-[var(--bg-surface)] flex justify-between items-center z-20 relative">
         <h3 className="text-sm font-bold uppercase tracking-widest text-[var(--text-main)] flex items-center gap-2">
           {job ? <Sparkles className="w-4 h-4 text-[var(--accent)]" /> : <FileType className="w-4 h-4" />} 
@@ -232,9 +231,9 @@ export function CsvImporter({
         )}
       </div>
 
-      {/* Main Content Area */}
+      {}
       {!job ? (
-        // STATE 1: Upload Dropzone
+       
         <div 
           {...getRootProps()} 
           className={`flex-grow m-6 border-2 border-dashed rounded-[16px] flex flex-col items-center justify-center p-8 transition-all cursor-pointer ${
@@ -271,13 +270,13 @@ export function CsvImporter({
           )}
         </div>
       ) : (
-        // STATE 2: Review Table & Summary Panel
+       
         <div className="flex flex-col lg:flex-row flex-grow overflow-hidden">
           
-          {/* Main Table Area */}
+          {}
           <div className="flex-1 flex flex-col overflow-hidden border-r border-[var(--border-light)] relative">
             
-            {/* Table Toolbar */}
+            {}
             <div className="p-4 bg-[var(--bg-base)] border-b border-[var(--border-light)] flex items-center justify-between gap-4">
               <div className="flex gap-4">
                  <button 
@@ -295,7 +294,7 @@ export function CsvImporter({
               </div>
             </div>
 
-            {/* Table Container */}
+            {}
             <div className="flex-1 overflow-auto">
               <table className="w-full text-left min-w-[900px]">
                 <thead className="sticky top-0 bg-[var(--bg-surface)] z-10 shadow-sm">
@@ -350,7 +349,7 @@ export function CsvImporter({
                           </div>
                         )}
                       </td>
-                      {/* Inline Type Select */}
+                      {}
                       <td className="p-4">
                         <select
                           value={row.parsed_type || 'expense'}
@@ -361,7 +360,7 @@ export function CsvImporter({
                           <option value="income">Income</option>
                         </select>
                       </td>
-                      {/* Inline Category Select */}
+                      {}
                       <td className="p-4">
                         <select
                           value={row.parsed_category_id || ''}
@@ -385,11 +384,11 @@ export function CsvImporter({
               </table>
             </div>
             
-            {/* Fade effect at bottom of table */}
+            {}
             <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[var(--bg-base)] to-transparent pointer-events-none"></div>
           </div>
 
-          {/* Right Summary Sidebar */}
+          {}
           <div className="w-full lg:w-[320px] bg-[var(--bg-surface)] p-6 flex flex-col justify-between shrink-0">
             <div>
               <h4 className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] mb-6">Import Summary</h4>
@@ -424,30 +423,6 @@ export function CsvImporter({
                   <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Total Outflow</span>
                   <span className="text-[14px] font-black text-[var(--text-main)]">-${totalExpense.toFixed(2)}</span>
                 </div>
-              </div>
-
-              {/* Account Selector */}
-              <div className="pt-6 mt-6 border-t border-[var(--border-light)]">
-                <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] mb-2 block">
-                  Target Account
-                </label>
-                <select
-                  value={selectedAccountId}
-                  onChange={(e) => setSelectedAccountId(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-light)] text-[11px] font-bold text-[var(--text-main)] cursor-pointer focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                >
-                  <option value="">No account (unlinked)</option>
-                  {accounts.map(acc => (
-                    <option key={acc.id} value={acc.id}>
-                      {acc.name} ({acc.type})
-                    </option>
-                  ))}
-                </select>
-                {accounts.length === 0 && (
-                  <p className="text-[11px] text-[var(--text-muted)] mt-2">
-                    <a href="/dashboard/settings" className="text-[var(--accent)] hover:underline">Add an account</a> to link imported transactions.
-                  </p>
-                )}
               </div>
             </div>
 

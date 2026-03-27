@@ -11,7 +11,7 @@ import { eq, and, gte, lte, sum, desc, sql, count } from 'drizzle-orm'
 import { addDays, differenceInDays, format } from 'date-fns'
 
 export async function getOverviewMetrics(userId: string, from: Date, to: Date) {
-  // Total Inflow
+ 
   const inflowResult = await db
     .select({ total: sum(transactions.amount) })
     .from(transactions)
@@ -24,7 +24,7 @@ export async function getOverviewMetrics(userId: string, from: Date, to: Date) {
       )
     )
 
-  // Total Outflow
+ 
   const outflowResult = await db
     .select({ total: sum(transactions.amount) })
     .from(transactions)
@@ -37,7 +37,7 @@ export async function getOverviewMetrics(userId: string, from: Date, to: Date) {
       )
     )
 
-  // Total Account Balance
+ 
   const balanceResult = await db
     .select({ total: sum(accounts.balance) })
     .from(accounts)
@@ -64,12 +64,12 @@ export async function getOverviewMetrics(userId: string, from: Date, to: Date) {
 
 export async function getCashFlowSeries(userId: string, from: Date, to: Date) {
   const daysDiff = differenceInDays(to, from)
-  let dateFormat = 'YYYY-MM-DD' // daily
+  let dateFormat = 'YYYY-MM-DD'
   if (daysDiff > 60) {
-    dateFormat = 'IYYY-IW' // weekly
+    dateFormat = 'IYYY-IW'
   }
   if (daysDiff > 180) {
-    dateFormat = 'YYYY-MM' // monthly
+    dateFormat = 'YYYY-MM'
   }
 
   const result = await db
@@ -89,7 +89,7 @@ export async function getCashFlowSeries(userId: string, from: Date, to: Date) {
     .groupBy(sql`1, 2`)
     .orderBy(sql`1`)
 
-  // Process result to an array of { date: string, income: number, expense: number }
+ 
   const chartMap = new Map<string, { income: number; expense: number }>()
 
   result.forEach((row) => {
@@ -105,7 +105,7 @@ export async function getCashFlowSeries(userId: string, from: Date, to: Date) {
     }
   })
 
-  // Format array
+ 
   const formattedData = Array.from(chartMap.entries()).map(([date, data]) => ({
     date,
     ...data

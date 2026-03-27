@@ -1,7 +1,4 @@
-/**
- * Standardized API error response helper.
- * Ensures consistent error format across all API routes.
- */
+
 import { NextResponse } from 'next/server'
 
 interface ApiErrorOptions {

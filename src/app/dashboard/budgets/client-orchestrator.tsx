@@ -8,7 +8,7 @@ import { SpendingVsBudgetPanel } from '@/components/dashboard/SpendingVsBudgetPa
 import { BudgetAlertsPanel } from '@/components/dashboard/BudgetAlertsPanel'
 import { AiBudgetSuggestionsPanel } from '@/components/dashboard/AiBudgetSuggestionsPanel'
 import { BudgetFormModal } from '@/components/dashboard/BudgetFormModal'
-import { TrendingUp, Bell, Sparkles, Plus, History, Target } from 'lucide-react'
+import { TrendingUp, Bell, Sparkles, Plus, Target } from 'lucide-react'
 
 interface Category {
   id: string
@@ -28,8 +28,8 @@ export function BudgetsClientOrchestrator({ initialData, categories }: Props) {
   const [modalOpen, setModalOpen] = useState(false)
   const [editingBudget, setEditingBudget] = useState<CategoryBudgetItem | null>(null)
 
-  // The actual live data comes from the server via page refresh (revalidatePath).
-  // The filter is client-controlled; changing filter refreshes the page via URL params.
+ 
+ 
   const data = initialData
 
   function handleOpenAdd() {
@@ -49,7 +49,7 @@ export function BudgetsClientOrchestrator({ initialData, categories }: Props) {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* ── Overview Header ─────────────────────────────── */}
+      {}
       <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
         <div className="flex items-center justify-between pb-4 border-b border-[var(--border-light)] mb-6">
           <div className="flex items-center gap-2">
@@ -57,10 +57,7 @@ export function BudgetsClientOrchestrator({ initialData, categories }: Props) {
             <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--text-main)]">Budget Overview</h2>
           </div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--bg-surface)] border border-[var(--border-light)] hover:border-[var(--border-dark)] rounded-full text-[11px] font-bold uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all">
-              <History className="w-3 h-3" />
-              Import History
-            </button>
+
             <button
               onClick={handleOpenAdd}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--text-main)] text-[var(--bg-base)] rounded-full text-[11px] font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all shadow-sm"
@@ -78,13 +75,13 @@ export function BudgetsClientOrchestrator({ initialData, categories }: Props) {
         />
       </div>
 
-      {/* ── Main Content Grid ────────────────────────────── */}
+      {}
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-8 items-start">
 
-        {/* Left Column */}
+        {}
         <div className="flex flex-col gap-8">
 
-          {/* Category Budgets */}
+          {}
           <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
             <div className="flex items-center justify-between pb-4 border-b border-[var(--border-light)] mb-6">
               <div className="flex items-center gap-2">
@@ -108,7 +105,7 @@ export function BudgetsClientOrchestrator({ initialData, categories }: Props) {
             />
           </div>
 
-          {/* Spending vs Budget */}
+          {}
           <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
             <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-6">
               <TrendingUp className="w-3.5 h-3.5 text-[var(--text-main)]" />
@@ -118,10 +115,10 @@ export function BudgetsClientOrchestrator({ initialData, categories }: Props) {
           </div>
         </div>
 
-        {/* Right Sidebar */}
+        {}
         <div className="flex flex-col gap-6">
 
-          {/* Alerts */}
+          {}
           <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
             <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-4">
               <Bell className="w-3.5 h-3.5 text-[var(--text-main)]" />
@@ -133,7 +130,7 @@ export function BudgetsClientOrchestrator({ initialData, categories }: Props) {
             <BudgetAlertsPanel alerts={data.alerts} />
           </div>
 
-          {/* AI Suggestions */}
+          {}
           <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
             <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-4">
               <Sparkles className="w-3.5 h-3.5 text-[var(--accent)]" />
@@ -144,7 +141,7 @@ export function BudgetsClientOrchestrator({ initialData, categories }: Props) {
         </div>
       </div>
 
-      {/* ── Form Modal ────────────────────────────────────── */}
+      {}
       <BudgetFormModal
         isOpen={modalOpen}
         onClose={handleCloseModal}

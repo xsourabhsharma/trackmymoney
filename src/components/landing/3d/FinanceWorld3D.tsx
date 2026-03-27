@@ -5,8 +5,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { PerspectiveCamera, Environment, Float, Sparkles, MeshTransmissionMaterial, ContactShadows } from '@react-three/drei'
 import * as THREE from 'three'
 import { useTheme } from 'next-themes'
-
-// A premium frosted glass shape (Icosahedron for a diamond-like abstract wealth node)
+
 function GlassDiamond({ position, scale }: { position: [number, number, number], scale: number }) {
   const mesh = useRef<THREE.Mesh>(null)
 
@@ -39,7 +38,7 @@ function GlassDiamond({ position, scale }: { position: [number, number, number],
           ior={1.5}
           color="#ffffff"
         />
-        {/* Inner solid shape to give it a core glow */}
+        {}
         <mesh scale={0.5}>
           <icosahedronGeometry args={[1, 0]} />
           <meshPhysicalMaterial color="#3B82F6" emissive="#1D4ED8" emissiveIntensity={2} roughness={0.4} />
@@ -48,8 +47,7 @@ function GlassDiamond({ position, scale }: { position: [number, number, number],
     </Float>
   )
 }
-
-// A 3D Coin representing finance/wealth
+
 function FloatingCoin({ position }: { position: [number, number, number] }) {
   const mesh = useRef<THREE.Mesh>(null)
 
@@ -71,7 +69,7 @@ function FloatingCoin({ position }: { position: [number, number, number] }) {
           roughness={0.2}
           envMapIntensity={2}
         />
-        {/* Inner detail on the coin */}
+        {}
         <mesh position={[0, 0.08, 0]}>
           <cylinderGeometry args={[0.8, 0.8, 0.01, 32]} />
           <meshStandardMaterial color="#059669" metalness={0.8} roughness={0.4} />
@@ -84,8 +82,7 @@ function FloatingCoin({ position }: { position: [number, number, number] }) {
     </Float>
   )
 }
-
-// Abstract connecting data lines
+
 function DataStreams() {
   const lineMaterial = new THREE.LineBasicMaterial({ color: '#3B82F6', transparent: true, opacity: 0.3 })
   const lines = useMemo(() => {
@@ -117,8 +114,7 @@ function DataStreams() {
 
   return <group ref={group} position={[-5, 0, -5]}>{lines}</group>
 }
-
-// Mouse Parallax Rig
+
 function Rig() {
   const { camera, pointer } = useThree()
   useFrame(() => {
@@ -138,7 +134,7 @@ export default function FinanceWorld3D() {
       <Canvas dpr={[1, 2]}>
         <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={45} />
         
-        {/* Premium Lighting Setup */}
+        {}
         <ambientLight intensity={isDark ? 0.3 : 1} />
         <spotLight position={[10, 20, 10]} penumbra={1} intensity={isDark ? 2 : 4} color="#ffffff" castShadow />
         <spotLight position={[-10, -20, -10]} penumbra={1} intensity={isDark ? 1 : 2} color="#10B981" />
@@ -146,7 +142,7 @@ export default function FinanceWorld3D() {
 
         <Rig />
 
-        {/* 3D Elements */}
+        {}
         <GlassDiamond position={[-3, 1, -2]} scale={1.5} />
         <GlassDiamond position={[4, -2, -4]} scale={1} />
         <FloatingCoin position={[3, 2, -1]} />
@@ -154,10 +150,10 @@ export default function FinanceWorld3D() {
         
         <DataStreams />
 
-        {/* Floating Particles for a magical atmosphere */}
+        {}
         <Sparkles count={150} scale={20} size={isDark ? 2 : 4} speed={0.4} opacity={isDark ? 0.5 : 0.8} color="#10B981" />
 
-        {/* Synthetic local environment to prevent failed network requests */}
+        {}
         <Environment resolution={128}>
           <group rotation={[-Math.PI / 2, 0, 0]}>
             <spotLight position={[0, 10, 0]} intensity={2} color="#ffffff" />

@@ -3,13 +3,13 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
 
 export function DashboardCharts({ transactions }: { transactions: any[] }) {
-  // Process Data for Pie Chart (Expenses by Category)
+ 
   const expenseTransactions = transactions.filter(t => t.type === 'expense')
   const categoryDataMap: Record<string, { name: string; value: number; color?: string }> = {}
 
   expenseTransactions.forEach(t => {
     const categoryName = t.categories?.name || 'Uncategorized'
-    const color = t.categories?.color // Only use the explicit DB color if it exists
+    const color = t.categories?.color
     const amount = parseFloat(t.amount) || 0
 
     if (!categoryDataMap[categoryName]) {
@@ -20,8 +20,8 @@ export function DashboardCharts({ transactions }: { transactions: any[] }) {
 
   const pieData = Object.values(categoryDataMap).sort((a, b) => b.value - a.value)
 
-  // Process Data for Bar Chart (Income vs Expense by Month)
-  // Pre-fill the last 6 months
+ 
+ 
   const timeDataMap: Record<string, { name: string; sortKey: string; income: number; expense: number }> = {}
   
   const now = new Date()
@@ -37,7 +37,7 @@ export function DashboardCharts({ transactions }: { transactions: any[] }) {
     const sortKey = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`
     const amount = parseFloat(t.amount)
 
-    // Only include if it's within our 6 month pre-filled window
+   
     if (timeDataMap[sortKey]) {
       if (t.type === 'income') {
         timeDataMap[sortKey].income += amount
@@ -51,7 +51,7 @@ export function DashboardCharts({ transactions }: { transactions: any[] }) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-      {/* Expenses Breakdown */}
+      {}
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm flex flex-col h-[400px]">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Expense Breakdown</h3>
         {pieData.length > 0 ? (
@@ -81,7 +81,7 @@ export function DashboardCharts({ transactions }: { transactions: any[] }) {
         )}
       </div>
 
-      {/* Cash Flow */}
+      {}
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm flex flex-col h-[400px]">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Cash Flow</h3>
         {barData.length > 0 ? (

@@ -3,6 +3,7 @@
 import { DebtRow, DebtFreeCountdown, PayoffStrategy } from '@/app/dashboard/goals/data'
 import { Plus, Info } from 'lucide-react'
 import { format, addMonths } from 'date-fns'
+import { useCurrency } from '@/hooks/useCurrency'
 
 interface Props {
   debts: DebtRow[]
@@ -11,6 +12,7 @@ interface Props {
   onChangeStrategy: (strategy: PayoffStrategy) => void
   onAddDebt: () => void
   onEditDebt: (debt: DebtRow) => void
+  onMoveDebt?: (id: string, dir: 'up' | 'down') => void
 }
 
 const STRATEGY_CONFIG: Record<PayoffStrategy, { label: string; tooltip: string; color: string }> = {
@@ -31,16 +33,13 @@ const STRATEGY_CONFIG: Record<PayoffStrategy, { label: string; tooltip: string; 
   },
 }
 
-function fmt(n: number) {
-  return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-}
-
-export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeStrategy, onAddDebt, onEditDebt }: Props) {
+export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeStrategy, onAddDebt, onEditDebt, onMoveDebt }: Props) {
+  const { fmt } = useCurrency()
   const totalOriginal = debts.reduce((s, d) => s + d.originalPrincipal, 0)
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Strategy Selector */}
+      {}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
           <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Payoff Strategy</span>
@@ -62,7 +61,7 @@ export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeS
                   <Info className="w-3 h-3" />
                   {cfg.label}
                 </button>
-                {/* Tooltip */}
+                {}
                 <div className="absolute bottom-full left-0 mb-2 w-48 bg-[var(--text-main)] text-[var(--bg-base)] text-[11px] font-bold rounded-xl px-3 py-2 opacity-0 group-hover/tip:opacity-100 pointer-events-none transition-opacity z-10 shadow-xl">
                   {cfg.tooltip}
                 </div>
@@ -72,7 +71,7 @@ export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeS
         </div>
       </div>
 
-      {/* Countdown Banner (if debts exist and countdown computed) */}
+      {}
       {debts.length > 0 && countdown && (
         <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-2xl flex items-center gap-4">
           <div className="w-12 h-12 rounded-full bg-[var(--income-green)]/10 border border-green-100 flex items-center justify-center text-xl flex-shrink-0">
@@ -83,13 +82,13 @@ export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeS
               Debt-free in <span className="text-[var(--income-green)]">{countdown.monthsToDebtFree} months</span> — by {countdown.debtFreeDate}
             </p>
             <p className="text-[11px] text-[var(--text-muted)] mt-0.5 uppercase tracking-widest">
-              Using {countdown.strategy} strategy · assuming current minimum payments
+              Using {STRATEGY_CONFIG[payoffStrategy]?.label || countdown.strategy} strategy · assuming current minimum payments
             </p>
           </div>
         </div>
       )}
 
-      {/* Debts List */}
+      {}
       {debts.length === 0 ? (
         <div className="py-16 text-center flex flex-col items-center gap-5 border-2 border-dashed border-[var(--border-light)] rounded-[24px] bg-[var(--bg-surface)]/30">
           <div className="w-16 h-16 rounded-full bg-[var(--bg-base)] border border-[var(--border-light)] flex items-center justify-center text-3xl shadow-sm">
@@ -113,14 +112,15 @@ export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeS
         </div>
       ) : (
         <div className="border border-[var(--border-light)] rounded-[20px] overflow-hidden shadow-sm">
-          {/* Header */}
-          <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-3 p-4 bg-[var(--bg-surface)] border-b border-[var(--border-light)] text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
+          {}
+          <div className="grid grid-cols-[2fr_1fr_1fr_1fr_auto] gap-3 p-4 bg-[var(--bg-surface)] border-b border-[var(--border-light)] text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
             <span>Debt / Creditor</span>
             <span>Balance</span>
             <span>Rate</span>
             <span>Min Payment</span>
+            {payoffStrategy === 'custom' && <span>Order</span>}
           </div>
-          {debts.map((debt) => {
+          {debts.map((debt, idx) => {
             const paidPct = debt.originalPrincipal > 0
               ? Math.min(100, Math.round(((debt.originalPrincipal - debt.currentBalance) / debt.originalPrincipal) * 100))
               : 0
@@ -128,7 +128,7 @@ export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeS
             return (
               <div
                 key={debt.id}
-                className="group grid grid-cols-[2fr_1fr_1fr_1fr] gap-3 p-4 items-center border-b border-[var(--border-light)]/50 last:border-b-0 hover:bg-[var(--bg-surface)]/50 transition-all cursor-pointer"
+                className="group grid grid-cols-[2fr_1fr_1fr_1fr_auto] gap-3 p-4 items-center border-b border-[var(--border-light)]/50 last:border-b-0 hover:bg-[var(--bg-surface)]/50 transition-all cursor-pointer"
                 onClick={() => onEditDebt(debt)}
               >
                 <div className="flex flex-col gap-1 min-w-0">
@@ -143,15 +143,33 @@ export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeS
                 </div>
                 <div>
                   <span className="text-[12px] font-bold tabular-nums text-[var(--expense-red)] tracking-tighter">
-                    ${fmt(debt.currentBalance)}
+                    {fmt(debt.currentBalance, debt.currency)}
                   </span>
                 </div>
                 <span className="text-[11px] font-bold tabular-nums text-[var(--text-muted)]">
                   {debt.interestRate}%
                 </span>
                 <span className="text-[11px] font-bold tabular-nums text-[var(--text-main)]">
-                  ${fmt(debt.minimumPayment)}/mo
+                  {fmt(debt.minimumPayment, debt.currency)}/mo
                 </span>
+                {payoffStrategy === 'custom' && (
+                  <div className="flex flex-col gap-1 ml-2" onClick={e => e.stopPropagation()}>
+                    <button
+                      onClick={() => onMoveDebt?.(debt.id, 'up')}
+                      disabled={idx === 0}
+                      className="p-1 rounded bg-[var(--bg-surface)] border border-[var(--border-light)] hover:bg-[var(--bg-base)] disabled:opacity-30 transition-all"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      onClick={() => onMoveDebt?.(debt.id, 'down')}
+                      disabled={idx === debts.length - 1}
+                      className="p-1 rounded bg-[var(--bg-surface)] border border-[var(--border-light)] hover:bg-[var(--bg-base)] disabled:opacity-30 transition-all"
+                    >
+                      ↓
+                    </button>
+                  </div>
+                )}
               </div>
             )
           })}

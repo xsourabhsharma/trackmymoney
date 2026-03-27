@@ -1,6 +1,4 @@
-// ─── Overview Metrics Engine ───
-// Pure computation functions — no DB calls, no side effects.
-// All amounts are expected as numbers (already parsed from decimal strings).
+
 
 import { format, parseISO } from 'date-fns';
 import type { ExpenseBreakdownItem, CashflowPoint, TopSpendingItem } from './types';
@@ -14,32 +12,32 @@ interface TransactionRow {
   categories?: { id?: string; name: string; icon?: string | null; color?: string | null } | null;
 }
 
-/** Sum of all income transactions */
+
 export function computeInflow(transactions: TransactionRow[]): number {
   return transactions
     .filter(t => t.type === 'income')
     .reduce((sum, t) => sum + Number(t.amount), 0);
 }
 
-/** Sum of all expense transactions */
+
 export function computeOutflow(transactions: TransactionRow[]): number {
   return transactions
     .filter(t => t.type === 'expense')
     .reduce((sum, t) => sum + Number(t.amount), 0);
 }
 
-/** Inflow minus Outflow for the period */
+
 export function computeNetPosition(inflow: number, outflow: number): number {
   return inflow - outflow;
 }
 
-/** Savings efficiency = (Inflow - Outflow) / Inflow * 100 */
+
 export function computeSavingsRate(inflow: number, outflow: number): number {
   if (inflow <= 0) return 0;
   return ((inflow - outflow) / inflow) * 100;
 }
 
-/** Group expenses by category with percentages */
+
 export function computeExpenseBreakdown(transactions: TransactionRow[], outflowTotal: number): ExpenseBreakdownItem[] {
   const map: Record<string, { amount: number; name: string; icon: string; color: string }> = {};
 
@@ -71,7 +69,7 @@ export function computeExpenseBreakdown(transactions: TransactionRow[], outflowT
     .sort((a, b) => b.amount - a.amount);
 }
 
-/** Build daily cashflow timeseries for charts */
+
 export function computeCashflowSeries(transactions: TransactionRow[]): CashflowPoint[] {
   const flowMap: Record<string, { income: number; expense: number }> = {};
 
@@ -83,7 +81,7 @@ export function computeCashflowSeries(transactions: TransactionRow[]): CashflowP
       if (t.type === 'income') flowMap[dateKey].income += Number(t.amount);
       if (t.type === 'expense') flowMap[dateKey].expense += Number(t.amount);
     } catch {
-      // skip malformed dates
+     
     }
   });
 
@@ -92,7 +90,7 @@ export function computeCashflowSeries(transactions: TransactionRow[]): CashflowP
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }
 
-/** Top N spending categories with percentage share */
+
 export function computeTopSpending(breakdown: ExpenseBreakdownItem[], limit = 5): TopSpendingItem[] {
   return breakdown.slice(0, limit).map(item => ({
     categoryName: item.categoryName,

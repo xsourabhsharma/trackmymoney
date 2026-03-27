@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { createClient } from '@/utils/supabase/server'
-
-// Client instantiated dynamically inside handlers to prevent build errors
+
 
 export async function POST(request: Request) {
   try {

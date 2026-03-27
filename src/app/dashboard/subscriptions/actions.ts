@@ -44,7 +44,7 @@ export async function createSubscription(payload: CreateSubscriptionPayload) {
     return { success: false, error: error.message }
   }
 
-  // Log Event
+ 
   await supabase.from('subscription_events').insert({
     subscription_id: newSub.id,
     user_id: user.id,
@@ -60,7 +60,7 @@ export async function updateSubscription(id: string, payload: Partial<CreateSubs
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error("Unauthorized")
 
-  // Map to DB schema keys
+ 
   const updateData: any = { updated_at: new Date().toISOString() }
   if (payload.merchant !== undefined) updateData.merchant = payload.merchant
   if (payload.serviceName !== undefined) updateData.service_name = payload.serviceName
@@ -112,7 +112,7 @@ export async function pauseSubscriptions(ids: string[]) {
     return { success: false, error: error.message }
   }
 
-  // Batch insert events
+ 
   const events = ids.map(id => ({
     subscription_id: id,
     user_id: user.id,

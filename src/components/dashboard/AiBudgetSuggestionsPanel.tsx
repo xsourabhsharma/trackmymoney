@@ -80,7 +80,7 @@ export function AiBudgetSuggestionsPanel({ suggestions }: Props) {
             </p>
           </div>
 
-          {/* Amount change display */}
+          {}
           {sug.fromAmount !== null && sug.toAmount !== null && (
             <div className="flex items-center gap-2 text-[12px] font-bold text-[var(--text-muted)]">
               <span className="line-through opacity-60">${fmt(sug.fromAmount)}</span>

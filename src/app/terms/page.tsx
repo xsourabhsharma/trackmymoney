@@ -10,11 +10,13 @@ export const metadata = {
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-main)] font-sans antialiased">
-      {/* Minimal nav */}
+      {}
       <nav className="border-b border-[var(--border-light)] py-4">
         <div className="max-w-[800px] mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
-            <Image src="/logo.svg" alt="TrackMyMoney" width={24} height={24} className="w-6 h-6" />
+          <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight group">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--text-main)]/5 border border-[var(--border-light)] overflow-hidden">
+              <Image src="/real-logo.png" alt="TrackMyMoney" width={20} height={20} className="w-5 h-5 opacity-90 group-hover:opacity-100 transition-opacity dark:invert" />
+            </div>
             Track<span className="text-[var(--text-muted)]">My</span>Money
           </Link>
           <Link
@@ -27,7 +29,7 @@ export default function TermsPage() {
         </div>
       </nav>
 
-      {/* Content */}
+      {}
       <main className="max-w-[800px] mx-auto px-6 py-12 md:py-20">
         <div className="mb-10">
           <h1 className="text-[2rem] md:text-[2.5rem] font-bold tracking-tight mb-3">Terms of Service</h1>
@@ -136,7 +138,7 @@ export default function TermsPage() {
         </div>
       </main>
 
-      {/* Footer */}
+      {}
       <footer className="border-t border-[var(--border-light)] py-6">
         <div className="max-w-[800px] mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[12px] text-[var(--text-muted)]">
           <span>© 2026 TrackMyMoney. All rights reserved.</span>

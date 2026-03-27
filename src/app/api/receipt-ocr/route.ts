@@ -5,6 +5,13 @@ import { createClient } from '@/utils/supabase/server'
 
 export const maxDuration = 30
 
+const receiptOcrRequestSchema = z.object({
+  image: z.string().min(1),
+})
+
+const ALLOWED_RECEIPT_IMAGE_PREFIX = /^data:image\/(png|jpeg|jpg|webp);base64,/i
+const MAX_RECEIPT_IMAGE_BYTES = 5 * 1024 * 1024
+
 export async function POST(req: Request) {
   try {
     const supabase = await createClient()
@@ -14,14 +21,22 @@ export async function POST(req: Request) {
       return new Response('Unauthorized', { status: 401 })
     }
 
-    const { image } = await req.json()
-
-    if (!image) {
+    const parsedBody = receiptOcrRequestSchema.safeParse(await req.json())
+    if (!parsedBody.success) {
       return new Response('Missing image data', { status: 400 })
     }
 
-    // Convert base64 to Buffer
+    const { image } = parsedBody.data
+    if (!ALLOWED_RECEIPT_IMAGE_PREFIX.test(image)) {
+      return new Response('Unsupported image format', { status: 400 })
+    }
+
     const base64Data = image.split(',')[1]
+    const estimatedSize = Math.floor((base64Data.length * 3) / 4)
+    if (estimatedSize > MAX_RECEIPT_IMAGE_BYTES) {
+      return new Response('Image too large', { status: 413 })
+    }
+
     const imageBuffer = Buffer.from(base64Data, 'base64')
 
     const groq = createGroq({
@@ -49,13 +64,12 @@ export async function POST(req: Request) {
     })
 
     return Response.json(object)
-  } catch (error: any) {
+  } catch (error) {
     console.error('Receipt OCR Error:', error)
-    // Return a structured error response with the specific message
     return new Response(
       JSON.stringify({ 
         error: 'Failed to process receipt', 
-        details: error.message || 'Unknown error' 
+        details: 'Unknown error' 
       }), 
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     )

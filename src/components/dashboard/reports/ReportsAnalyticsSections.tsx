@@ -2,8 +2,7 @@
 
 import { CategorySpendingItem, MerchantSpendingItem, PeriodComparisonMetrics } from '@/app/dashboard/reports/data'
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
-
-// ─── Top Categories ─────────────────────────────────────────────────────────
+
 
 interface TopCatsProps {
   topCategories: CategorySpendingItem[]
@@ -48,8 +47,7 @@ export function TopCategoriesSection({ topCategories, totalExpenses }: TopCatsPr
     </div>
   )
 }
-
-// ─── Top Merchants ────────────────────────────────────────────────────────────
+
 
 interface TopMerchantsProps {
   merchants: MerchantSpendingItem[]
@@ -91,8 +89,7 @@ export function TopMerchantsSection({ merchants }: TopMerchantsProps) {
     </div>
   )
 }
-
-// ─── Period Comparison ────────────────────────────────────────────────────────
+
 
 interface ComparisonProps {
   comparison: PeriodComparisonMetrics
@@ -103,7 +100,7 @@ function ComparisonCard({
 }: {
   label: string; current: number; previous: number; changePct: number; isExpense?: boolean; isPercent?: boolean
 }) {
-  // For expenses: going up is bad (red), going down is good (green)
+ 
   const isGood = isExpense ? changePct < 0 : changePct > 0
 
   function fmt(n: number) {

@@ -14,15 +14,15 @@ export function TiltCard({ children, className = '' }: TiltCardProps) {
   const x = useMotionValue(0)
   const y = useMotionValue(0)
 
-  // Smooth out the raw mouse values
+ 
   const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 })
   const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 })
 
-  // Map mouse position to rotation angles (-10deg to +10deg max)
+ 
   const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ['7.5deg', '-7.5deg'])
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ['-7.5deg', '7.5deg'])
 
-  // Add a subtle glare/highlight that follows the cursor
+ 
   const glareX = useTransform(mouseXSpring, [-0.5, 0.5], ['100%', '0%'])
   const glareY = useTransform(mouseYSpring, [-0.5, 0.5], ['100%', '0%'])
 
@@ -36,11 +36,11 @@ export function TiltCard({ children, className = '' }: TiltCardProps) {
     const width = rect.width
     const height = rect.height
     
-    // Mouse position relative to the element (0 to width/height)
+   
     const mouseX = e.clientX - rect.left
     const mouseY = e.clientY - rect.top
     
-    // Normalize to range [-0.5, 0.5]
+   
     const xPct = mouseX / width - 0.5
     const yPct = mouseY / height - 0.5
 
@@ -78,7 +78,7 @@ export function TiltCard({ children, className = '' }: TiltCardProps) {
       />
       <div 
         className="w-full h-full transform-gpu" 
-        style={{ transform: 'translateZ(20px)' }} // Push content forward slightly
+        style={{ transform: 'translateZ(20px)' }}
       >
         {children}
       </div>

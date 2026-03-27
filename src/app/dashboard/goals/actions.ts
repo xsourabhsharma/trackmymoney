@@ -10,8 +10,7 @@ async function getAuthUser() {
   if (!user) throw new Error('Unauthorized')
   return user
 }
-
-// ─── Savings Goals ─────────────────────────────────────────────────────────
+
 
 export async function addSavingsGoal(formData: FormData) {
   const user = await getAuthUser()
@@ -82,8 +81,7 @@ export async function deleteSavingsGoal(id: string) {
   if (error) throw new Error('Failed to delete goal')
   revalidatePath('/dashboard/goals', 'page')
 }
-
-// ─── Debts ─────────────────────────────────────────────────────────────────
+
 
 export async function addDebt(formData: FormData) {
   const user = await getAuthUser()
@@ -151,8 +149,7 @@ export async function deleteDebt(id: string) {
   if (error) throw new Error('Failed to delete debt')
   revalidatePath('/dashboard/goals', 'page')
 }
-
-// ─── AI Suggestions ────────────────────────────────────────────────────────
+
 
 export async function applyGoalDebtSuggestion(suggestionId: string) {
   const user = await getAuthUser()
@@ -165,7 +162,7 @@ export async function applyGoalDebtSuggestion(suggestionId: string) {
       .eq('id', suggestionId)
       .eq('user_id', user.id)
   } catch {
-    // Table may not exist — silently no-op
+   
   }
 
   revalidatePath('/dashboard/goals', 'page')
@@ -182,7 +179,7 @@ export async function dismissGoalDebtSuggestion(suggestionId: string) {
       .eq('id', suggestionId)
       .eq('user_id', user.id)
   } catch {
-    // Table may not exist — silently no-op
+   
   }
 
   revalidatePath('/dashboard/goals', 'page')

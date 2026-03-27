@@ -80,7 +80,7 @@ export function EditTransactionButton({ transaction, categories, accounts = [] }
     }
   }
 
-  // Format date for input default value
+ 
   const dateObj = new Date(transaction.date)
   const formattedDate = dateObj.toISOString().split('T')[0]
 

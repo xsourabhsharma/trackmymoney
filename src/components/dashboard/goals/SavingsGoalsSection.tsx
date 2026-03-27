@@ -4,6 +4,7 @@ import { SavingsGoalRow, GoalStatus } from '@/app/dashboard/goals/data'
 import { Plus, Flag, Clock } from 'lucide-react'
 import { format } from 'date-fns'
 import { ConfettiCelebration } from '@/components/dashboard/goals/ConfettiCelebration'
+import { useCurrency } from '@/hooks/useCurrency'
 
 interface Props {
   goals: SavingsGoalRow[]
@@ -20,6 +21,7 @@ const STATUS_COLORS: Record<GoalStatus, string> = {
 }
 
 function GoalCard({ goal, onEdit }: { goal: SavingsGoalRow; onEdit: () => void }) {
+  const { fmt } = useCurrency()
   const pct = goal.progressPercent
   const isCompleted = goal.status === 'completed'
   const isPaused = goal.status === 'paused'
@@ -41,7 +43,7 @@ function GoalCard({ goal, onEdit }: { goal: SavingsGoalRow; onEdit: () => void }
     >
       <ConfettiCelebration percentage={pct} />
 
-      {/* Color accent strip */}
+      {}
       {goal.color && (
         <div
           className="absolute top-0 left-0 right-0 h-0.5 rounded-t-2xl"
@@ -50,7 +52,7 @@ function GoalCard({ goal, onEdit }: { goal: SavingsGoalRow; onEdit: () => void }
       )}
 
       <div className="flex flex-col gap-3 mt-1">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition-transform">
@@ -71,7 +73,7 @@ function GoalCard({ goal, onEdit }: { goal: SavingsGoalRow; onEdit: () => void }
           </span>
         </div>
 
-        {/* Progress Bar */}
+        {}
         <div className="h-2 bg-[var(--bg-surface)] rounded-full overflow-hidden shadow-inner">
           <div
             className={`h-full rounded-full transition-all duration-700 ${barColor}`}
@@ -79,14 +81,14 @@ function GoalCard({ goal, onEdit }: { goal: SavingsGoalRow; onEdit: () => void }
           />
         </div>
 
-        {/* Amounts + Date */}
+        {}
         <div className="flex items-center justify-between">
           <div className="flex items-baseline gap-1.5">
             <span className="text-[15px] font-bold tabular-nums text-[var(--text-main)]">
-              ${goal.currentAmount.toLocaleString()}
+              {fmt(goal.currentAmount, goal.currency)}
             </span>
             <span className="text-[11px] font-bold text-[var(--text-muted)]">
-              / ${goal.targetAmount.toLocaleString()}
+              / {fmt(goal.targetAmount, goal.currency)}
             </span>
           </div>
           {goal.targetDate && (
@@ -97,10 +99,10 @@ function GoalCard({ goal, onEdit }: { goal: SavingsGoalRow; onEdit: () => void }
           )}
         </div>
 
-        {/* Remaining */}
+        {}
         {!isCompleted && (
           <div className="text-[12px] text-[var(--text-muted)] font-bold">
-            💡 ${(goal.targetAmount - goal.currentAmount).toLocaleString()} to go
+            💡 {fmt(goal.targetAmount - goal.currentAmount, goal.currency)} to go
           </div>
         )}
       </div>
@@ -113,7 +115,7 @@ export function SavingsGoalsSection({ goals, activeTab, onTabChange, onAddGoal, 
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Tab Bar */}
+      {}
       <div className="flex gap-1.5 p-1 bg-[var(--bg-surface)] rounded-lg border border-[var(--border-light)] w-fit">
         {TABS.map(tab => (
           <button
@@ -130,7 +132,7 @@ export function SavingsGoalsSection({ goals, activeTab, onTabChange, onAddGoal, 
         ))}
       </div>
 
-      {/* Goals List */}
+      {}
       {goals.length === 0 ? (
         <div className="py-16 text-center flex flex-col items-center gap-5 border-2 border-dashed border-[var(--border-light)] rounded-[24px] bg-[var(--bg-surface)]/30">
           <div className="w-16 h-16 rounded-full bg-[var(--bg-base)] border border-[var(--border-light)] flex items-center justify-center text-3xl shadow-sm">

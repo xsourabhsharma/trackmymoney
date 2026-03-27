@@ -30,11 +30,11 @@ export function ReportsExportButtons({ transactions }: ReportsExportButtonsProps
         return
       }
 
-      // Create CSV content
+     
       const headers = ['Date', 'Merchant', 'Category', 'Type', 'Amount']
       const rows = transactions.map(t => [
         new Date(t.date).toLocaleDateString(),
-        `"${t.merchant.replace(/"/g, '""')}"`, // Escape quotes in merchant
+        `"${t.merchant.replace(/"/g, '""')}"`,
         `"${t.category.replace(/"/g, '""')}"`,
         t.type,
         t.amount.toString()
@@ -45,7 +45,7 @@ export function ReportsExportButtons({ transactions }: ReportsExportButtonsProps
         ...rows.map(r => r.join(','))
       ].join('\n')
 
-      // Create a Blob and trigger download
+     
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
@@ -68,12 +68,12 @@ export function ReportsExportButtons({ transactions }: ReportsExportButtonsProps
   const handleExportPDF = () => {
     setIsExportingPDF(true)
     
-    // Simulating PDF generation as client-side PDF generation from HTML requires large libraries like html2pdf.js or jspdf
-    // In a real app, you might trigger an edge API to generate it using Playwright/Puppeteer or use a dedicated library.
+   
+   
     setTimeout(() => {
       addToast('Generating high-quality PDF. Check your downloads shortly.', 'info')
       
-      // Simulate successful download after a delay
+     
       setTimeout(() => {
         setIsExportingPDF(false)
       }, 1500)

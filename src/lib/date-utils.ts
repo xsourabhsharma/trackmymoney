@@ -8,10 +8,7 @@ import {
 
 export type TransactionsPeriod = 'this_month' | 'last_month' | 'last_3_months' | 'this_year' | 'all_time';
 
-/**
- * Returns the start and end ISO strings for a given period.
- * For 'all_time', returns an empty object.
- */
+
 export function getDateRangeForPeriod(period: TransactionsPeriod): { startDate?: string; endDate?: string } {
   const now = new Date();
   
@@ -30,7 +27,7 @@ export function getDateRangeForPeriod(period: TransactionsPeriod): { startDate?:
       };
       
     case 'last_3_months':
-       // Rolling 90 days for a fluid view
+      
       return { 
         startDate: subDays(now, 90).toISOString(), 
         endDate: now.toISOString() 

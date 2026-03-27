@@ -1,6 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
-
-// ─── Types ──────────────────────────────────────────────────────────────────
+
 
 export type Theme = 'system' | 'light' | 'dark'
 export type Density = 'comfortable' | 'compact'
@@ -50,8 +49,7 @@ export interface Integration {
   status: IntegrationStatus
   metadata: Record<string, unknown>
 }
-
-// ─── Default Construction ───────────────────────────────────────────────────
+
 
 export const DEFAULT_SETTINGS: UserSettings = {
   full_name: '',
@@ -76,9 +74,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   notify_new_ai_insights: true,
   intelligence_frequency: 'instant',
 }
-
-// ─── Data Access ────────────────────────────────────────────────────────────
-// Settings are stored in the profiles.preferences JSONB column.
+
 
 export async function getUserSettings(): Promise<UserSettings> {
   const supabase = await createClient()
@@ -93,7 +89,7 @@ export async function getUserSettings(): Promise<UserSettings> {
 
   if (!profile) return { ...DEFAULT_SETTINGS, full_name: user.email?.split('@')[0] || '' }
 
-  // Merge stored preferences (JSONB) with defaults
+ 
   const prefs = (profile.preferences as Partial<UserSettings>) || {}
 
   return {
@@ -105,8 +101,8 @@ export async function getUserSettings(): Promise<UserSettings> {
 }
 
 export async function getUserIntegrations(): Promise<Integration[]> {
-  // The integrations table does not exist in the current schema.
-  // Return an empty array gracefully so the UI renders without errors.
+ 
+ 
   return []
 }
 

@@ -1,7 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
-
-// ─── Period Helpers ────────────────────────────────────────────────────────
+
 
 export type BudgetPeriod = 'this_month' | 'last_month' | 'last_three_months' | 'all'
 export type BudgetScope = 'all' | 'personal' | 'business'
@@ -30,7 +29,7 @@ export function getDateRangeForBudgetPeriod(period: BudgetPeriod, now: Date = ne
       return { startDate: start.toISOString(), endDate: end.toISOString() }
     }
     case 'last_three_months': {
-      // Last 3 complete calendar months
+     
       const start = new Date(year, month - 3, 1)
       const end = new Date(year, month, 0, 23, 59, 59)
       return { startDate: start.toISOString(), endDate: end.toISOString() }
@@ -40,8 +39,7 @@ export function getDateRangeForBudgetPeriod(period: BudgetPeriod, now: Date = ne
       return { startDate: null, endDate: null }
   }
 }
-
-// ─── Types ─────────────────────────────────────────────────────────────────
+
 
 export interface BudgetOverviewMetrics {
   totalBudget: number
@@ -98,8 +96,7 @@ export interface BudgetsPageData {
   aiSuggestions: AiBudgetSuggestion[]
   hasNoCategories: boolean
 }
-
-// ─── Main Loader ───────────────────────────────────────────────────────────
+
 
 export async function loadBudgetsPageData(filter: BudgetFilter): Promise<BudgetsPageData> {
   const supabase = await createClient()
@@ -109,7 +106,7 @@ export async function loadBudgetsPageData(filter: BudgetFilter): Promise<Budgets
   const admin = createAdminClient()
   const { startDate, endDate } = getDateRangeForBudgetPeriod(filter.period)
 
-  // 1. Fetch all budgets for user (with categories joined)
+ 
   const { data: budgetsRaw, error: budgetsError } = await admin
     .from('budgets')
     .select(`
@@ -126,7 +123,7 @@ export async function loadBudgetsPageData(filter: BudgetFilter): Promise<Budgets
 
   const budgets = budgetsRaw || []
 
-  // 2. Fetch expense transactions for the period
+ 
   let txQuery = admin
     .from('transactions')
     .select('amount, category_id')
@@ -138,7 +135,7 @@ export async function loadBudgetsPageData(filter: BudgetFilter): Promise<Budgets
 
   const { data: transactions } = await txQuery
 
-  // 3. Aggregate spending by category
+ 
   const spentByCategory: Record<string, number> = {}
   for (const tx of transactions || []) {
     if (tx.category_id) {
@@ -146,7 +143,7 @@ export async function loadBudgetsPageData(filter: BudgetFilter): Promise<Budgets
     }
   }
 
-  // 4. Build category budget items
+ 
   const categoryBudgets: CategoryBudgetItem[] = budgets.map((b: any) => {
     const cat = b.categories as { id: string; name: string; icon: string | null; color: string | null } | null
     const catId = cat?.id || b.category_id
@@ -170,17 +167,17 @@ export async function loadBudgetsPageData(filter: BudgetFilter): Promise<Budgets
     }
   })
 
-  // Sort: over-budget first, then by percentage used desc
+ 
   categoryBudgets.sort((a, b) => b.percentageUsed - a.percentageUsed)
 
-  // 5. Compute overall metrics
+ 
   const totalBudget = categoryBudgets.reduce((s, c) => s + c.budgetAmount, 0)
   const totalSpent = categoryBudgets.reduce((s, c) => s + c.spentAmount, 0)
   const remaining = totalBudget - totalSpent
 
   const overview: BudgetOverviewMetrics = { totalBudget, totalSpent, remaining }
 
-  // 6. Build spending vs budget comparison points
+ 
   const spendingVsBudget: SpendingVsBudgetPoint[] = categoryBudgets.map(c => ({
     label: c.categoryName,
     budgetAmount: c.budgetAmount,
@@ -188,7 +185,7 @@ export async function loadBudgetsPageData(filter: BudgetFilter): Promise<Budgets
     categoryId: c.categoryId,
   }))
 
-  // Add overall aggregate at the start
+ 
   spendingVsBudget.unshift({
     label: 'Overall',
     budgetAmount: totalBudget,
@@ -196,7 +193,7 @@ export async function loadBudgetsPageData(filter: BudgetFilter): Promise<Budgets
     categoryId: null,
   })
 
-  // 7. Generate alerts
+ 
   const alerts: BudgetAlertItem[] = []
 
   for (const c of categoryBudgets) {
@@ -229,7 +226,7 @@ export async function loadBudgetsPageData(filter: BudgetFilter): Promise<Budgets
     })
   }
 
-  // 8. Load AI suggestions (silently skip if table does not exist)
+ 
   let aiSuggestions: AiBudgetSuggestion[] = []
   try {
     const { data: suggestionsRaw } = await admin
@@ -251,7 +248,7 @@ export async function loadBudgetsPageData(filter: BudgetFilter): Promise<Budgets
       createdAt: s.created_at,
     }))
   } catch {
-    // Table may not exist yet — silently no-op
+   
   }
 
   return {

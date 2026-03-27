@@ -28,7 +28,7 @@ export async function BudgetSummaryWidget() {
     spentByCat[e.category_id] = (spentByCat[e.category_id] || 0) + parseFloat(e.amount)
   })
 
-  // get top 4 budgets
+ 
   const topBudgets = budgets.slice(0, 4)
 
   return (

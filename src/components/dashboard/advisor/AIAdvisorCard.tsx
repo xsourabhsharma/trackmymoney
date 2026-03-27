@@ -90,10 +90,10 @@ export function AIAdvisorCard({ stats, lastInsight }: Props) {
                 <div key={insight.id || idx} className="flex flex-col gap-1.5 p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
                     <div className="flex items-center gap-2">
                         {getSeverityIcon(insight.severity)}
-                        <span className="text-[11px] font-bold uppercase tracking-wide text-white/90">{insight.title}</span>
+                        <span className="text-[12px] font-bold tracking-wide text-white/90">{insight.title}</span>
                     </div>
-                    <p className="text-[11px] leading-relaxed text-white/70 font-medium">{insight.body}</p>
-                    <div className="text-[11px] font-bold text-white/40 uppercase tracking-tighter italic mt-1">💡 {insight.actionHint}</div>
+                    <p className="text-[12px] leading-relaxed text-white/70 font-medium">{insight.body}</p>
+                    <div className="text-[11px] font-bold text-white/50 tracking-wide italic mt-1">💡 {insight.actionHint}</div>
                 </div>
             ))}
           </div>

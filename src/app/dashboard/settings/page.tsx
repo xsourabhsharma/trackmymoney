@@ -19,10 +19,10 @@ export default async function SettingsPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Shared Sub Nav */}
+      {}
       <DashboardSubNav />
 
-      {/* Main Settings Grid orchestrated on the client for optimistic updates */}
+      {}
       <SettingsClientOrchestrator 
         initialSettings={settings} 
         integrations={integrations} 

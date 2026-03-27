@@ -1,9 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
-import { Loader2, Eye, EyeOff } from 'lucide-react'
+import Image from 'next/image'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { Loader2, Eye, EyeOff, Sparkles, Activity, Shield, TrendingUp, AlertCircle } from 'lucide-react'
 import { signInWithOAuth, login } from './actions'
+import { motion, AnimatePresence } from 'framer-motion'
 
 function GoogleIcon() {
   return (
@@ -24,11 +27,48 @@ function GithubIcon() {
   )
 }
 
-export default function LoginPage() {
+function LoginPageContent() {
+  const searchParams = useSearchParams()
   const [oauthLoading, setOauthLoading] = useState<'google' | 'github' | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [emailError, setEmailError] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  
+ 
+  const [emailFocused, setEmailFocused] = useState(false)
+  const [emailValue, setEmailValue] = useState('')
+  const [passwordFocused, setPasswordFocused] = useState(false)
+  const [passwordValue, setPasswordValue] = useState('')
+
+ 
+  useEffect(() => {
+    const urlError = searchParams.get('error')
+    if (urlError) {
+      setError(mapAuthError(urlError))
+    }
+  }, [searchParams])
+
+  function mapAuthError(raw: string): string {
+    const lower = raw.toLowerCase()
+    if (lower.includes('invalid login credentials') || lower.includes('invalid_credentials')) return 'Invalid email or password. Please check your credentials and try again.'
+    if (lower.includes('email not confirmed')) return 'Please check your inbox and verify your email address before logging in.'
+    if (lower.includes('rate limit') || lower.includes('too many requests')) return 'Too many login attempts. Please wait a moment and try again.'
+    if (lower.includes('user not found')) return 'No account found with this email. Please sign up first.'
+    if (lower.includes('network')) return 'Network error. Please check your connection and try again.'
+    return raw
+  }
+
+  function validateEmail(email: string): boolean {
+    if (!email) return true
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!re.test(email)) {
+      setEmailError('Please enter a valid email address')
+      return false
+    }
+    setEmailError(null)
+    return true
+  }
 
   async function handleOAuth(provider: 'google' | 'github') {
     setOauthLoading(provider)
@@ -36,210 +76,304 @@ export default function LoginPage() {
   }
 
   async function handleSubmit(formData: FormData) {
-    setIsPending(true)
     setError(null)
+    setEmailError(null)
+
+    const email = formData.get('email') as string
+    if (!validateEmail(email)) return
+    if (!formData.get('password')) {
+      setError('Please enter your password.')
+      return
+    }
+
+    setIsPending(true)
     try {
       await login(formData)
     } catch {
-      setError('Invalid email or password.')
+      setError('Invalid email or password. Please try again.')
       setIsPending(false)
     }
   }
 
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen bg-[var(--bg-base)] text-[var(--text-main)] font-sans">
-      {/* Left Panel - Branding */}
-      <div className="relative flex flex-col justify-center px-8 lg:px-12 py-12 lg:py-16 min-h-[auto] lg:min-h-screen overflow-hidden bg-gradient-to-br from-[var(--bg-surface-dark)] to-[#2a2824]">
-        {/* Background Gradients */}
-        <div className="absolute top-[-50%] right-[-50%] w-full h-full rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)' }}></div>
-        <div className="absolute bottom-[-30%] left-[-30%] w-[60%] h-[60%] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%)' }}></div>
+  const fadeUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  }
 
-        {/* Env Label */}
-        <div className="absolute top-4 right-4 lg:top-6 lg:right-6 px-2.5 py-1 bg-white/10 rounded-full text-[0.625rem] font-medium text-[var(--text-inverse-muted)] uppercase tracking-[0.05em]">
-          Beta
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen bg-[var(--bg-base)] text-[var(--text-main)] font-sans selection:bg-[var(--income-green)] selection:text-white">
+      
+      {}
+      <div className="relative flex flex-col justify-between px-8 lg:px-16 py-12 lg:py-16 min-h-[auto] lg:min-h-screen overflow-hidden bg-[#0A0A0A] text-white">
+        {}
+        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-[var(--income-green)]/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-20%] left-[-20%] w-[600px] h-[600px] bg-[#3B82F6]/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] pointer-events-none" />
+
+        {}
+        <div className="relative z-10 flex justify-between items-center w-full">
+          <Link href="/" className="flex items-center gap-2.5 text-xl font-bold tracking-tight group">
+            <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/10 shadow-lg backdrop-blur-md group-hover:scale-105 transition-transform duration-300 overflow-hidden">
+               <Image src="/real-logo.png" alt="TrackMyMoney Logo" width={28} height={28} className="w-7 h-7 opacity-90 group-hover:opacity-100 transition-opacity drop-shadow-md invert" />
+            </div>
+            <span className="text-white drop-shadow-sm">Track<span className="text-white/50">My</span>Money</span>
+          </Link>
+          <div className="px-3 py-1 bg-[var(--income-green)]/10 border border-[var(--income-green)]/20 rounded-full text-[10px] font-black uppercase tracking-[0.15em] text-[var(--income-green)] backdrop-blur-md shadow-[0_0_15px_rgba(39,201,63,0.15)]">
+            Beta
+          </div>
         </div>
 
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 text-xl font-bold uppercase tracking-[0.05em] text-[var(--text-inverse)] mb-8 lg:mb-12 relative z-10 w-fit">
-          <div className="w-[28px] h-[28px] border-2 border-[var(--text-inverse)] rounded-md flex-shrink-0"></div>
-          TrackMyMoney
-        </Link>
+        {}
+        <div className="relative z-10 w-full max-w-[500px] mt-16 lg:mt-0">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-semibold tracking-wide text-white/80 mb-6 backdrop-blur-md">
+              <Sparkles className="w-3.5 h-3.5 text-[#3B82F6]" /> Welcome back
+            </div>
+            <h1 className="text-4xl lg:text-[3rem] font-black mb-6 leading-[1.1] tracking-[-0.03em] text-balance">
+              Understand your money in minutes.
+            </h1>
+            <p className="text-lg text-white/60 mb-10 leading-relaxed font-medium">
+              Log in to access your AI-powered financial dashboard, upload new statements, and track your net worth.
+            </p>
+          </motion.div>
 
-        <div className="relative z-10 w-full max-w-[500px]">
-          <h1 className="text-3xl lg:text-[2rem] font-bold text-[var(--text-inverse)] mb-6 leading-tight tracking-tight">
-            Understand your money in minutes, not months
-          </h1>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="flex flex-col gap-5"
+          >
+            {[
+              { icon: Activity, text: 'Track income, expenses, and subscriptions' },
+              { icon: Shield, text: 'Bank-grade secure data storage' },
+              { icon: Sparkles, text: 'AI Auto-Parse for statements and receipts' }
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-4 text-[15px] text-white/70 font-medium">
+                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[var(--income-green)] backdrop-blur-sm">
+                  <item.icon className="w-4 h-4" />
+                </div>
+                {item.text}
+              </div>
+            ))}
+          </motion.div>
+        </div>
+
+        {}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="hidden lg:block relative z-10 w-full max-w-[500px] bg-white/5 border border-white/10 rounded-[24px] p-5 backdrop-blur-2xl shadow-[0_30px_60px_rgba(0,0,0,0.5)] mt-12 overflow-hidden group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           
-          <div className="flex flex-col gap-3 mb-8">
-            <div className="flex items-center gap-3 text-[0.9375rem] text-[var(--text-inverse-muted)]">
-              <span className="w-5 h-5 bg-white/10 rounded-full flex items-center justify-center text-[0.625rem] text-[var(--text-inverse)]">✓</span>
-              Track income, expenses, and subscriptions
+          <div className="flex gap-2 mb-4">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56] opacity-80" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E] opacity-80" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F] opacity-80" />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="p-4 bg-black/40 rounded-xl border border-white/5">
+              <div className="text-[10px] text-white/50 uppercase tracking-widest font-bold mb-1">Net Worth</div>
+              <div className="text-xl font-bold tracking-tight">₹1,24,590</div>
             </div>
-            <div className="flex items-center gap-3 text-[0.9375rem] text-[var(--text-inverse-muted)]">
-              <span className="w-5 h-5 bg-white/10 rounded-full flex items-center justify-center text-[0.625rem] text-[var(--text-inverse)]">✓</span>
-              Set budgets, goals, and manage debts
-            </div>
-            <div className="flex items-center gap-3 text-[0.9375rem] text-[var(--text-inverse-muted)]">
-              <span className="w-5 h-5 bg-white/10 rounded-full flex items-center justify-center text-[0.625rem] text-[var(--text-inverse)]">✓</span>
-              AI Auto-Parse for statements and receipts
+            <div className="p-4 bg-[var(--income-green)]/10 rounded-xl border border-[var(--income-green)]/20 relative overflow-hidden">
+               <div className="absolute top-0 right-0 p-2 opacity-20"><TrendingUp className="w-8 h-8 text-[var(--income-green)]" /></div>
+              <div className="text-[10px] text-[var(--income-green)] uppercase tracking-widest font-bold mb-1">Monthly Saved</div>
+              <div className="text-xl font-bold tracking-tight text-white">₹42,300</div>
             </div>
           </div>
+        </motion.div>
 
-          {/* Dashboard Preview */}
-          <div className="hidden lg:block bg-[var(--bg-base)] rounded-[24px] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.3)] opacity-95 relative z-10 w-full">
-            <div className="flex gap-2 mb-3">
-              <span className="w-2 h-2 rounded-full bg-[#FF6B6B]"></span>
-              <span className="w-2 h-2 rounded-full bg-[#FFD93D]"></span>
-              <span className="w-2 h-2 rounded-full bg-[#6BCB77]"></span>
-            </div>
-            
-            <div className="grid grid-cols-3 gap-2 mb-3">
-              <div className="p-2 bg-[var(--bg-surface)] rounded-lg text-center">
-                <div className="text-[0.875rem] font-semibold">$124,590</div>
-                <div className="text-[0.5rem] text-[var(--text-muted)] uppercase">Balance</div>
-              </div>
-              <div className="p-2 bg-[var(--bg-surface)] rounded-lg text-center">
-                <div className="text-[0.875rem] font-semibold text-[var(--income-green)]">$8,450</div>
-                <div className="text-[0.5rem] text-[var(--text-muted)] uppercase">Income</div>
-              </div>
-              <div className="p-2 bg-[var(--bg-surface)] rounded-lg text-center">
-                <div className="text-[0.875rem] font-semibold text-[var(--expense-red)]">$3,240</div>
-                <div className="text-[0.5rem] text-[var(--text-muted)] uppercase">Expenses</div>
-              </div>
-            </div>
-
-            <div className="bg-[var(--bg-surface)] rounded-lg p-2 mb-2">
-              <div className="text-[0.5rem] font-semibold text-[var(--text-muted)] uppercase mb-1">Recent Transactions</div>
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-1 text-[0.625rem] p-1 bg-[var(--bg-base)] rounded">
-                  <span className="w-4 h-4 bg-[var(--bg-surface)] rounded flex items-center justify-center text-[0.5rem]">🏪</span>
-                  <span className="flex-grow overflow-hidden text-ellipsis whitespace-nowrap">Whole Foods Market</span>
-                  <span className="font-medium text-[var(--expense-red)]">-$142</span>
-                </div>
-                <div className="flex items-center gap-1 text-[0.625rem] p-1 bg-[var(--bg-base)] rounded">
-                  <span className="w-4 h-4 bg-[var(--bg-surface)] rounded flex items-center justify-center text-[0.5rem]">💼</span>
-                  <span className="flex-grow overflow-hidden text-ellipsis whitespace-nowrap">Acme Corp Salary</span>
-                  <span className="font-medium text-[var(--income-green)]">+$4,225</span>
-                </div>
-                <div className="flex items-center gap-1 text-[0.625rem] p-1 bg-[var(--bg-base)] rounded">
-                  <span className="w-4 h-4 bg-[var(--bg-surface)] rounded flex items-center justify-center text-[0.5rem]">☕</span>
-                  <span className="flex-grow overflow-hidden text-ellipsis whitespace-nowrap">Sightglass Coffee</span>
-                  <span className="font-medium text-[var(--expense-red)]">-$6.50</span>
-                </div>
-              </div>
-            </div>
-          </div>
+        {}
+        <div className="relative z-10 hidden lg:flex items-center gap-6 text-[13px] text-white/40 font-medium">
+          <span>© TrackMyMoney 2026</span>
+          <span className="w-1 h-1 rounded-full bg-white/20" />
+          <span>All rights reserved</span>
         </div>
       </div>
 
-      {/* Right Panel - Login Form */}
-      <div className="flex flex-col justify-center bg-[var(--bg-base)] p-8 lg:p-12 relative h-full">
-        <div className="w-full max-w-[400px] mx-auto">
-          <div className="mb-6">
-            <h2 className="text-[1.75rem] font-bold text-[var(--text-main)] mb-2 tracking-tight">Log in to TrackMyMoney</h2>
-            <p className="text-[0.9375rem] text-[var(--text-muted)]">Welcome back, let&apos;s get you to your dashboard.</p>
-          </div>
+      {}
+      <div className="flex flex-col justify-center bg-[var(--bg-base)] p-6 sm:p-8 lg:p-16 relative h-full">
+        
+        {}
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--bg-surface)]/50 to-transparent pointer-events-none" />
 
-          <form action={handleSubmit} className="mb-6">
-            {error && (
-              <div className="mb-4 bg-[var(--expense-red)]/10 text-[var(--expense-red)] border border-[var(--expense-red)]/20 rounded-lg p-3 text-sm font-medium">
-                {error}
-              </div>
-            )}
+        <div className="w-full max-w-[440px] mx-auto relative z-10">
+          
+          <motion.div 
+            initial="hidden" animate="visible" variants={fadeUp} transition={{ duration: 0.4 }}
+            className="mb-8 text-center lg:text-left"
+          >
+            <h2 className="text-[2rem] md:text-[2.25rem] font-bold text-[var(--text-main)] mb-2 tracking-[-0.02em]">Welcome back</h2>
+            <p className="text-[15px] text-[var(--text-muted)]">Please enter your details to sign in.</p>
+          </motion.div>
 
-            <div className="mb-4">
-              <label className="block text-[0.8125rem] font-medium mb-2 text-[var(--text-main)]" htmlFor="email">Email</label>
-              <input 
-                type="email" 
-                id="email" 
-                name="email"
-                className="w-full p-[12px_16px] border border-[var(--border-light)] rounded-lg text-[0.9375rem] bg-[var(--bg-base)] text-[var(--text-main)] placeholder-[var(--text-muted)] transition-all focus:outline-none focus:border-[var(--text-main)] focus:ring-[3px] focus:ring-[var(--text-main)]/10" 
-                placeholder="Enter your email"
-                required 
-              />       
+          <motion.div 
+            initial="hidden" animate="visible" variants={fadeUp} transition={{ duration: 0.4, delay: 0.1 }}
+            className="bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-[24px] p-6 sm:p-8 shadow-sm"
+          >
+            {}
+            <div className="flex flex-col gap-3 mb-6">
+              <button 
+                type="button"
+                onClick={() => handleOAuth('google')}
+                disabled={!!oauthLoading}
+                className="w-full inline-flex items-center justify-center p-[14px_24px] rounded-xl text-[14px] font-semibold transition-all bg-[var(--bg-base)] border border-[var(--border-light)] text-[var(--text-main)] hover:border-[var(--border-dark)] hover:shadow-sm active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 group"
+              >
+                {oauthLoading === 'google' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <div className="group-hover:scale-110 transition-transform"><GoogleIcon /></div>}
+                Continue with Google
+              </button>
+
+              <button 
+                type="button"
+                onClick={() => handleOAuth('github')}
+                disabled={!!oauthLoading}
+                className="w-full inline-flex items-center justify-center p-[14px_24px] rounded-xl text-[14px] font-semibold transition-all bg-[var(--bg-base)] border border-[var(--border-light)] text-[var(--text-main)] hover:border-[var(--border-dark)] hover:shadow-sm active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 group"
+              >
+                {oauthLoading === 'github' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <div className="group-hover:scale-110 transition-transform"><GithubIcon /></div>}
+                Continue with GitHub
+              </button>
             </div>
 
-            <div className="mb-4">
-              <label className="block text-[0.8125rem] font-medium mb-2 text-[var(--text-main)]" htmlFor="password">Password</label>
-              <div className="relative">
+            <div className="flex items-center gap-4 my-6">
+              <span className="flex-grow h-[1px] bg-[var(--border-light)]"></span>
+              <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Or email</span>
+              <span className="flex-grow h-[1px] bg-[var(--border-light)]"></span>
+            </div>
+
+            {}
+            <form action={handleSubmit} className="flex flex-col gap-5">
+              <AnimatePresence>
+                {error && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                    animate={{ opacity: 1, height: 'auto', marginBottom: 8 }}
+                    exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                    className="bg-[var(--expense-red)]/10 text-[var(--expense-red)] border border-[var(--expense-red)]/20 rounded-xl p-3 text-sm font-medium flex items-center gap-2 overflow-hidden"
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--expense-red)] shrink-0" />
+                    {error}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {}
+              <div className="relative group">
+                <input 
+                  type="email" 
+                  id="email" 
+                  name="email"
+                  value={emailValue}
+                  onChange={(e) => { setEmailValue(e.target.value); if (emailError) setEmailError(null) }}
+                  onFocus={() => setEmailFocused(true)}
+                  onBlur={(e) => { setEmailFocused(false); validateEmail(e.target.value) }}
+                  className={`peer w-full h-[56px] px-4 pt-4 pb-1 border rounded-xl text-[15px] bg-[var(--bg-base)] text-[var(--text-main)] transition-all focus:outline-none focus:ring-1 hover:border-[var(--border-dark)] shadow-inner ${
+                    emailError 
+                      ? 'border-[var(--expense-red)] focus:border-[var(--expense-red)] focus:ring-[var(--expense-red)]' 
+                      : 'border-[var(--border-light)] focus:border-[var(--text-main)] focus:ring-[var(--text-main)]'
+                  }`} 
+                  required 
+                />
+                <label 
+                  htmlFor="email"
+                  className={`absolute left-4 transition-all duration-200 pointer-events-none ${
+                    emailError ? 'text-[var(--expense-red)]' : 'text-[var(--text-muted)]'
+                  } ${
+                    emailFocused || emailValue
+                      ? 'text-[11px] top-2 font-medium text-[var(--text-main)]'
+                      : 'text-[15px] top-4 group-hover:text-[var(--text-main)]'
+                  }`}
+                >
+                  Email address
+                </label>
+                {emailError && (
+                  <p className="mt-1.5 text-[12px] font-medium text-[var(--expense-red)] flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" /> {emailError}
+                  </p>
+                )}
+              </div>
+
+              {}
+              <div className="relative group">
                 <input 
                   type={showPassword ? 'text' : 'password'} 
                   id="password" 
                   name="password"
-                  className="w-full p-[12px_16px] border border-[var(--border-light)] rounded-lg text-[0.9375rem] bg-[var(--bg-base)] text-[var(--text-main)] placeholder-[var(--text-muted)] transition-all focus:outline-none focus:border-[var(--text-main)] focus:ring-[3px] focus:ring-[var(--text-main)]/10 pr-12" 
-                  placeholder="Enter your password"
+                  value={passwordValue}
+                  onChange={(e) => setPasswordValue(e.target.value)}
+                  onFocus={() => setPasswordFocused(true)}
+                  onBlur={() => setPasswordFocused(false)}
+                  className="peer w-full h-[56px] px-4 pt-4 pb-1 pr-12 border border-[var(--border-light)] rounded-xl text-[15px] bg-[var(--bg-base)] text-[var(--text-main)] transition-all focus:outline-none focus:border-[var(--text-main)] focus:ring-1 focus:ring-[var(--text-main)] hover:border-[var(--border-dark)] shadow-inner" 
                   required
                 />
+                <label 
+                  htmlFor="password"
+                  className={`absolute left-4 transition-all duration-200 pointer-events-none text-[var(--text-muted)] ${
+                    passwordFocused || passwordValue
+                      ? 'text-[11px] top-2 font-medium text-[var(--text-main)]'
+                      : 'text-[15px] top-4 group-hover:text-[var(--text-main)]'
+                  }`}
+                >
+                  Password
+                </label>
                 <button 
                   type="button" 
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-main)] p-1 focus:outline-none"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors focus:outline-none p-1"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
-            </div>
 
-            <div className="flex justify-between items-center mb-4">
-              <label className="flex items-center gap-2 text-[0.8125rem] text-[var(--text-muted)] cursor-pointer select-none">
-                <input type="checkbox" className="w-4 h-4 accent-[var(--accent)]" /> 
-                Remember me
-              </label>
-              <Link href="/forgot-password" className="text-[0.8125rem] text-[var(--text-main)] font-medium hover:underline">
-                Forgot password?
-              </Link>
-            </div>
+              <div className="flex justify-between items-center mt-1 mb-2">
+                <label className="flex items-center gap-2 text-[13px] text-[var(--text-muted)] cursor-pointer select-none font-medium hover:text-[var(--text-main)] transition-colors">
+                  <input type="checkbox" className="w-4 h-4 rounded border-[var(--border-light)] accent-[var(--text-main)]" /> 
+                  Remember for 30 days
+                </label>
+                <Link href="/forgot-password" className="text-[13px] text-[var(--text-main)] font-semibold hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
 
-            <button 
-              type="submit" 
-              disabled={isPending}
-              className="w-full inline-flex items-center justify-center p-[14px_24px] rounded-full text-[0.9375rem] font-medium transition-all bg-[var(--text-main)] text-[var(--bg-base)] hover:bg-[var(--bg-surface-dark)] disabled:opacity-70"
-            >
-              {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Log in'}
-            </button>
-          </form>
+              <button 
+                type="submit" 
+                disabled={isPending}
+                className="w-full inline-flex items-center justify-center h-[56px] rounded-xl text-[15px] font-bold transition-all bg-[var(--text-main)] text-[var(--bg-base)] hover:bg-[var(--text-main)]/90 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 shadow-[0_4px_14px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_14px_rgba(255,255,255,0.1)]"
+              >
+                {isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Log in'}
+              </button>
+            </form>
+          </motion.div>
 
-          <div className="flex items-center gap-3 my-6">
-            <span className="flex-grow h-[1px] bg-[var(--border-light)]"></span>
-            <span className="text-[0.75rem] text-[var(--text-muted)] uppercase tracking-[0.05em]">or continue with</span>
-            <span className="flex-grow h-[1px] bg-[var(--border-light)]"></span>
-          </div>
-
-          <button 
-            type="button"
-            onClick={() => handleOAuth('google')}
-            disabled={!!oauthLoading}
-            className="w-full inline-flex items-center justify-center p-[14px_24px] rounded-full text-[0.9375rem] font-medium transition-all bg-[var(--bg-base)] border border-[var(--border-light)] text-[var(--text-main)] mb-3 hover:bg-[var(--bg-surface)] hover:border-[var(--border-dark)] disabled:opacity-70"
+          <motion.p 
+            initial="hidden" animate="visible" variants={fadeUp} transition={{ duration: 0.4, delay: 0.4 }}
+            className="text-center text-[14px] text-[var(--text-muted)] mt-8"
           >
-            {oauthLoading === 'google' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <GoogleIcon />}
-            Continue with Google
-          </button>
-
-          <button 
-            type="button"
-            onClick={() => handleOAuth('github')}
-            disabled={!!oauthLoading}
-            className="w-full inline-flex items-center justify-center p-[14px_24px] rounded-full text-[0.9375rem] font-medium transition-all bg-[var(--bg-base)] border border-[var(--border-light)] text-[var(--text-main)] hover:bg-[var(--bg-surface)] hover:border-[var(--border-dark)] disabled:opacity-70"
-          >
-            {oauthLoading === 'github' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <GithubIcon />}
-            Continue with GitHub
-          </button>
-
-          <p className="text-center text-[0.875rem] text-[var(--text-muted)] mt-6">
-            New here? <Link href="/signup" className="text-[var(--text-main)] font-medium hover:underline">Create an account</Link>
-          </p>
+            Don&apos;t have an account? <Link href="/signup" className="text-[var(--text-main)] font-bold hover:underline underline-offset-4 decoration-2 decoration-[var(--border-light)] hover:decoration-[var(--text-main)] transition-colors">Sign up for free</Link>
+          </motion.p>
         </div>
 
-        {/* Footer */}
-        <div className="lg:absolute lg:bottom-6 lg:left-12 lg:right-12 mt-8 lg:mt-0 flex flex-col lg:flex-row justify-between items-center gap-2 text-[0.75rem] text-[var(--text-muted)]">
-          <div className="flex gap-4">
-            <Link href="/privacy" className="hover:text-[var(--text-main)]">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-[var(--text-main)]">Terms</Link>
-          </div>
-          <span>© TrackMyMoney, 2026</span>
+        {}
+        <div className="lg:hidden mt-12 flex justify-center gap-6 text-[12px] font-medium text-[var(--text-muted)]">
+          <Link href="/privacy" className="hover:text-[var(--text-main)]">Privacy Policy</Link>
+          <Link href="/terms" className="hover:text-[var(--text-main)]">Terms</Link>
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginPageContent />
+    </Suspense>
   )
 }

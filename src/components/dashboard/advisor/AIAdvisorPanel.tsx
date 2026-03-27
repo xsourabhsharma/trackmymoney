@@ -23,12 +23,12 @@ export function AIAdvisorPanel() {
     }
   }
 
-  // Typewriter effect
+ 
   useEffect(() => {
     if (!insights || isLoading) return
     
     let i = 0
-    setDisplayedText('') // Reset
+    setDisplayedText('')
     
     const interval = setInterval(() => {
       setDisplayedText((prev) => prev + insights.charAt(i))
@@ -36,19 +36,19 @@ export function AIAdvisorPanel() {
       if (i >= insights.length) {
         clearInterval(interval)
       }
-    }, 15) // Speed of typing
+    }, 15)
 
     return () => clearInterval(interval)
   }, [insights, isLoading])
 
-  // Auto-fetch on mount
+ 
   useEffect(() => {
     fetchInsights()
   }, [])
 
   return (
     <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-zinc-900 p-6 shadow-sm mb-8 relative overflow-hidden group transition-all duration-500 hover:shadow-blue-500/10 hover:border-blue-300 dark:hover:border-blue-800">
-      {/* Decorative background element */}
+      {}
       <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-100 dark:bg-blue-900/20 rounded-full opacity-50 blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
       
       <div className="flex items-center justify-between mb-4 relative z-10">

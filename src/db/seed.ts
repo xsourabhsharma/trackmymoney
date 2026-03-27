@@ -15,7 +15,7 @@ const db = drizzle(pool, { schema });
 async function seed() {
   console.log('Seeding data...');
 
-  // 1. Ensure a user exists
+ 
   const userProfiles = await db.select().from(schema.profiles).limit(1);
   let userId: string;
 
@@ -34,7 +34,7 @@ async function seed() {
     console.log(`Using existing profile: ${userProfiles[0].email}`);
   }
 
-  // 2. Insert Accounts
+ 
   console.log('Inserting accounts...');
   const accountsData = [
     { id: uuidv4(), userId, name: 'Main Checking', type: 'bank' as const, balance: '5200.50', color: '#3B82F6' },
@@ -44,7 +44,7 @@ async function seed() {
   ];
   await db.insert(schema.accounts).values(accountsData).onConflictDoNothing();
 
-  // 3. Insert Categories
+ 
   console.log('Inserting categories...');
   const categoriesData = [
     { id: uuidv4(), userId, name: 'Housing', type: 'expense' as const, isDefault: true, icon: '🏠', color: '#3b82f6' },
@@ -55,7 +55,7 @@ async function seed() {
   ];
   await db.insert(schema.categories).values(categoriesData).onConflictDoNothing();
 
-  // 4. Insert Transactions
+ 
   console.log('Inserting transactions...');
   const txData: any[] = [];
   const now = new Date();
@@ -85,21 +85,21 @@ async function seed() {
   }
   await db.insert(schema.transactions).values(txData).onConflictDoNothing();
 
-  // 5. Insert Budgets
+ 
   console.log('Inserting budgets...');
   await db.insert(schema.budgets).values([
     { id: uuidv4(), userId, categoryId: categoriesData[0].id, periodType: 'monthly', periodStart: new Date(now.getFullYear(), now.getMonth(), 1), limitAmount: '2000.00', spent: '1500.00', status: 'active' },
     { id: uuidv4(), userId, categoryId: categoriesData[1].id, periodType: 'monthly', periodStart: new Date(now.getFullYear(), now.getMonth(), 1), limitAmount: '600.00', spent: '450.00', status: 'active' },
   ]).onConflictDoNothing();
 
-  // 6. Insert Goals
+ 
   console.log('Inserting goals...');
   await db.insert(schema.goals).values([
     { id: uuidv4(), userId, name: 'Emergency Fund', targetAmount: '10000.00', currentAmount: '4500.00', status: 'active', color: '#10B981' },
     { id: uuidv4(), userId, name: 'Vacation', targetAmount: '3000.00', currentAmount: '1200.00', status: 'active', color: '#3B82F6' },
   ]).onConflictDoNothing();
 
-  // 7. Insert Subscriptions
+ 
   console.log('Inserting subscriptions...');
   const nextMonth = new Date();
   nextMonth.setMonth(nextMonth.getMonth() + 1);

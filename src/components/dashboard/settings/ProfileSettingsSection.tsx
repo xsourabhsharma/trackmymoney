@@ -137,23 +137,7 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
             className="bg-[var(--bg-surface)] border-[var(--border-light)] text-[13px] font-medium rounded-xl h-11 opacity-70"
           />
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <Label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-1">Time Zone</Label>
-            <div className="relative">
-              <select
-                value={formData.timezone}
-                onChange={e => setFormData({ ...formData, timezone: e.target.value })}
-                className="w-full pl-3 pr-8 py-2.5 bg-[var(--bg-base)] border border-[var(--border-light)] rounded-xl text-[11px] font-bold appearance-none outline-none focus:border-[var(--border-dark)] cursor-pointer uppercase tracking-tight"
-              >
-                <option value="UTC+05:30 IST">UTC+05:30 IST</option>
-                <option value="UTC+00:00 GMT">UTC+00:00 GMT</option>
-                <option value="UTC-05:00 EST">UTC-05:00 EST</option>
-                <option value="UTC-08:00 PST">UTC-08:00 PST</option>
-              </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[var(--text-muted)] pointer-events-none" />
-            </div>
-          </div>
+        <div className="grid grid-cols-1 gap-4">
           <div className="space-y-1.5">
             <Label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-1">Currency</Label>
             <div className="relative">
@@ -162,10 +146,8 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
                 onChange={e => setFormData({ ...formData, currency: e.target.value })}
                 className="w-full pl-3 pr-8 py-2.5 bg-[var(--bg-base)] border border-[var(--border-light)] rounded-xl text-[11px] font-bold appearance-none outline-none focus:border-[var(--border-dark)] cursor-pointer uppercase tracking-tight"
               >
-                <option value="INR (₹)">INR (₹)</option>
-                <option value="USD ($)">USD ($)</option>
-                <option value="EUR (€)">EUR (€)</option>
-                <option value="GBP (£)">GBP (£)</option>
+                <option value="INR">INR (₹)</option>
+                <option value="USD">USD ($)</option>
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[var(--text-muted)] pointer-events-none" />
             </div>

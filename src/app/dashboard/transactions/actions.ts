@@ -11,7 +11,7 @@ export interface CreateTransactionPayload {
   account_id: string;
   merchant?: string;
   description?: string;
-  date: string; // ISO string
+  date: string;
 }
 
 export async function createTransaction(payload: CreateTransactionPayload) {
@@ -24,7 +24,7 @@ export async function createTransaction(payload: CreateTransactionPayload) {
     user_id: user.id,
     ...payload,
     source: 'manual',
-    status: 'cleared', // Default to cleared for manual entry unless specified
+    status: 'cleared',
   });
 
   if (error) {
@@ -41,7 +41,7 @@ export async function updateTransaction(id: string, payload: Partial<CreateTrans
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Unauthorized");
 
-  // Supabase RLS policies guarantee we only update our own rows
+ 
   const { error } = await supabase
     .from('transactions')
     .update({ 

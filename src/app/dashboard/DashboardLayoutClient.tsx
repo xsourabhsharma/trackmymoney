@@ -1,14 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import type { User } from '@supabase/supabase-js'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { useTheme } from 'next-themes'
 import { ToastProvider } from '@/components/ui/toast-provider'
-import { Menu, X, Bell, LogOut } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { useCurrencyStore } from '@/store/useCurrencyStore'
 
 interface Props {
@@ -24,31 +25,26 @@ export default function DashboardLayoutClient({ user, initialTheme, initialCurre
   const router = useRouter()
   const supabase = createClient()
   const setCurrency = useCurrencyStore((state) => state.setCurrency)
+  const { setTheme } = useTheme()
+  const isInitialMount = useRef(true)
 
-  // Hydrate currency store on mount
+ 
   useEffect(() => {
     setCurrency(initialCurrency)
   }, [initialCurrency, setCurrency])
 
-  // Apply the saved theme from DB on mount
+ 
   useEffect(() => {
-    const root = document.documentElement
-    if (initialTheme === 'dark') {
-      root.classList.add('dark')
-      root.classList.remove('light')
-    } else if (initialTheme === 'light') {
-      root.classList.add('light')
-      root.classList.remove('dark')
-    } else {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      if (prefersDark) root.classList.add('dark')
-      else root.classList.remove('dark')
+    if (isInitialMount.current && initialTheme) {
+      setTheme(initialTheme)
+      isInitialMount.current = false
     }
-  }, [initialTheme])
+  }, [initialTheme, setTheme])
+
 
   useEffect(() => {
     if (isMobileMenuOpen) setIsMobileMenuOpen(false)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+ 
   }, [pathname])
 
   const handleSignOut = async () => {
@@ -83,9 +79,11 @@ export default function DashboardLayoutClient({ user, initialTheme, initialCurre
       <header className="sticky top-0 z-50 bg-[var(--bg-base)] border-b border-[var(--border-light)] px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-6">
 
-          <Link href="/dashboard" className="flex items-center gap-2 text-lg font-bold uppercase tracking-wider text-[var(--text-main)]">
-            <Image src="/logo.svg" alt="TrackMyMoney" width={24} height={24} className="w-6 h-6" />
-            TrackMyMoney
+          <Link href="/dashboard" className="flex items-center gap-2.5 text-lg font-bold tracking-tight text-[var(--text-main)] group">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--text-main)]/5 border border-[var(--border-light)] overflow-hidden">
+               <Image src="/real-logo.png" alt="TrackMyMoney" width={20} height={20} className="w-5 h-5 opacity-90 group-hover:opacity-100 transition-opacity dark:invert" />
+            </div>
+            Track<span className="text-[var(--text-muted)]">My</span>Money
           </Link>
 
           <nav className="hidden lg:block ml-4">
@@ -132,7 +130,7 @@ export default function DashboardLayoutClient({ user, initialTheme, initialCurre
         </div>
       </header>
 
-      {/* Ultra-Premium Mobile Bottom Navigation */}
+      {}
       <nav className="lg:hidden fixed bottom-4 left-4 right-4 z-50 bg-[var(--bg-base)]/80 backdrop-blur-3xl border border-[var(--border-light)] rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] p-2">
         <ul className="flex items-center overflow-x-auto hide-scrollbar gap-2 snap-x snap-mandatory">
           {navLinks.map(link => {

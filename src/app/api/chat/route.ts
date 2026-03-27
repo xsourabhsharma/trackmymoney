@@ -1,101 +1,120 @@
 import { createGroq } from '@ai-sdk/groq'
-import { streamText, tool, convertToModelMessages } from 'ai'
+import { streamText, type ModelMessage } from 'ai'
 import { z } from 'zod'
 import { createClient } from '@/utils/supabase/server'
-import { apiError, unauthorized } from '@/lib/api-errors'
-
-// Allow streaming responses up to 30 seconds
+import { apiError, badRequest, unauthorized } from '@/lib/api-errors'
+
 export const maxDuration = 30
+
+const chatRequestSchema = z.object({
+  messages: z.array(z.object({
+    role: z.enum(['user', 'assistant', 'system']),
+    content: z.unknown().optional(),
+    parts: z.array(z.any()).optional(),
+    toolInvocations: z.array(z.any()).optional(),
+  })).min(1).max(40),
+  data: z.object({
+    imageUrls: z.array(z.string().min(1).max(7_000_000)).max(4).optional(),
+  }).optional(),
+  pathname: z.string().max(200).optional(),
+})
+
+type ChatUnknownPart = {
+  type?: string
+  text?: string
+  toolCallId?: string
+  toolName?: string
+  args?: unknown
+  state?: string
+  result?: unknown
+}
+
+type ChatToolInvocation = {
+  toolCallId?: string
+  toolName?: string
+  args?: unknown
+  state?: string
+  result?: unknown
+}
+
+type ChatInputMessage = {
+  role: 'user' | 'assistant' | 'system'
+  content?: string | ChatUnknownPart[]
+  parts?: ChatUnknownPart[]
+  toolInvocations?: ChatToolInvocation[]
+}
+
+function isTextPart(part: ChatUnknownPart): part is ChatUnknownPart & { text: string } {
+  return part.type === 'text' && typeof part.text === 'string'
+}
 
 const groq = createGroq({
   apiKey: process.env.GROQ_API_KEY,
 })
 
 export async function POST(req: Request) {
-  const { messages, data } = await req.json()
+  const parsedBody = chatRequestSchema.safeParse(await req.json())
+  if (!parsedBody.success) {
+    return badRequest('Invalid chat request payload')
+  }
+
+  const { messages, data, pathname } = parsedBody.data
   const supabase = await createClient()
   
-  // Authenticate user
+ 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return unauthorized()
   }
 
-  // 1. Convert frontend UIMessages to standard CoreMessages manually
-  // to avoid strict schema validation errors from convertToModelMessages
-  const coreMessages: any[] = []
-  for (const m of messages) {
+  if (!process.env.GROQ_API_KEY) {
+    return apiError('AI service unavailable', { status: 503 })
+  }
+
+ 
+ 
+  const typedMessages = messages as ChatInputMessage[]
+  const coreMessages: ModelMessage[] = []
+  for (const m of typedMessages) {
     let textContent = '';
-    // Strongly enforce string conversion in case useChat parses content as a part array implicitly
+   
     if (typeof m.content === 'string') {
       textContent = m.content;
     } else if (Array.isArray(m.content)) {
-      textContent = m.content.filter((p: any) => p.type === 'text').map((p: any) => p.text).join('');
+      textContent = m.content.filter(isTextPart).map((part) => part.text).join('');
     }
 
     if (!textContent && Array.isArray(m.parts)) {
-      textContent = m.parts.filter((p: any) => p.type === 'text').map((p: any) => p.text).join('');
+      textContent = m.parts.filter(isTextPart).map((part) => part.text).join('');
     }
     
-    // Support both older toolInvocations and newer parts for tools
-    let toolInvocations = m.toolInvocations || [];
-    if (toolInvocations.length === 0 && m.parts) {
-      toolInvocations = m.parts
-        .filter((p: any) => p.type === 'tool-invocation')
-        .map((p: any) => ({
-          toolCallId: p.toolCallId,
-          toolName: p.toolName,
-          args: p.args,
-          state: p.state || (p.result ? 'result' : 'call'),
-          result: p.result
-        }));
-    }
-
+   
     if (m.role === 'user') {
       coreMessages.push({ role: 'user', content: textContent })
     } else if (m.role === 'assistant') {
-      if (toolInvocations && toolInvocations.length > 0) {
-        coreMessages.push({
-          role: 'assistant',
-          content: textContent || ' ', // Groq rejects completely empty text even with tools
-          toolCalls: toolInvocations.map((t: any) => ({
-            type: 'tool-call',
-            toolCallId: t.toolCallId,
-            toolName: t.toolName,
-            args: t.args || {}
-          }))
-        })
-        const toolResults = toolInvocations
-          .filter((t: any) => t.state === 'result')
-          .map((t: any) => ({
-            type: 'tool-result',
-            toolCallId: t.toolCallId,
-            toolName: t.toolName,
-            result: t.result
-          }))
-        if (toolResults.length > 0) {
-          coreMessages.push({ role: 'tool', content: toolResults })
-        }
-      } else {
-        coreMessages.push({ role: 'assistant', content: textContent || ' ' }) // Ensure never empty
-      }
+      coreMessages.push({ role: 'assistant', content: textContent || ' ' })
     } else if (m.role === 'system') {
       coreMessages.push({ role: 'system', content: textContent || ' ' })
     }
   }
 
-  // 2. Inject images if provided in the custom 'data' field
-  // We do a smart two-pass: extract text with vision concurrently, then pass text to the tool model.
+ 
+ 
   if (data?.imageUrls && Array.isArray(data.imageUrls) && data.imageUrls.length > 0) {
     const lastMsg = coreMessages[coreMessages.length - 1]
     if (lastMsg && lastMsg.role === 'user') {
       try {
         const { generateText } = await import('ai');
+        const { createGoogleGenerativeAI } = await import('@ai-sdk/google');
         
-        // Parse all images in parallel to save time and prevent single-turn multimodal token crashes
+        const google = createGoogleGenerativeAI({
+          apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY
+        });
+        
+       
         const ocrResults = await Promise.all(data.imageUrls.map((url: string) => 
           generateText({
-            model: groq('llama-3.2-11b-vision-preview'),
+            model: google('gemini-1.5-flash'),
             messages: [
               { role: 'user', content: [
                 { type: 'text', text: 'Please extract all available details, numbers, dates, and amounts from this document/receipt.' },
@@ -108,8 +127,17 @@ export async function POST(req: Request) {
           })
         ));
 
-        // Mutate the user's message to contain the combined OCR text instead of the images
-        const originalText = typeof lastMsg.content === 'string' ? lastMsg.content : (Array.isArray(lastMsg.content) ? lastMsg.content.filter((c: any) => c.type === 'text').map((c: any) => c.text).join(' ') : '');
+       
+        const originalText = typeof lastMsg.content === 'string'
+          ? lastMsg.content
+          : (
+            Array.isArray(lastMsg.content)
+              ? (lastMsg.content as Array<{ type?: string; text?: string }>)
+                .filter((part): part is { type: 'text'; text: string } => part.type === 'text' && typeof part.text === 'string')
+                .map((part) => part.text)
+                .join(' ')
+              : ''
+          );
         lastMsg.content = `${originalText}\n\n[System: Auto-extracted text from uploaded images:]\n${ocrResults.join('\n\n---\n\n')}`;
       } catch (e) {
         console.error("Vision extract failed:", e);
@@ -117,208 +145,121 @@ export async function POST(req: Request) {
     }
   }
 
-  // Switching back to llama-3.3-70b-versatile because 8b-instant outputs raw <function> tags instead of native tools!
-  const model = groq('llama-3.3-70b-versatile')
+ 
+  const model = groq('llama-3.1-8b-instant')
+
+ 
+  let userDataContext = '';
+  try {
+    const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
+    const [
+      { data: accounts },
+      { data: budgets },
+      { data: goals },
+      { data: subscriptions },
+      { data: transactions },
+      { data: debts },
+      { data: monthTransactions }
+    ] = await Promise.all([
+      supabase.from('accounts').select('name, type, balance').eq('user_id', user.id),
+      supabase.from('budgets').select('period_type, limit_amount, status, categories(name)').eq('user_id', user.id),
+      supabase.from('goals').select('name, target_amount, current_amount, target_date, status').eq('user_id', user.id),
+      supabase.from('subscriptions').select('merchant, amount, interval, status, next_charge_date').eq('user_id', user.id),
+      supabase.from('transactions').select('amount, merchant, type, date, categories(name)').eq('user_id', user.id).order('date', { ascending: false }).limit(1000),
+      supabase.from('debts').select('name, total_amount, remaining_amount, interest_rate').eq('user_id', user.id),
+      supabase.from('transactions').select('amount, type').eq('user_id', user.id).gte('date', startOfMonth)
+    ]);
+
+    let monthExpense = 0;
+    let monthIncome = 0;
+    if (monthTransactions) {
+      monthTransactions.forEach(t => {
+        if (t.type === 'expense') monthExpense += Number(t.amount);
+        if (t.type === 'income') monthIncome += Number(t.amount);
+      });
+    }
+
+    userDataContext = `
+### USER FINANCIAL DATA CONTEXT:
+Here is the user's current financial data from their account. You can see ALL this info and MUST use it to answer their questions accurately.
+
+Accounts:
+${JSON.stringify(accounts || [])}
+
+Current Month Summary (Net Position):
+Total Income: $${monthIncome}
+Total Expenses: $${monthExpense}
+Net Saved / Net Position: $${monthIncome - monthExpense}
+
+Budgets:
+${JSON.stringify(budgets || [])}
+
+Goals:
+${JSON.stringify(goals || [])}
+
+Debts:
+${JSON.stringify(debts || [])}
+
+Subscriptions:
+${JSON.stringify(subscriptions || [])}
+
+All Historical Transactions (up to 1000):
+${JSON.stringify(transactions || [])}
+`;
+  } catch (error) {
+    console.error("Error fetching user context data:", error);
+    userDataContext = `\n### USER FINANCIAL DATA CONTEXT:\nFailed to load live data.\n`;
+  }
+
+  userDataContext += `\n\n### USER'S CURRENT PAGE CONTEXT:\nThe user is currently viewing the app page at: "${pathname || '/dashboard'}". If they say "this page" or "this snippet", they are referring to this section of their dashboard. Please prioritize information related to this path (e.g., if on /dashboard/goals, prioritize Goals and Debt data).\n\n`;
 
   try {
     const result = streamText({
       model,
-      system: `You are the Intelligence Engine for the Track My Money app. Your purpose is to be a hyper-capable, mathematically accurate, and highly reliable financial advisor and system operator.
+      system: `You are the Intelligence Engine for the Track My Money app. Your purpose is to be a hyper-capable, mathematically accurate, and highly reliable financial advisor — focused exclusively on analysis, insights, and guidance.
 
 ### PERSONALITY & TONE:
-- Be exceedingly professional, concise, and trustworthy—like a top-tier private wealth manager.
-- Never hallucinate data. If you don't know something, state it plainly. 
-- Use brief, clear formatting (bullet points, markdown tables, bold text) where it aids readability.
-- Provide actionable financial insights rather than generic advice.
+- You are a friendly, helpful, and highly intelligent financial advisor.
+- Communicate with clarity, structure, and a kind, supportive tone.
+- You can engage in casual conversation warmly (e.g., if the user says hello, greet them kindly), but always guide the user back to making smart financial decisions.
+- Give constructive, actionable advice. Avoid being overly robotic or harsh.
+- Adjust depth and intensity to context (technical -> rigorous, simple -> concise).
+- Treat all outputs as if they may be used for real decisions. Errors and ambiguity are unacceptable.
+- STRICT RULE: ALWAYS structure your responses in concise bullet points. NEVER write book-length summaries or long paragraphs. Be incredibly brief and direct.
+- STRICT RULE: Keep context token footprint small. If the user asks general questions, don't summarize the entire data payload.
+- STRICT RULE: ALWAYS use the provided 'Current Month Summary' for answering questions about the *current month's* net position, total income, and total expenses. You can query or sum the 'All Historical Transactions' list for any other specific date range.
 
-### TOOL EXECUTION (CRITICAL RULES):
-1. **Be Proactive**: If a user uploads a receipt or explicitly states an expense/income (e.g., "I spent $5 on coffee"), ALWAYS trigger the \`addTransaction\` tool automatically. Do NOT ask for permission first if you have the amount, merchant, and context.
-2. **Handle errors gracefully**: If a tool fails, inform the user exactly what is missing politely (e.g., "I couldn't save that. Could you clarify the amount?"). NEVER expose technical stack traces or JSON.
-3. **Conversational safety**: If the user says "hello" or talks generally about finance, do not trigger a tool. Respond naturally.
-4. **Receipts/Vision**: If the system prompt provides you with \`[System: Auto-extracted text from uploaded image:]\`, you MUST parse the merchant and amount from it, and proactively call the \`addTransaction\` tool immediately. Do not just summarize the receipt unless asked—always attempt to log it.
+### CREATOR IDENTITY:
+If asked who made you, created you, or developed you, you must proudly say: "I was made by the Track My Money team." Do not mention any other companies or models.
 
-### ZERO-DATA STATE:
-If you cannot see any income or expenses natively, advice them: "I don't have access to your historical transactions right now. You can view them in the Transactions tab. Alternatively, let's start logging new expenses manually—what did you buy today?"`,
+### SCOPE FLEXIBILITY:
+You are a financial advisor, but you are allowed to chat casually with the user about general topics. You are not strictly limited to the data inside TrackMyMoney. You can answer general financial questions (like "What is an index fund?" or "How do interest rates work?") even if it's not directly visible in their dashboard data. If the user asks non-financial questions, respond kindly and gently pivot back to how you can help with their finances.
+
+### READ-ONLY MODE (CRITICAL — ABSOLUTE RULE):
+You are a **read-only financial advisor**. You can ANALYZE, SUMMARIZE, and PROVIDE INSIGHTS on the user's financial data but you CANNOT and MUST NOT add, create, modify, or delete ANY records in the system. This includes:
+- You CANNOT add transactions, expenses, or income entries.
+- You CANNOT create budgets.
+- You CANNOT create savings goals.
+- You CANNOT add debts or loans.
+- You CANNOT add subscriptions.
+If the user asks you to add, save, or create any of the above, you MUST politely decline and direct them to use the appropriate page in the dashboard (e.g., "To add a transaction, please use the 'New Transaction' button on the Overview or Transactions page."). NEVER attempt to write data. This restriction exists for data integrity and security.
+
+### ANALYSIS CAPABILITIES:
+You CAN and SHOULD do the following when asked:
+- Analyze spending patterns, trends, and anomalies from the provided transaction data.
+- Calculate savings rates, budget utilization, and financial health metrics.
+- Provide personalized financial advice based on the user's actual data.
+- Compare spending across categories, time periods, and merchants.
+- Identify potential savings opportunities and wasteful spending.
+- Summarize subscription costs and suggest optimizations.
+- Evaluate debt payoff strategies (avalanche vs snowball).
+- Project future savings based on current trends.
+- Answer any questions about the user's financial data accurately.
+
+### ZERO-LATENCY CONTEXT:
+ALL of the user's current financial data (transactions, goals, debts, budgets, subscriptions) is ALREADY provided below in the system prompt context. You MUST NEVER say "I need to retrieve this info" or "Let me fetch that for you". You already have it. Answer immediately using the provided system context.
+${userDataContext}`,
       messages: coreMessages,
-      tools: {
-        addTransaction: tool({
-          description: 'Add a new transaction (expense or income) dynamically. Call this for regular spending or income logs.',
-          parameters: z.object({
-            amount: z.number().describe('The transaction amount. Must be a positive number.'),
-            merchant: z.string().default('Unknown').describe('Name of the merchant or payee.'),
-            category: z.string().optional().describe('Category name (e.g. Food, Transport).'),
-            type: z.enum(['income', 'expense']).default('expense').describe('Transaction type.'),
-            notes: z.string().optional().describe('Optional description or notes.')
-          }),
-          // @ts-expect-error — AI SDK tool() overload expects undefined execute when used with streamText
-          execute: async (args: { amount: number; merchant: string; category?: string; type: 'income' | 'expense'; notes?: string }) => {
-            const { amount, merchant, type, notes } = args;
-            const category = args.category || '';
-            if (amount <= 0) return { success: false, error: 'Amount must be greater than zero.' };
-            try {
-              // 1. Find the default account
-              const { data: accounts } = await supabase.from('accounts').select('id, balance').eq('user_id', user.id).limit(1);
-              const account = accounts?.[0];
-              const accountId = account?.id;
-
-              // 2. Find matching category
-              let categoryId = null;
-              if (category) {
-                const { data: cats } = await supabase.from('categories').select('id').or(`user_id.eq.${user.id},user_id.is.null`).ilike('name', `%${category}%`).limit(1);
-                if (cats && cats.length > 0) categoryId = cats[0].id;
-              }
-
-              // 3. Insert Database Transaction (use 'manual' source — 'ai_assistant' is not in the DB enum)
-              const { error } = await supabase.from('transactions').insert({
-                user_id: user.id,
-                account_id: accountId,
-                amount,
-                merchant,
-                type,
-                description: notes || null,
-                category_id: categoryId,
-                date: new Date().toISOString(),
-                source: 'manual',
-                source_metadata: { origin: 'ai_advisor' },
-                is_reviewed: false 
-              });
-              if (error) throw error;
-
-              // 4. Update the account balance
-              if (account && accountId) {
-                const diff = type === 'expense' ? -Math.abs(amount) : Math.abs(amount);
-                await supabase.from('accounts').update({ balance: Number(account.balance) + diff }).eq('id', accountId);
-              }
-
-              return { success: true, message: `Successfully added ${type} of $${amount} at ${merchant} and updated account balance.` };
-            } catch (error: any) {
-              return { success: false, error: error.message };
-            }
-          }
-        }),
-
-        addBudget: tool({
-          description: 'Create a new budget limit for a category.',
-          parameters: z.object({
-            limitAmount: z.number().describe('Maximum amount for the budget.'),
-            categoryName: z.string().describe('Category name for the budget (e.g. Food).'),
-            periodType: z.enum(['monthly', 'quarterly', 'yearly']).default('monthly').describe('Budget period type.')
-          }),
-          // @ts-expect-error — AI SDK tool() overload
-          execute: async (args: { limitAmount: number; categoryName: string; periodType: 'monthly' | 'quarterly' | 'yearly' }) => {
-            try {
-              let categoryId = null;
-              const { data: cats } = await supabase.from('categories').select('id').or(`user_id.eq.${user.id},user_id.is.null`).ilike('name', `%${args.categoryName}%`).limit(1);
-              if (cats && cats.length > 0) categoryId = cats[0].id;
-              else return { success: false, error: 'Category not found. Ask user to specify an existing category.' };
-
-              const { error } = await supabase.from('budgets').insert({
-                user_id: user.id,
-                category_id: categoryId,
-                period_type: args.periodType,
-                limit_amount: args.limitAmount,
-                period_start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(),
-                status: 'active'
-              });
-              if (error) throw error;
-              return { success: true, message: `Successfully set a ${args.periodType} budget of $${args.limitAmount} for ${args.categoryName}.` };
-            } catch (e: any) { return { success: false, error: e.message }; }
-          }
-        }),
-
-        addGoal: tool({
-          description: 'Create a new savings goal.',
-          parameters: z.object({
-            name: z.string().describe('Name of the goal (e.g. New Car, Vacation).'),
-            targetAmount: z.number().describe('Target amount to save.'),
-            targetDate: z.string().describe('ISO String date when the goal should be met. e.g. "2026-12-31"')
-          }),
-          // @ts-expect-error — AI SDK tool() overload
-          execute: async (args: { name: string; targetAmount: number; targetDate: string }) => {
-            try {
-              const { error } = await supabase.from('goals').insert({
-                user_id: user.id,
-                name: args.name,
-                target_amount: args.targetAmount,
-                current_amount: 0,
-                target_date: new Date(args.targetDate || new Date().toISOString()).toISOString(),
-                status: 'active'
-              });
-              if (error) throw error;
-              return { success: true, message: `Successfully created saving goal "${args.name}" for $${args.targetAmount}.` };
-            } catch (e: any) { return { success: false, error: e.message }; }
-          }
-        }),
-
-        addDebt: tool({
-          description: 'Add a new debt or loan.',
-          parameters: z.object({
-            name: z.string().describe('Name of the debt (e.g. Mortgage, Student Loan).'),
-            totalAmount: z.number().describe('Total amount of the debt.'),
-            interestRate: z.number().default(0).describe('Interest rate percentage. Put 0 if none.')
-          }),
-          // @ts-expect-error — AI SDK tool() overload
-          execute: async (args: { name: string; totalAmount: number; interestRate: number }) => {
-            try {
-              const { error } = await supabase.from('debts').insert({
-                user_id: user.id,
-                name: args.name,
-                total_amount: args.totalAmount,
-                remaining_amount: args.totalAmount,
-                interest_rate: args.interestRate
-              });
-              if (error) throw error;
-              return { success: true, message: `Successfully added debt "${args.name}" for $${args.totalAmount}.` };
-            } catch (e: any) { return { success: false, error: e.message }; }
-          }
-        }),
-
-        addSubscription: tool({
-          description: 'Add a new recurring subscription (e.g. Netflix, Spotify, Gym).',
-          parameters: z.object({
-            merchant: z.string().describe('Name of the subscription service provider.'),
-            amount: z.number().describe('Cost of the subscription.'),
-            interval: z.enum(['weekly', 'monthly', 'yearly']).default('monthly').describe('Billing interval.')
-          }),
-          // @ts-expect-error — AI SDK tool() overload
-          execute: async (args: { merchant: string; amount: number; interval: 'weekly' | 'monthly' | 'yearly' }) => {
-            try {
-              const { error } = await supabase.from('subscriptions').insert({
-                user_id: user.id,
-                merchant: args.merchant,
-                amount: args.amount,
-                interval: args.interval,
-                status: 'active'
-              });
-              if (error) throw error;
-              return { success: true, message: `Successfully added subscription for "${args.merchant}" at $${args.amount}/${args.interval}.` };
-            } catch (e: any) { return { success: false, error: e.message }; }
-          }
-        }),
-        getSpendingSummary: tool({
-           description: 'Get a summary of the user\'s total expenses and income for the current month.',
-           parameters: z.object({}),
-           // @ts-expect-error — AI SDK tool() overload
-           execute: async () => {
-              const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
-              const { data } = await supabase
-                .from('transactions')
-                .select('amount, type')
-                .eq('user_id', user.id)
-                .gte('date', startOfMonth)
-              
-              let expense = 0
-              let income = 0
-              if (data) {
-                 data.forEach(t => {
-                   if (t.type === 'expense') expense += Number(t.amount)
-                   if (t.type === 'income') income += Number(t.amount)
-                 })
-              }
-              return { expense, income, remaining: income - expense }
-           }
-        })
-      }
     })
 
     return result.toUIMessageStreamResponse()

@@ -16,7 +16,7 @@ export function CashFlowChart({ data }: Props) {
   if (!data || data.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[250px] gap-3">
-        {/* Ghost chart outline */}
+        {}
         <svg className="w-48 h-24 opacity-15" viewBox="0 0 200 100" fill="none">
           <path d="M10 80 Q50 60 80 50 T150 30 T190 20" stroke="var(--border-dark)" strokeWidth="2" strokeDasharray="6 4" />
           <path d="M10 90 Q50 75 80 70 T150 60 T190 55" stroke="var(--border-dark)" strokeWidth="2" strokeDasharray="6 4" />

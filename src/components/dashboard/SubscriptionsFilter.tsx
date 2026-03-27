@@ -11,11 +11,11 @@ export function SubscriptionsFilter() {
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
 
-  // Local state for immediate UI feedback before URL updates
+ 
   const [query, setQuery] = useState(searchParams.get('q') || '')
   const [status, setStatus] = useState(searchParams.get('status') || 'all')
 
-  // Debounced search
+ 
   useEffect(() => {
     const handler = setTimeout(() => {
       createQueryString('q', query)
@@ -55,7 +55,7 @@ export function SubscriptionsFilter() {
           Select all
         </label>
         
-        {/* Status Filter */}
+        {}
         <div className="relative group shrink-0">
           <select 
             value={status}
@@ -73,7 +73,7 @@ export function SubscriptionsFilter() {
           <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[var(--text-muted)] pointer-events-none group-hover:text-[var(--text-main)] transition-colors" />
         </div>
 
-        {/* Search Input */}
+        {}
         <div className="relative flex-grow sm:flex-grow-0 sm:w-[200px]">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--text-muted)]" />
           <input 

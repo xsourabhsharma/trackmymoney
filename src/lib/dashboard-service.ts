@@ -3,8 +3,7 @@ import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths, startOfYea
 import { computeInflow, computeOutflow, computeNetPosition, computeSavingsRate, computeExpenseBreakdown, computeCashflowSeries, computeTopSpending } from './overview-engine';
 import { computeFinancialHealth } from './financial-health';
 import type { OverviewPeriod, OverviewData, AiInsightRecord } from './types';
-
-// Re-export for backward compatibility
+
 export type DashboardRange = OverviewPeriod;
 export type { OverviewData as DashboardOverview };
 
@@ -43,7 +42,7 @@ export async function loadOverviewData(period: OverviewPeriod): Promise<Overview
   const fromISO = startDate.toISOString();
   const toISO = endDate.toISOString();
 
-  // ── Parallel batch queries ──
+ 
   const [
     txResult,
     accountsResult,
@@ -53,7 +52,7 @@ export async function loadOverviewData(period: OverviewPeriod): Promise<Overview
     debtsResult,
     insightResult,
   ] = await Promise.all([
-    // 1. Transactions in range with category join
+   
     supabase
       .from('transactions')
       .select('id, amount, type, merchant, description, date, category_id, categories(id, name, icon, color)')
@@ -62,13 +61,13 @@ export async function loadOverviewData(period: OverviewPeriod): Promise<Overview
       .lte('date', toISO)
       .order('date', { ascending: false }),
 
-    // 2. All accounts
+   
     supabase
       .from('accounts')
       .select('id, name, balance, type')
       .eq('user_id', userId),
 
-    // 3. Upcoming subscriptions
+   
     supabase
       .from('subscriptions')
       .select('id, merchant, amount, cadence, next_charge_date, category_id, categories(name, icon, color)')
@@ -77,28 +76,28 @@ export async function loadOverviewData(period: OverviewPeriod): Promise<Overview
       .order('next_charge_date', { ascending: true })
       .limit(5),
 
-    // 4. Active budgets
+   
     supabase
       .from('budgets')
       .select('id, limit_amount, spent, category_id, status')
       .eq('user_id', userId)
       .eq('status', 'active'),
 
-    // 5. Active goals
+   
     supabase
       .from('goals')
       .select('id, name, target_amount, current_amount, status')
       .eq('user_id', userId)
       .eq('status', 'active'),
 
-    // 6. Debts (try debts table first, fall back to debt_tracker)
+   
     supabase
       .from('debts')
       .select('id, name, total_amount, remaining_amount')
       .eq('user_id', userId)
       .then(res => {
         if (res.error) {
-          // Fallback to debt_tracker if debts table doesn't exist yet
+         
           return supabase
             .from('debt_tracker')
             .select('id, name, total_amount, remaining_amount')
@@ -107,7 +106,7 @@ export async function loadOverviewData(period: OverviewPeriod): Promise<Overview
         return res;
       }),
 
-    // 7. Latest AI insight
+   
     supabase
       .from('ai_insights')
       .select('id, period, insights_json, created_at')
@@ -123,7 +122,7 @@ export async function loadOverviewData(period: OverviewPeriod): Promise<Overview
   const goals = goalsResult.data || [];
   const debts = debtsResult.data || [];
 
-  // ── Compute metrics using pure functions ──
+ 
   const inflow = computeInflow(transactions as any);
   const outflow = computeOutflow(transactions as any);
   const netPosition = computeNetPosition(inflow, outflow);
@@ -134,7 +133,7 @@ export async function loadOverviewData(period: OverviewPeriod): Promise<Overview
   const topSpending = computeTopSpending(expenseBreakdown);
   const recentTransactions = transactions.slice(0, 10);
 
-  // ── Upcoming charges normalization ──
+ 
   const upcomingCharges = subscriptions.map((s: any) => {
     const cat = Array.isArray(s.categories) ? s.categories[0] : s.categories;
     return {
@@ -148,7 +147,7 @@ export async function loadOverviewData(period: OverviewPeriod): Promise<Overview
     };
   });
 
-  // ── Financial Health ──
+ 
   const financialHealth = computeFinancialHealth({
     savingsRate,
     budgets: budgets.map((b: any) => ({
@@ -165,7 +164,7 @@ export async function loadOverviewData(period: OverviewPeriod): Promise<Overview
     })),
   });
 
-  // ── Last AI Insight ──
+ 
   let lastInsight: AiInsightRecord | null = null;
   const insightRows = insightResult.data;
   if (insightRows && insightRows.length > 0) {

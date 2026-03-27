@@ -20,13 +20,13 @@ export function TransactionsFilter({ categories }: TransactionsFilterProps) {
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
 
-  // Local state for immediate UI feedback before URL updates
+ 
   const [query, setQuery] = useState(searchParams.get('q') || '')
   const [dateRange, setDateRange] = useState(searchParams.get('range') || 'this-month')
   const [type, setType] = useState(searchParams.get('type') || 'all')
   const [categoryId, setCategoryId] = useState(searchParams.get('cat') || 'all')
 
-  // Debounced search
+ 
   useEffect(() => {
     const handler = setTimeout(() => {
       createQueryString('q', query)
@@ -43,7 +43,7 @@ export function TransactionsFilter({ categories }: TransactionsFilterProps) {
         params.delete(name)
       }
       
-      // Reset page when filters change
+     
       if (name !== 'page') {
         params.delete('page')
       }
@@ -73,7 +73,7 @@ export function TransactionsFilter({ categories }: TransactionsFilterProps) {
       </h2>
       
       <div className="flex flex-wrap items-center gap-4">
-        {/* Date Filter */}
+        {}
         <div className="flex items-center gap-2">
           <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Date:</span>
           <div className="relative group">
@@ -96,7 +96,7 @@ export function TransactionsFilter({ categories }: TransactionsFilterProps) {
           </div>
         </div>
 
-        {/* Type Filter */}
+        {}
         <div className="flex items-center gap-2">
           <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Type:</span>
           <div className="relative group">
@@ -118,7 +118,7 @@ export function TransactionsFilter({ categories }: TransactionsFilterProps) {
           </div>
         </div>
 
-        {/* Category Filter */}
+        {}
         <div className="flex items-center gap-2">
           <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Category:</span>
           <div className="relative group">
@@ -140,7 +140,7 @@ export function TransactionsFilter({ categories }: TransactionsFilterProps) {
           </div>
         </div>
 
-        {/* Search */}
+        {}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--text-muted)]" />
           <input 
@@ -152,7 +152,7 @@ export function TransactionsFilter({ categories }: TransactionsFilterProps) {
           />
         </div>
 
-        {/* Reset */}
+        {}
         <div className="flex gap-2">
           {(query || dateRange !== 'this-month' || type !== 'all' || categoryId !== 'all') && (
             <Button 

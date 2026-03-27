@@ -23,25 +23,25 @@ export function BudgetAlertsPanel({ alerts }: Props) {
 
   const config = {
     critical: {
-      icon: <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />,
-      bg: 'bg-red-50/60',
-      border: 'border-red-100',
-      titleColor: 'text-red-700',
-      dot: 'bg-red-500',
+      icon: <AlertTriangle className="w-4 h-4 text-[var(--expense-red)] flex-shrink-0" />,
+      bg: 'bg-[var(--expense-red)]/5 dark:bg-[var(--expense-red)]/10',
+      border: 'border-[var(--expense-red)]/20',
+      titleColor: 'text-[var(--expense-red)]',
+      dot: 'bg-[var(--expense-red)]',
     },
     warning: {
       icon: <AlertCircle className="w-4 h-4 text-orange-500 flex-shrink-0" />,
-      bg: 'bg-orange-50/60',
-      border: 'border-orange-100',
-      titleColor: 'text-orange-700',
+      bg: 'bg-orange-500/5 dark:bg-orange-500/10',
+      border: 'border-orange-500/20',
+      titleColor: 'text-orange-600 dark:text-orange-400',
       dot: 'bg-orange-500',
     },
     info: {
-      icon: <Info className="w-4 h-4 text-blue-500 flex-shrink-0" />,
-      bg: 'bg-blue-50/60',
-      border: 'border-blue-100',
-      titleColor: 'text-blue-700',
-      dot: 'bg-blue-500',
+      icon: <Info className="w-4 h-4 text-[var(--accent)] flex-shrink-0" />,
+      bg: 'bg-[var(--accent)]/5 dark:bg-[var(--accent)]/10',
+      border: 'border-[var(--accent)]/20',
+      titleColor: 'text-[var(--accent)]',
+      dot: 'bg-[var(--accent)]',
     },
   }
 
@@ -65,7 +65,7 @@ export function BudgetAlertsPanel({ alerts }: Props) {
               <p className={`text-[11px] font-bold uppercase tracking-tight leading-tight ${c.titleColor}`}>
                 {titleMap[alert.type]}
               </p>
-              <p className="text-[12px] font-medium text-[var(--text-muted)] leading-relaxed">
+              <p className="text-[12px] font-medium text-[var(--text-main)] opacity-70 leading-relaxed">
                 {alert.message}
               </p>
             </div>

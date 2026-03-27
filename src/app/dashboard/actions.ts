@@ -16,7 +16,7 @@ const transactionSchema = z.object({
   currency: z.string().optional().default('INR'),
 })
 
-const RECEIPT_MAX_SIZE = 5 * 1024 * 1024 // 5 MB
+const RECEIPT_MAX_SIZE = 5 * 1024 * 1024
 const RECEIPT_ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']
 
 export async function addTransaction(formData: FormData) {
@@ -24,7 +24,7 @@ export async function addTransaction(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  // Fix missing profile issue
+ 
   const { data: existingProfile } = await supabase
     .from('profiles')
     .select('id')
@@ -40,7 +40,7 @@ export async function addTransaction(formData: FormData) {
     })
   }
 
-  // Validate form input
+ 
   const parsed = transactionSchema.safeParse({
     amount: formData.get('amount'),
     type: formData.get('type'),
@@ -64,12 +64,11 @@ export async function addTransaction(formData: FormData) {
     .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     .join(' ')
 
-  let parsedDate: string
-  try {
-    parsedDate = new Date(date).toISOString()
-  } catch {
+  const parsedDate = new Date(date)
+  if (isNaN(parsedDate.getTime())) {
     throw new Error('Invalid date provided.')
   }
+  const parsedDateISO = parsedDate.toISOString()
 
   const admin = createAdminClient()
   let receiptUrl: string | null = null
@@ -107,7 +106,7 @@ export async function addTransaction(formData: FormData) {
     account_id: accountId || null,
     merchant,
     description: description || null,
-    date: parsedDate,
+    date: parsedDateISO,
     source: 'manual',
     receipt_url: receiptUrl,
     is_reviewed: true,
@@ -121,42 +120,59 @@ export async function addTransaction(formData: FormData) {
   revalidatePath('/dashboard', 'layout')
 }
 
+const updateTransactionSchema = z.object({
+  id: z.string().min(1, 'ID is required'),
+  amount: z.string().refine(v => !isNaN(parseFloat(v)) && parseFloat(v) > 0, 'Amount must be positive'),
+  type: z.enum(['income', 'expense']),
+  merchant: z.string().min(1, 'Merchant is required'),
+  categoryId: z.string().optional().default(''),
+  accountId: z.string().optional().default(''),
+  date: z.string().min(1, 'Date is required'),
+  description: z.string().optional().default(''),
+})
+
 export async function updateTransaction(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  const id = formData.get('id') as string
-  const amount = formData.get('amount') as string
-  const type = formData.get('type') as 'income' | 'expense'
-  const rawMerchant = formData.get('merchant') as string
+  const parsed = updateTransactionSchema.safeParse({
+    id: formData.get('id'),
+    amount: formData.get('amount'),
+    type: formData.get('type'),
+    merchant: formData.get('merchant'),
+    categoryId: formData.get('categoryId'),
+    accountId: formData.get('accountId'),
+    date: formData.get('date'),
+    description: formData.get('description'),
+  })
+
+  if (!parsed.success) {
+    throw new Error(`Validation failed: ${parsed.error.issues.map(i => i.message).join(', ')}`)
+  }
+
+  const { id, amount: amountStr, type, merchant: rawMerchant, categoryId, accountId, date, description } = parsed.data
   const merchant = rawMerchant
     .trim()
     .split(/\s+/)
     .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     .join(' ')
-  const categoryId = formData.get('categoryId') as string
-  const accountId = formData.get('accountId') as string
-  const date = formData.get('date') as string
-  const description = formData.get('description') as string
 
-  let parsedDate: string
-  try {
-    parsedDate = new Date(date).toISOString()
-  } catch {
+  const parsedDate = new Date(date)
+  if (isNaN(parsedDate.getTime())) {
     throw new Error('Invalid date provided.')
   }
 
   const { error } = await supabase
     .from('transactions')
     .update({
-      amount: parseFloat(amount),
+      amount: parseFloat(amountStr),
       type,
       category_id: categoryId || null,
       account_id: accountId || null,
       merchant,
       description: description || null,
-      date: parsedDate,
+      date: parsedDate.toISOString(),
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)

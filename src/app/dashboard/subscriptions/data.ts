@@ -79,8 +79,8 @@ export async function loadSubscriptionsPageData(
   const { data: { user }, error: authErr } = await supabase.auth.getUser()
   if (authErr || !user) throw new Error("Unauthorized")
 
-  // 1. Fetch ALL subscriptions for the user to compute exact aggregates
-  // In a massive app, this would be heavily SQL-driven via RPC. We will do it in JS for exact precision given typical subscription cardinalities (< 50).
+ 
+ 
   const { data: allSubs, error: allSubsError } = await supabase
     .from('subscriptions')
     .select(`
@@ -94,12 +94,12 @@ export async function loadSubscriptionsPageData(
 
   const rows = allSubs || []
   
-  // -- Calculate Overview Metrics --
+ 
   let totalMonthlyOutflow = 0
   let activeCount = 0
   let potentialSavingsMonthly = 0
   
-  // -- Calculate Upcoming & Health Metrics --
+ 
   const now = new Date()
   const todayStr = now.toISOString()
   const upcomingCharges: UpcomingChargeItem[] = []
@@ -107,7 +107,7 @@ export async function loadSubscriptionsPageData(
   let rarelyUsedCount = 0
   let overdueCount = 0
 
-  // -- Category Aggregations --
+ 
   const categoryMap = new Map<string, SubscriptionCategoryItem>()
 
   for (const sub of rows) {
@@ -124,12 +124,12 @@ export async function loadSubscriptionsPageData(
 
       if (sub.usage_score !== null && sub.usage_score < 30) rarelyUsedCount++
 
-      // Check upcoming and overdue
+     
       if (sub.next_charge_date) {
         if (sub.next_charge_date < todayStr) {
           overdueCount++
         } else {
-          // Push to upcoming charges. We will slice the top 5 closest later.
+         
           upcomingCharges.push({
             id: sub.id,
             merchant: sub.merchant,
@@ -142,7 +142,7 @@ export async function loadSubscriptionsPageData(
         }
       }
 
-      // Aggregate Category Cost
+     
       const catId = sub.category_id || 'uncategorized'
       const catName = sub.categories?.name || 'Uncategorized'
       
@@ -159,8 +159,8 @@ export async function loadSubscriptionsPageData(
     }
   }
 
-  // Calculate Vs Income (Fetching last 30 days of income)
-  // Strict implementation calculates rolling 30 day income
+ 
+ 
   const thirtyDaysAgo = new Date(now)
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
   
@@ -174,13 +174,13 @@ export async function loadSubscriptionsPageData(
   const monthlyIncome = (incomeTx || []).reduce((sum, tx) => sum + Number(tx.amount || 0), 0)
   const monthlyCostVsIncomePercent = monthlyIncome > 0 ? (totalMonthlyOutflow / monthlyIncome) * 100 : 0
 
-  // Final preparations for aggregates
+ 
   upcomingCharges.sort((a, b) => new Date(a.nextChargeDate).getTime() - new Date(b.nextChargeDate).getTime())
   const topUpcoming = upcomingCharges.slice(0, 5)
 
   const categoriesBreakdown = Array.from(categoryMap.values()).sort((a, b) => b.amountMonthly - a.amountMonthly)
 
-  // -- Pagination & Filtering logic for the Table --
+ 
   let filteredRows = [...rows]
   
   if (filter.status !== 'all') {
@@ -197,7 +197,7 @@ export async function loadSubscriptionsPageData(
 
   const totalCount = filteredRows.length
   
-  // Sort alphabetically by merchant, then paginate
+ 
   filteredRows.sort((a, b) => a.merchant.localeCompare(b.merchant))
   const fromIndex = (page - 1) * pageSize
   const paginatedRows = filteredRows.slice(fromIndex, fromIndex + pageSize)

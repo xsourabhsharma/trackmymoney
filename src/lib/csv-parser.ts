@@ -8,17 +8,14 @@ export interface ParsedCsvRow {
   amount: number | null;
   type: 'income' | 'expense' | null;
 }
-
-// Common header names for bank statements
+
 const DATE_HEADERS = ['date', 'posting date', 'transaction date', 'trans date', 'post date'];
 const DESC_HEADERS = ['description', 'name', 'merchant', 'payee', 'memo', 'details'];
 const AMOUNT_HEADERS = ['amount', 'value'];
 const DEBIT_HEADERS = ['debit', 'withdrawal', 'outflow', 'spent'];
 const CREDIT_HEADERS = ['credit', 'deposit', 'inflow', 'received'];
 
-/**
- * Attempts to intelligently map CSV headers to our standardized fields
- */
+
 function mapRow(row: Record<string, string>): ParsedCsvRow {
   const keys = Object.keys(row);
   const lowerKeys = keys.map(k => k.toLowerCase().trim());
@@ -29,7 +26,7 @@ function mapRow(row: Record<string, string>): ParsedCsvRow {
   let debitKey: string | null = null;
   let creditKey: string | null = null;
 
-  // Find matching column headers
+ 
   lowerKeys.forEach((lk, i) => {
     if (!dateKey && DATE_HEADERS.some(h => lk.includes(h))) dateKey = keys[i];
     if (!descKey && DESC_HEADERS.some(h => lk.includes(h))) descKey = keys[i];
@@ -38,11 +35,11 @@ function mapRow(row: Record<string, string>): ParsedCsvRow {
     if (!creditKey && CREDIT_HEADERS.some(h => lk.includes(h))) creditKey = keys[i];
   });
 
-  // Extract raw values
+ 
   const rawDate = dateKey ? row[dateKey] : '';
   const rawDesc = descKey ? row[descKey] : Object.values(row).find(v => typeof v === 'string' && v.length > 3) || '';
   
-  // Try combined amount column first
+ 
   let amount: number | null = null;
   let type: 'income' | 'expense' | null = null;
 
@@ -54,7 +51,7 @@ function mapRow(row: Record<string, string>): ParsedCsvRow {
       type = num < 0 ? 'expense' : 'income';
     }
   } 
-  // Fallback to separate debit/credit columns
+ 
   else if (debitKey && row[debitKey]) {
     const cleanAmt = row[debitKey].replace(/[^0-9.-]/g, '');
     const num = parseFloat(cleanAmt);
@@ -71,14 +68,14 @@ function mapRow(row: Record<string, string>): ParsedCsvRow {
     }
   }
 
-  // Parse Date
+ 
   let date: string | null = null;
   if (rawDate) {
     const parsed = new Date(rawDate);
     if (isValid(parsed)) {
       date = parsed.toISOString();
     } else {
-      // Try common formats if standard parsing fails: MM/dd/yyyy
+     
       const altParse = dateParse(rawDate, 'MM/dd/yyyy', new Date());
       if (isValid(altParse)) date = altParse.toISOString();
     }

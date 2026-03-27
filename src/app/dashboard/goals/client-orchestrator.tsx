@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { GoalsDebtsPageData, GoalsDebtsFilter, SavingsGoalRow, DebtRow, PayoffStrategy } from '@/app/dashboard/goals/data'
+import { GoalsDebtsPageData, GoalsDebtsFilter, SavingsGoalRow, DebtRow, PayoffStrategy, simulateDebtPayoff } from '@/app/dashboard/goals/data'
 import { GoalsDebtsSummaryHeader } from '@/components/dashboard/goals/GoalsDebtsSummaryHeader'
 import { SavingsGoalsSection } from '@/components/dashboard/goals/SavingsGoalsSection'
 import { DebtsPayoffSection } from '@/components/dashboard/goals/DebtsPayoffSection'
@@ -21,7 +21,35 @@ export function GoalsDebtsClientOrchestrator({ initialData }: Props) {
   const [editingGoal, setEditingGoal] = useState<SavingsGoalRow | null>(null)
   const [editingDebt, setEditingDebt] = useState<DebtRow | null>(null)
 
+  const [customDebtOrder, setCustomDebtOrder] = useState<string[]>(initialData.debts.map(d => d.id))
+
   const data = initialData
+
+ 
+  const liveSortedDebts = [...data.debts].sort((a, b) => {
+    if (filter.payoffStrategy === 'snowball') return a.currentBalance - b.currentBalance
+    if (filter.payoffStrategy === 'avalanche') return b.interestRate - a.interestRate
+    return customDebtOrder.indexOf(a.id) - customDebtOrder.indexOf(b.id)
+  })
+
+  function handleMoveCustomDebt(id: string, dir: 'up' | 'down') {
+    setCustomDebtOrder(prev => {
+      const idx = prev.indexOf(id)
+      const copy = [...prev]
+      if (dir === 'up' && idx > 0) [copy[idx - 1], copy[idx]] = [copy[idx], copy[idx - 1]]
+      if (dir === 'down' && idx < prev.length - 1) [copy[idx + 1], copy[idx]] = [copy[idx], copy[idx + 1]]
+      return copy
+    })
+  }
+
+  const liveDebtInputs = liveSortedDebts.filter(d => d.currentBalance > 0).map(d => ({
+    id: d.id,
+    balance: d.currentBalance,
+    interestRate: d.interestRate,
+    minimumPayment: Math.max(d.minimumPayment, 10)
+  }))
+  const liveCountdown = simulateDebtPayoff(liveDebtInputs, 0, filter.payoffStrategy) || data.debtFreeCountdown
+
 
   function handleFilterChange(partial: Partial<GoalsDebtsFilter>) {
     setFilter(prev => ({ ...prev, ...partial }))
@@ -32,13 +60,13 @@ export function GoalsDebtsClientOrchestrator({ initialData }: Props) {
   function handleOpenAddDebt() { setEditingDebt(null); setDebtModalOpen(true) }
   function handleOpenEditDebt(debt: DebtRow) { setEditingDebt(debt); setDebtModalOpen(true) }
 
-  // Apply scope filter for display
+ 
   const showGoals = filter.scope === 'all' || filter.scope === 'savings'
   const showDebts = filter.scope === 'all' || filter.scope === 'debt'
 
   return (
     <div className="flex flex-col gap-8">
-      {/* ── Summary Header ─────────────────────────────── */}
+      {}
       <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
         <GoalsDebtsSummaryHeader
           summary={data.summary}
@@ -49,10 +77,10 @@ export function GoalsDebtsClientOrchestrator({ initialData }: Props) {
         />
       </div>
 
-      {/* ── Main 2-column Grid ───────────────────────────── */}
+      {}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
 
-        {/* Left: Savings Goals */}
+        {}
         {showGoals && (
           <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm flex flex-col gap-6">
             <div className="flex items-center justify-between pb-4 border-b border-[var(--border-light)]">
@@ -74,7 +102,7 @@ export function GoalsDebtsClientOrchestrator({ initialData }: Props) {
           </div>
         )}
 
-        {/* Right: Debts */}
+        {}
         {showDebts && (
           <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm flex flex-col gap-6">
             <div className="flex items-center justify-between pb-4 border-b border-[var(--border-light)]">
@@ -89,21 +117,22 @@ export function GoalsDebtsClientOrchestrator({ initialData }: Props) {
               )}
             </div>
             <DebtsPayoffSection
-              debts={data.debts}
+              debts={liveSortedDebts}
               payoffStrategy={filter.payoffStrategy}
-              countdown={data.debtFreeCountdown}
+              countdown={liveCountdown}
               onChangeStrategy={strategy => handleFilterChange({ payoffStrategy: strategy })}
               onAddDebt={handleOpenAddDebt}
               onEditDebt={handleOpenEditDebt}
+              onMoveDebt={handleMoveCustomDebt}
             />
           </div>
         )}
       </div>
 
-      {/* ── Bottom Row: Snapshot + Countdown + AI Tips ── */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        {/* Goal Progress Snapshot */}
+        {}
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
           <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-5">
             <Activity className="w-3.5 h-3.5 text-[var(--text-muted)]" />
@@ -112,19 +141,19 @@ export function GoalsDebtsClientOrchestrator({ initialData }: Props) {
           <GoalProgressSnapshotPanel snapshot={data.goalProgressSnapshot} />
         </div>
 
-        {/* Debt-Free Countdown */}
+        {}
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
           <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-5">
             <TrendingDown className="w-3.5 h-3.5 text-[var(--text-muted)]" />
             <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">Debt-Free Countdown</h3>
           </div>
           <DebtFreeCountdownPanel
-            countdown={data.debtFreeCountdown}
+            countdown={liveCountdown}
             totalDebt={data.summary.totalDebt}
           />
         </div>
 
-        {/* AI Tips */}
+        {}
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
           <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-4">
             <Sparkles className="w-3.5 h-3.5 text-[var(--accent)]" />
@@ -134,7 +163,7 @@ export function GoalsDebtsClientOrchestrator({ initialData }: Props) {
         </div>
       </div>
 
-      {/* ── Form Modals ────────────────────────────────── */}
+      {}
       <GoalFormModal
         isOpen={goalModalOpen}
         onClose={() => { setGoalModalOpen(false); setEditingGoal(null) }}

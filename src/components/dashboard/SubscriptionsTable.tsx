@@ -25,7 +25,7 @@ export function SubscriptionsTable({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [isPending, startTransition] = useTransition()
 
-  // Optimistic UI for instant feedback on bulk actions
+ 
   const [optimisticSubs, setOptimisticSubs] = useOptimistic(
     subscriptions,
     (state, info: { type: 'pause' | 'delete', ids: string[] }) => {
@@ -78,7 +78,7 @@ export function SubscriptionsTable({
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Bulk Toolbar */}
+      {}
       <div className="flex items-center justify-between py-2 border-b border-[var(--border-light)] min-h-[40px]">
         <div className="flex items-center gap-4">
           <label className="flex items-center gap-2 text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest cursor-pointer">
@@ -119,7 +119,7 @@ export function SubscriptionsTable({
         </div>
       </div>
 
-      {/* Table Main */}
+      {}
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>

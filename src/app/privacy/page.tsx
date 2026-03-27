@@ -10,11 +10,13 @@ export const metadata = {
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-main)] font-sans antialiased">
-      {/* Minimal nav */}
+      {}
       <nav className="border-b border-[var(--border-light)] py-4">
         <div className="max-w-[800px] mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
-            <Image src="/logo.svg" alt="TrackMyMoney" width={24} height={24} className="w-6 h-6" />
+          <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight group">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--text-main)]/5 border border-[var(--border-light)] overflow-hidden">
+              <Image src="/real-logo.png" alt="TrackMyMoney" width={20} height={20} className="w-5 h-5 opacity-90 group-hover:opacity-100 transition-opacity dark:invert" />
+            </div>
             Track<span className="text-[var(--text-muted)]">My</span>Money
           </Link>
           <Link
@@ -27,22 +29,48 @@ export default function PrivacyPage() {
         </div>
       </nav>
 
-      {/* Content */}
-      <main className="max-w-[800px] mx-auto px-6 py-12 md:py-20">
+      {}
+      <main className="max-w-[1000px] mx-auto px-6 py-12 md:py-20">
         <div className="mb-10">
           <h1 className="text-[2rem] md:text-[2.5rem] font-bold tracking-tight mb-3">Privacy Policy</h1>
           <p className="text-[var(--text-muted)] text-sm">Last updated: March 19, 2026</p>
         </div>
 
-        <div className="space-y-8">
-          <section>
+        <div className="flex gap-10">
+          {}
+          <nav className="hidden lg:block sticky top-24 self-start w-56 shrink-0">
+            <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest mb-3">On this page</p>
+            <ul className="flex flex-col gap-1.5 border-l border-[var(--border-light)] pl-3">
+              {[
+                { id: 'introduction', label: '1. Introduction' },
+                { id: 'information-we-collect', label: '2. Information We Collect' },
+                { id: 'how-we-use', label: '3. How We Use Your Info' },
+                { id: 'data-storage', label: '4. Data Storage & Security' },
+                { id: 'ai-processing', label: '5. AI Processing' },
+                { id: 'third-party', label: '6. Third-Party Services' },
+                { id: 'your-rights', label: '7. Your Rights' },
+                { id: 'data-retention', label: '8. Data Retention' },
+                { id: 'changes', label: '9. Policy Changes' },
+                { id: 'contact', label: '10. Contact Us' },
+              ].map((item) => (
+                <li key={item.id}>
+                  <a href={`#${item.id}`} className="text-[12px] font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors leading-tight block py-0.5">
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+        <div className="flex-1 space-y-8 min-w-0">
+          <section id="introduction">
             <h2 className="text-xl font-bold mb-3 tracking-tight">1. Introduction</h2>
             <p className="text-[15px] text-[var(--text-muted)] leading-relaxed">
               TrackMyMoney (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, store, and protect your personal and financial information when you use our Service. We believe your financial data is deeply personal, and we treat it with the care it deserves.
             </p>
           </section>
 
-          <section>
+          <section id="information-we-collect">
             <h2 className="text-xl font-bold mb-3 tracking-tight">2. Information We Collect</h2>
             <p className="text-[15px] text-[var(--text-muted)] leading-relaxed mb-3">
               We collect the following types of information:
@@ -181,9 +209,10 @@ export default function PrivacyPage() {
             </p>
           </section>
         </div>
+        </div>
       </main>
 
-      {/* Footer */}
+      {}
       <footer className="border-t border-[var(--border-light)] py-6">
         <div className="max-w-[800px] mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[12px] text-[var(--text-muted)]">
           <span>© 2026 TrackMyMoney. All rights reserved.</span>

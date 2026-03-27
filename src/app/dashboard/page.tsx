@@ -35,13 +35,13 @@ export default async function DashboardOverviewPage({
     )
   }
 
-  // Fetch support data for the AddTransactionButton
+ 
   const { data: allCategories } = await supabase.from('categories').select('*')
   const { data: userAccounts } = await supabase.from('accounts').select('*')
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-500">
-      {/* Shared Sub Nav Action Bar */}
+      {}
       <div className="flex flex-wrap items-center justify-between gap-4 overflow-x-auto pb-4 border-b border-[var(--border-light)]">
         <DashboardSubNav />
         <div className="ml-auto">

@@ -3,8 +3,7 @@
 import OpenAI from 'openai'
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
-
-// Client instantiated dynamically inside handlers to prevent build errors
+
 
 interface TxRow {
   amount: string | number

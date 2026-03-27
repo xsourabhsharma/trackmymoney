@@ -12,6 +12,16 @@ interface Props {
 }
 
 type ExportFormat = 'csv' | 'pdf'
+type AutoTableDoc = jsPDF & {
+  autoTable: (options: {
+    startY: number
+    head: string[][]
+    body: string[][]
+    theme: 'striped'
+    headStyles: { fillColor: number[] }
+    styles: { fontSize: number; cellPadding: number }
+  }) => void
+}
 
 interface ExportCard {
   id: string
@@ -22,7 +32,6 @@ interface ExportCard {
 
 const EXPORT_CARDS: ExportCard[] = [
   { id: 'monthly', name: 'Monthly Summary Report', desc: 'Income, expenses, net, and category totals for the current period.', icon: '📋' },
-  { id: 'tax', name: 'Tax-Ready Ledger', desc: 'Optimized transaction export for fiscal year tax prep.', icon: '🧾' },
 ]
 
 export function ReportsExportsSection({ filter }: Props) {
@@ -41,7 +50,7 @@ export function ReportsExportsSection({ filter }: Props) {
     setLoading(prev => ({ ...prev, [card.id]: true }))
 
     try {
-      // Fetch raw CSV data from the backend
+     
       const res = await fetch(`/api/reports/export?type=${card.id}&format=csv&period=${filter.period}&scope=${filter.scope}`)
       if (!res.ok) throw new Error('Failed to fetch report data')
       const csvText = await res.text()
@@ -66,7 +75,7 @@ export function ReportsExportsSection({ filter }: Props) {
           return
         }
 
-        const doc = new jsPDF()
+        const doc = new jsPDF() as AutoTableDoc
         const headers = data[0]
         const body = data.slice(1)
 
@@ -76,7 +85,7 @@ export function ReportsExportsSection({ filter }: Props) {
         doc.setTextColor(100)
         doc.text(`Generated on ${now.toLocaleDateString()}`, 14, 30)
 
-        // @ts-ignore - jspdf-autotable plugin adds autoTable to jsPDF instance
+       
         doc.autoTable({
           startY: 36,
           head: [headers],

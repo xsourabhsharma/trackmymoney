@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { ReportsPageData, ReportsFilter } from '@/app/dashboard/reports/data'
 import { ReportsFilterBar } from '@/components/dashboard/reports/ReportsFilterBar'
 import { ReportsSummaryCards } from '@/components/dashboard/reports/ReportsSummaryCards'
@@ -19,14 +20,17 @@ interface Props {
 }
 
 export function ReportsClientOrchestrator({ initialData }: Props) {
-  const [filter, setFilter] = useState<ReportsFilter>(initialData.filter)
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const data = initialData
+  const filter = data.filter
 
   function handleFilterChange(partial: Partial<ReportsFilter>) {
-    setFilter(prev => ({ ...prev, ...partial }))
-    // NOTE: For real-time filter updates, you'd trigger a server-side fetch here.
-    // With Next.js 14, the simplest approach is router.push with searchParams.
-    // For now, the page re-renders on navigation with the updated filter.
+    const params = new URLSearchParams(searchParams.toString())
+    if (partial.period) params.set('period', partial.period)
+    if (partial.scope) params.set('scope', partial.scope)
+    if (partial.view) params.set('view', partial.view)
+    router.push(`?${params.toString()}`, { scroll: false })
   }
 
   const showGoals = filter.view === 'summary' || filter.view === 'detailed'
@@ -35,7 +39,7 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* ── Filter Bar + Summary ────────────────────────────────── */}
+      {}
       <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm flex flex-col gap-6">
         <ReportsFilterBar filter={filter} onChangeFilter={handleFilterChange} />
         <div className="pt-4 border-t border-[var(--border-light)]">
@@ -43,9 +47,9 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
         </div>
       </div>
 
-      {/* ── Charts Row ────────────────────────────────────────────── */}
+      {}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        {/* Cash Flow */}
+        {}
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm flex flex-col gap-4">
           <div className="flex items-center gap-2 pb-3 border-b border-[var(--border-light)]">
             <Activity className="w-4 h-4 text-[var(--income-green)]" />
@@ -54,7 +58,7 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
           <CashFlowChartSection points={data.cashFlowSeries} comparison={data.periodComparison} />
         </div>
 
-        {/* Spending by Category */}
+        {}
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm flex flex-col gap-4">
           <div className="flex items-center gap-2 pb-3 border-b border-[var(--border-light)]">
             <BarChart3 className="w-4 h-4 text-[var(--accent)]" />
@@ -64,9 +68,9 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
         </div>
       </div>
 
-      {/* ── Analytics Tables ───────────────────────────────────────── */}
+      {}
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_1.5fr] gap-8">
-        {/* Top Categories */}
+        {}
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
           <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-5">
             <Tag className="w-3.5 h-3.5 text-[var(--text-muted)]" />
@@ -78,7 +82,7 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
           <TopCategoriesSection topCategories={data.topCategories} totalExpenses={data.summary.periodExpenses} />
         </div>
 
-        {/* Top Merchants */}
+        {}
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
           <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-5">
             <Store className="w-3.5 h-3.5 text-[var(--text-muted)]" />
@@ -90,7 +94,7 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
         </div>
       </div>
 
-      {/* ── Period Comparison ──────────────────────────────────────── */}
+      {}
       <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
         <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-6">
           <GitCompare className="w-3.5 h-3.5 text-[var(--text-muted)]" />
@@ -99,7 +103,7 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
         <PeriodComparisonSection comparison={data.periodComparison} />
       </div>
 
-      {/* ── Exports ────────────────────────────────────────────────── */}
+      {}
       <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
         <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-6">
           <Download className="w-3.5 h-3.5 text-[var(--text-muted)]" />

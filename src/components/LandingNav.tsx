@@ -23,7 +23,7 @@ export default function LandingNav() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Lock body scroll when mobile menu is open
+ 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
@@ -39,16 +39,18 @@ export default function LandingNav() {
         }`}
       >
         <div className="max-w-[1200px] mx-auto px-6 flex justify-between items-center">
-          {/* Logo */}
+          {}
           <Link
             href="/"
             className="flex items-center gap-2 text-xl font-bold tracking-tight text-[var(--text-main)] relative z-[110]"
           >
-            <Image src="/logo.svg" alt="TrackMyMoney Logo" width={28} height={28} className="w-7 h-7" />
+            <div className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-[var(--text-main)]/5 border border-[var(--border-light)] shadow-sm group-hover:scale-105 transition-transform duration-300 overflow-hidden">
+               <Image src="/real-logo.png" alt="TrackMyMoney Logo" width={24} height={24} className="w-6 h-6 opacity-90 group-hover:opacity-100 transition-opacity dark:invert" />
+            </div>
             Track<span className="text-[var(--text-muted)]">My</span>Money
           </Link>
 
-          {/* Desktop nav links */}
+          {}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map(({ href, label }) => (
               <Link
@@ -78,7 +80,7 @@ export default function LandingNav() {
             </Link>
           </div>
 
-          {/* Mobile hamburger */}
+          {}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="md:hidden relative z-[110] w-10 h-10 flex items-center justify-center rounded-xl border border-[var(--border-light)] bg-[var(--bg-surface)] text-[var(--text-main)]"
@@ -89,7 +91,7 @@ export default function LandingNav() {
         </div>
       </nav>
 
-      {/* Mobile slide-in overlay */}
+      {}
       <div
         className={`fixed inset-0 z-[105] bg-black/40 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
           mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'

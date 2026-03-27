@@ -37,7 +37,7 @@ export default function UpdatePasswordPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)] grid grid-cols-1 lg:grid-cols-2 font-sans overflow-hidden">
-      {/* Left Panel - Branding */}
+      {}
       <div className="hidden lg:flex flex-col justify-center px-16 py-20 relative overflow-hidden bg-gradient-to-br from-[#45433A] to-[#2a2824]">
         <div className="absolute top-[-50%] right-[-50%] w-full h-full rounded-full opacity-30 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)' }} />
         <div className="absolute bottom-[-30%] left-[-30%] w-[60%] h-[60%] rounded-full opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%)' }} />
@@ -65,7 +65,7 @@ export default function UpdatePasswordPage() {
         </div>
       </div>
 
-      {/* Right Panel - Update Password Form */}
+      {}
       <div className="flex flex-col justify-center px-8 sm:px-12 md:px-20 lg:px-24 py-12 relative h-full">
         <div className="max-w-md w-full mx-auto">
           <div className="mb-8">

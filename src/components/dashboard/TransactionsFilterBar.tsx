@@ -30,7 +30,7 @@ export function TransactionsFilterBar({
   const [searchTerm, setSearchTerm] = useState(currentQuery)
   const debouncedSearch = useDebounce(searchTerm, 400)
 
-  // Apply filters to URL
+ 
   const applyFilter = useCallback((key: string, value: string) => {
     const params = new URLSearchParams(searchParams?.toString() || '')
     if (value && value !== 'all') {
@@ -38,7 +38,7 @@ export function TransactionsFilterBar({
     } else {
       params.delete(key)
     }
-    // reset to page 1 on filter change
+   
     params.set('page', '1')
     router.push(`/dashboard/transactions?${params.toString()}`)
   }, [searchParams, router])
@@ -54,7 +54,7 @@ export function TransactionsFilterBar({
       <div className="flex flex-col gap-6">
         <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
           <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0">
-            {/* Period Select */}
+            {}
             <div className="relative shrink-0">
               <select 
                 value={currentPeriod}
@@ -70,7 +70,7 @@ export function TransactionsFilterBar({
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
             </div>
 
-            {/* Type Select */}
+            {}
             <div className="relative shrink-0">
               <select 
                 value={currentType}
@@ -85,7 +85,7 @@ export function TransactionsFilterBar({
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
             </div>
 
-             {/* Category Select */}
+             {}
              <div className="relative shrink-0">
               <select
                 value={currentCategoryId}
@@ -99,7 +99,7 @@ export function TransactionsFilterBar({
               </select>              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
             </div>
 
-            {/* Account Select */}
+            {}
             <div className="relative shrink-0">
               <select 
                 value={currentAccountId}
@@ -117,13 +117,13 @@ export function TransactionsFilterBar({
           </div>
 
           <div className="relative w-full lg:w-[280px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-main)] opacity-70" />
             <input 
               type="text"
               placeholder="Search merchant..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[11px] font-bold text-[var(--text-main)] uppercase tracking-widest outline-none focus:border-[var(--text-main)] transition-colors placeholder:text-[var(--text-muted)]"
+              className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[11px] font-bold text-[var(--text-main)] uppercase tracking-widest outline-none focus:border-[var(--text-main)] transition-colors placeholder:text-[var(--text-main)] opacity-70 shadow-sm"
             />
           </div>
         </div>

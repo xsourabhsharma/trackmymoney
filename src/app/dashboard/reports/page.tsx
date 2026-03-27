@@ -9,15 +9,24 @@ export const metadata: Metadata = {
 import { ReportsClientOrchestrator } from '@/app/dashboard/reports/client-orchestrator'
 import { loadReportsPageData } from '@/app/dashboard/reports/data'
 
-export default async function ReportsPage() {
+export default async function ReportsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
+  const resolvedSearchParams = await searchParams
+  const period = (resolvedSearchParams?.period as any) || 'this_month'
+  const scope = (resolvedSearchParams?.scope as any) || 'all'
+  const view = (resolvedSearchParams?.view as any) || 'summary'
+
   const pageData = await loadReportsPageData({
-    period: 'this_month',
-    scope: 'all',
-    view: 'summary',
+    period,
+    scope,
+    view,
   })
 
   return (

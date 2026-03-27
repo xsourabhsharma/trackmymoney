@@ -21,7 +21,7 @@ export default async function TransactionsPage({
 }) {
   const resolvedSearchParams = await searchParams
   
-  // Parse SearchParams
+ 
   const filter: TransactionFilter = {
     period: (resolvedSearchParams?.period as TransactionsPeriod) || 'this_month',
     type: (resolvedSearchParams?.type as TransactionType | 'all') || 'all',
@@ -35,10 +35,10 @@ export default async function TransactionsPage({
   const sortCol = (resolvedSearchParams?.sort as string) || 'date'
   const sortDir = (resolvedSearchParams?.dir as string) || 'desc'
 
-  // Load Main Data
+ 
   const pageData = await loadTransactionsPageData(filter, page, pageSize, sortCol, sortDir)
 
-  // Load Lookup Data for Selects and Modals (Categories & Accounts)
+ 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
@@ -52,7 +52,7 @@ export default async function TransactionsPage({
     <div className="flex flex-col gap-6 pb-20">
       <DashboardSubNav />
 
-      {/* Top Filter Bar */}
+      {}
       <TransactionsFilterBar 
         categories={categories || []}
         accounts={accounts || []}
@@ -63,13 +63,13 @@ export default async function TransactionsPage({
         currentQuery={filter.merchantQuery || ''}
       />
 
-      {/* Aggregate KPI Cards */}
+      {}
       <TransactionsSummaryMetrics metrics={pageData.metrics} />
 
-      {/* Main Grid: Data Table + Side Cards */}
+      {}
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-8">
         
-        {/* The Grid dominates the center */}
+        {}
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm overflow-hidden flex flex-col gap-6">
           <div className="pb-4 border-b border-[var(--border-light)] flex justify-between items-center">
             <h3 className="text-sm font-bold uppercase tracking-widest text-[var(--text-main)]">Ledger</h3>
@@ -78,7 +78,7 @@ export default async function TransactionsPage({
             </span>
           </div>
 
-          {/* Interactive Table Client Component */}
+          {}
           <TransactionsTable 
             transactions={pageData.transactions}
             categories={categories || []}
@@ -89,7 +89,7 @@ export default async function TransactionsPage({
           />
         </div>
 
-        {/* Side Panels */}
+        {}
         <div className="flex flex-col gap-6">
           <SpendingByCategoryPanel items={pageData.spendingByCategory} />
           <BudgetsSnapshotPanel />

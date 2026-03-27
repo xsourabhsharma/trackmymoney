@@ -41,7 +41,7 @@ export function SpendingByCategoryPanel({ items }: { items: SpendingByCategoryIt
                     <span className="text-[11px] font-bold text-[var(--text-muted)] ml-1.5">{pct.toFixed(0)}%</span>
                   </div>
                 </div>
-                {/* Progress bar with animation */}
+                {}
                 <div className="ml-11 h-1 bg-[var(--border-light)] rounded-full overflow-hidden">
                   <div 
                     className="h-full rounded-full animate-progress-fill"

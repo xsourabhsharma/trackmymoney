@@ -68,7 +68,7 @@ export async function loadTransactionsPageData(
 
   const { startDate, endDate } = getDateRangeForPeriod(filter.period);
 
-  // 1. Build the base query for transactions
+ 
   let baseQuery = supabase
     .from('transactions')
     .select(`
@@ -100,16 +100,16 @@ export async function loadTransactionsPageData(
     baseQuery = baseQuery.or(`merchant.ilike.%${filter.merchantQuery}%,description.ilike.%${filter.merchantQuery}%`);
   }
 
-  // Add pagination
+ 
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  // 2. We also need aggregates. Since Supabase PostgREST doesn't support complex GROUP BY queries easily,
-  // we will execute RPC if defined, or we can fetch the filtered dataset for the period if it's small,
-  // OR we use the database to do the heavy lifting via an rpc function.
-  // Assuming no custom RPC is deployed yet, we have to fetch the matching rows for aggregates.
-  // To avoid pulling 50,000 rows into JS, we SHOULD use an RPC. Wait, if we pull just 'type, amount, category_id'
-  // for the current filter it's usually < 1000 rows. Let's do a lightweight aggregate fetch.
+ 
+ 
+ 
+ 
+ 
+ 
   
   let aggQuery = supabase
     .from('transactions')
@@ -134,7 +134,7 @@ export async function loadTransactionsPageData(
   if (rowsError) console.error("Transactions Fetch Error:", rowsError?.message, rowsError?.details, rowsError?.hint);
   if (aggError) console.error("Aggregates Fetch Error:", aggError?.message, aggError?.details, aggError?.hint);
 
-  // Parse paginated results
+ 
   const transactions: TransactionRow[] = (paginatedRows || []).map((row: any) => ({
     id: row.id,
     date: row.date,
@@ -152,7 +152,7 @@ export async function loadTransactionsPageData(
     accountName: row.accounts?.name || null,
   }));
 
-  // Process Aggregates
+ 
   let inflow = 0;
   let outflow = 0;
   const categorySpendingMap = new Map<string, SpendingByCategoryItem>();
@@ -165,7 +165,7 @@ export async function loadTransactionsPageData(
     } else if (row.type === 'expense') {
       outflow += amt;
       
-      // Accumulate category spending (expenses only)
+     
       if (row.category_id && row.categories) {
         if (!categorySpendingMap.has(row.category_id)) {
           categorySpendingMap.set(row.category_id, {
@@ -179,11 +179,11 @@ export async function loadTransactionsPageData(
         categorySpendingMap.get(row.category_id)!.amount += amt;
       }
     }
-    // transfers do not affect inflow/outflow bounds directly in this model unless explicitly requested
+   
   });
 
   const spendingByCategory = Array.from(categorySpendingMap.values())
-    .sort((a, b) => b.amount - a.amount); // Sort by highest spend
+    .sort((a, b) => b.amount - a.amount);
 
   return {
     filter,

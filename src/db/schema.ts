@@ -12,7 +12,7 @@ export const goalStatusEnum = pgEnum("goal_status", ["active", "completed", "pau
 export const budgetStatusEnum = pgEnum("budget_status", ["active", "inactive"]);
 
 export const profiles = pgTable("profiles", {
-  id: uuid("id").primaryKey().notNull(), // Matches auth.users id
+  id: uuid("id").primaryKey().notNull(),
   email: text("email").notNull().unique(),
   fullName: text("full_name"),
   avatarUrl: text("avatar_url"),
@@ -123,7 +123,7 @@ export const subscriptions = pgTable("subscriptions", {
   lastChargeDate: timestamp("last_charge_date"),
   categoryId: uuid("category_id").references(() => categories.id),
   linkedAccountId: uuid("linked_account_id").references(() => accounts.id),
-  usageScore: decimal("usage_score", { precision: 5, scale: 2 }), // 0-100
+  usageScore: decimal("usage_score", { precision: 5, scale: 2 }),
   potentialSavings: boolean("potential_savings").default(false),
   notes: text("notes"),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -146,21 +146,21 @@ export const subscriptionEvents = pgTable("subscription_events", {
 export const healthSnapshots = pgTable("health_snapshots", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
-  periodType: text("period_type").notNull(), // 'week', 'month', 'year'
+  periodType: text("period_type").notNull(),
   periodStart: timestamp("period_start").notNull(),
   periodEnd: timestamp("period_end").notNull(),
-  savingsRate: decimal("savings_rate", { precision: 5, scale: 2 }), // Percentage
-  budgetAdherence: decimal("budget_adherence", { precision: 5, scale: 2 }), // Percentage
-  goalProgress: decimal("goal_progress", { precision: 5, scale: 2 }), // Percentage
-  debtScore: decimal("debt_score", { precision: 5, scale: 2 }), // 0-100
-  overallScore: decimal("overall_score", { precision: 5, scale: 2 }), // 0-100
+  savingsRate: decimal("savings_rate", { precision: 5, scale: 2 }),
+  budgetAdherence: decimal("budget_adherence", { precision: 5, scale: 2 }),
+  goalProgress: decimal("goal_progress", { precision: 5, scale: 2 }),
+  debtScore: decimal("debt_score", { precision: 5, scale: 2 }),
+  overallScore: decimal("overall_score", { precision: 5, scale: 2 }),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const chatMessages = pgTable("chat_messages", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
-  role: text("role").notNull(), // "user" or "assistant"
+  role: text("role").notNull(),
   content: text("content").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 }, (t) => ({
@@ -194,9 +194,9 @@ export const aiInsights = pgTable("ai_insights", {
 export const importJobs = pgTable("import_jobs", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
-  status: text("status").default("pending").notNull(), // pending, uploading, parsing, ai_categorizing, ready_for_review, importing, completed, failed, cancelled
-  source: text("source").default("csv").notNull(),     // csv, receipt
-  filePath: text("file_path"),                         // Supabase Storage key
+  status: text("status").default("pending").notNull(),
+  source: text("source").default("csv").notNull(),    
+  filePath: text("file_path"),                        
   rowCount: integer("row_count").default(0),
   errorMessage: text("error_message"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -207,25 +207,21 @@ export const importJobs = pgTable("import_jobs", {
 export const importRows = pgTable("import_rows", {
   id: uuid("id").defaultRandom().primaryKey(),
   importJobId: uuid("import_job_id").references(() => importJobs.id, { onDelete: "cascade" }).notNull(),
-  userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(), // Denormalized for easier RLS
-  rawRow: jsonb("raw_row"),                          // Original CSV row data
+  userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
+  rawRow: jsonb("raw_row"),                         
   parsedDate: timestamp("parsed_date"),
   parsedDescription: text("parsed_description"),
   parsedAmount: decimal("parsed_amount", { precision: 12, scale: 2 }),
   parsedCurrency: text("parsed_currency").default("USD"),
-  parsedType: text("parsed_type"),                       // income, expense
+  parsedType: text("parsed_type"),                      
   parsedMerchant: text("parsed_merchant"),
   parsedCategoryId: uuid("parsed_category_id").references(() => categories.id, { onDelete: "set null" }),
-  aiConfidence: decimal("ai_confidence", { precision: 3, scale: 2 }), // 0.00 to 1.00
-  aiPayload: jsonb("ai_payload"),                       // Raw LLM reasoning/output
+  aiConfidence: decimal("ai_confidence", { precision: 3, scale: 2 }),
+  aiPayload: jsonb("ai_payload"),                      
   isDuplicateGuess: boolean("is_duplicate_guess").default(false),
   isSelectedForImport: boolean("is_selected_for_import").default(true),
   hasError: boolean("has_error").default(false),
   errorMessage: text("error_message"),
   createdAt: timestamp("created_at").defaultNow(),
 });
-
-// ────────────────────────────────────────────────
-// Performance Indexes
-// ────────────────────────────────────────────────
-// Indexes are declared directly inside the table definitions above.
+

@@ -1,25 +1,72 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
 import { getDateRangeForReports } from '@/app/dashboard/reports/data'
-import type { ReportsPeriod, ReportsScope } from '@/app/dashboard/reports/data'
+import type { ReportsScope } from '@/app/dashboard/reports/data'
+
+const reportsExportQuerySchema = z.object({
+  type: z.enum(['monthly', 'tax']).default('monthly'),
+  format: z.literal('csv').default('csv'),
+  period: z.enum(['this_month', 'last_month', 'last_three_months', 'year_to_date']).default('this_month'),
+  scope: z.enum(['all', 'bank', 'card']).default('all'),
+})
+
+type ReportTransactionRow = {
+  date: string
+  amount: string | number | null
+  type: string | null
+  merchant: string | null
+  description: string | null
+  categories: { name: string } | { name: string }[] | null
+}
+
+function getCategoryLabel(categories: ReportTransactionRow['categories']) {
+  const category = Array.isArray(categories) ? categories[0] : categories
+  return category?.name || 'Uncategorized'
+}
 
 export async function GET(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { searchParams } = req.nextUrl
-  const type = searchParams.get('type') || 'monthly'
-  const format = searchParams.get('format') || 'csv'
-  const period = (searchParams.get('period') || 'this_month') as ReportsPeriod
-  const scope = (searchParams.get('scope') || 'all') as ReportsScope
+  const parsedQuery = reportsExportQuerySchema.safeParse({
+    type: req.nextUrl.searchParams.get('type') || undefined,
+    format: req.nextUrl.searchParams.get('format') || undefined,
+    period: req.nextUrl.searchParams.get('period') || undefined,
+    scope: req.nextUrl.searchParams.get('scope') || undefined,
+  })
 
-  const admin = createAdminClient()
+  if (!parsedQuery.success) {
+    return NextResponse.json({ error: 'Invalid export query parameters' }, { status: 400 })
+  }
+
+  const { type, period, scope } = parsedQuery.data
   const { startDate, endDate } = getDateRangeForReports(period, new Date())
 
-  // Fetch transactions
-  const { data: txRaw } = await admin
+  let accountIds: string[] | null = null
+  if (scope !== 'all') {
+    const { data: accounts } = await supabase
+      .from('accounts')
+      .select('id, type')
+      .eq('user_id', user.id)
+
+    const allowedTypes: Record<ReportsScope, string[]> = {
+      all: [],
+      bank: ['bank', 'checking', 'savings'],
+      card: ['card', 'credit_card', 'credit'],
+    }
+
+    accountIds = (accounts || [])
+      .filter((account) => allowedTypes[scope].some((typeName) => account.type?.toLowerCase().includes(typeName)))
+      .map((account) => account.id)
+
+    if (accountIds.length === 0) {
+      accountIds = ['__none__']
+    }
+  }
+
+  let transactionsQuery = supabase
     .from('transactions')
     .select(`date, amount, type, merchant, description, categories ( name )`)
     .eq('user_id', user.id)
@@ -27,9 +74,13 @@ export async function GET(req: NextRequest) {
     .lte('date', endDate)
     .order('date', { ascending: true })
 
-  const transactions = txRaw || []
+  if (accountIds) {
+    transactionsQuery = transactionsQuery.in('account_id', accountIds)
+  }
 
-  // Build CSV
+  const { data: txRaw } = await transactionsQuery
+  const transactions = (txRaw || []) as ReportTransactionRow[]
+
   let csvContent = ''
   const headers: string[] = []
 
@@ -42,12 +93,11 @@ export async function GET(req: NextRequest) {
         tx.type,
         `"${(tx.merchant || '').replace(/"/g, '""')}"`,
         `"${(tx.description || '').replace(/"/g, '""')}"`,
-        `"${((tx.categories as any)?.name || 'Uncategorized').replace(/"/g, '""')}"`,
+        `"${getCategoryLabel(tx.categories).replace(/"/g, '""')}"`,
         Number(tx.amount || 0).toFixed(2),
       ].join(',')),
     ].join('\n')
   } else {
-    // Generic summary
     headers.push('Date', 'Type', 'Merchant', 'Category', 'Amount')
     csvContent = [
       headers.join(','),
@@ -55,7 +105,7 @@ export async function GET(req: NextRequest) {
         tx.date,
         tx.type,
         `"${(tx.merchant || '').replace(/"/g, '""')}"`,
-        `"${((tx.categories as any)?.name || 'Uncategorized').replace(/"/g, '""')}"`,
+        `"${getCategoryLabel(tx.categories).replace(/"/g, '""')}"`,
         Number(tx.amount || 0).toFixed(2),
       ].join(',')),
     ].join('\n')

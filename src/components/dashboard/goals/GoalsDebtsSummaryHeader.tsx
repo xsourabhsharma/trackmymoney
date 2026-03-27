@@ -22,9 +22,9 @@ export function GoalsDebtsSummaryHeader({ summary, filter, onChangeFilter, onAdd
 
   return (
     <div className="flex flex-col gap-6">
-      {/* KPI Cards */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-stagger">
-        {/* Savings Goals */}
+        {}
         <div className="group relative p-6 bg-[var(--bg-base)] border border-[var(--border-light)] hover:border-[var(--border-dark)] rounded-2xl transition-all hover:shadow-md overflow-hidden hover-lift">
           <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--income-green)]/5 rounded-bl-[60px]" />
           <div className="flex items-start justify-between mb-4">
@@ -40,7 +40,7 @@ export function GoalsDebtsSummaryHeader({ summary, filter, onChangeFilter, onAdd
           </div>
         </div>
 
-        {/* Total Debt */}
+        {}
         <div className="group relative p-6 bg-[var(--bg-base)] border border-[var(--border-light)] hover:border-[var(--border-dark)] rounded-2xl transition-all hover:shadow-md overflow-hidden hover-lift">
           <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-bl-[60px]" />
           <div className="flex items-start justify-between mb-4">
@@ -54,22 +54,22 @@ export function GoalsDebtsSummaryHeader({ summary, filter, onChangeFilter, onAdd
           <div className="text-[11px] text-[var(--text-muted)] mt-2">Outstanding balance</div>
         </div>
 
-        {/* Net Progress */}
-        <div className={`group relative p-6 border rounded-2xl transition-all hover:shadow-md overflow-hidden ${isGood ? 'bg-[var(--bg-base)] border-[var(--border-light)]' : 'bg-orange-50/30 border-orange-100'}`}>
-          <div className={`absolute top-0 right-0 w-24 h-24 rounded-bl-[60px] ${isGood ? 'bg-[var(--accent)]/5' : 'bg-orange-400/5'}`} />
+        {}
+        <div className={`group relative p-6 border rounded-2xl transition-all hover:shadow-md overflow-hidden ${isGood ? 'bg-[var(--bg-base)] border-[var(--border-light)]' : 'bg-orange-50/30 border-orange-100 dark:bg-orange-500/10 dark:border-orange-500/20'}`}>
+          <div className={`absolute top-0 right-0 w-24 h-24 rounded-bl-[60px] ${isGood ? 'bg-[var(--accent)]/5' : 'bg-orange-400/5 dark:bg-orange-500/10'}`} />
           <div className="flex items-start justify-between mb-4">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isGood ? 'bg-[var(--accent)]/10' : 'bg-orange-100'}`}>
-              <Activity className={`w-5 h-5 ${isGood ? 'text-[var(--accent)]' : 'text-orange-500'}`} />
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isGood ? 'bg-[var(--accent)]/10' : 'bg-orange-100 dark:bg-orange-500/20'}`}>
+              <Activity className={`w-5 h-5 ${isGood ? 'text-[var(--accent)]' : 'text-orange-500 dark:text-orange-400'}`} />
             </div>
-            <span className={`text-[11px] font-bold uppercase tracking-widest px-2 py-1 rounded-full border ${isGood ? 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-light)]' : 'bg-orange-50 text-orange-600 border-orange-100'}`}>
+            <span className={`text-[11px] font-bold uppercase tracking-widest px-2 py-1 rounded-full border ${isGood ? 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-light)]' : 'bg-orange-50 text-orange-600 border-orange-100 dark:bg-orange-500/20 dark:text-orange-400 dark:border-orange-500/30'}`}>
               Progress
             </span>
           </div>
-          <div className={`text-3xl font-bold tabular-nums tracking-tight ${isGood ? 'text-[var(--accent)]' : 'text-orange-500'}`}>{pct}%</div>
+          <div className={`text-3xl font-bold tabular-nums tracking-tight ${isGood ? 'text-[var(--accent)]' : 'text-orange-500 dark:text-orange-400'}`}>{pct}%</div>
           <div className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-[0.15em] mt-1">Net Progress</div>
           <div className="mt-3 h-1.5 bg-[var(--bg-surface)] rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full animate-progress-fill ${isGood ? 'bg-[var(--accent)]' : 'bg-orange-400'}`}
+              className={`h-full rounded-full animate-progress-fill ${isGood ? 'bg-[var(--accent)]' : 'bg-orange-400 dark:bg-orange-500'}`}
               style={{ width: `${pct}%` }}
             />
           </div>
@@ -77,10 +77,10 @@ export function GoalsDebtsSummaryHeader({ summary, filter, onChangeFilter, onAdd
         </div>
       </div>
 
-      {/* Filters + Action Buttons */}
+      {}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 justify-between">
         <div className="flex flex-wrap gap-2">
-          {/* Period filter */}
+          {}
           <div className="flex gap-1 p-1 bg-[var(--bg-surface)] rounded-full border border-[var(--border-light)] shadow-inner">
             {(['this_year', 'all_time'] as const).map((p) => (
               <button
@@ -93,7 +93,7 @@ export function GoalsDebtsSummaryHeader({ summary, filter, onChangeFilter, onAdd
               </button>
             ))}
           </div>
-          {/* Scope filter */}
+          {}
           <div className="flex gap-1 p-1 bg-[var(--bg-surface)] rounded-full border border-[var(--border-light)] shadow-inner">
             {(['all', 'savings', 'debt'] as const).map((s) => (
               <button

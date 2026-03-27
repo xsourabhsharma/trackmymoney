@@ -8,24 +8,24 @@ import * as THREE from 'three'
 function AnimatedOrb({ state }: { state: 'neutral' | 'warning' | 'opportunity' | 'no_data' }) {
   const meshRef = useRef<THREE.Mesh>(null)
 
-  // Determine color and distortion based on state
-  let color = '#3B82F6' // neutral blue
+ 
+  let color = '#3B82F6'
   let distort = 0.3
   let speed = 2
 
   switch (state) {
     case 'warning':
-      color = '#EF4444' // red
+      color = '#EF4444'
       distort = 0.6
       speed = 4
       break
     case 'opportunity':
-      color = '#10B981' // green
+      color = '#10B981'
       distort = 0.4
       speed = 3
       break
     case 'no_data':
-      color = '#9CA3AF' // gray
+      color = '#9CA3AF'
       distort = 0.1
       speed = 1
       break
@@ -51,7 +51,7 @@ function AnimatedOrb({ state }: { state: 'neutral' | 'warning' | 'opportunity' |
           wireframe={state === 'no_data'}
         />
       </Sphere>
-      {/* Dynamic Lighting */}
+      {}
       <ambientLight intensity={0.5} />
       <directionalLight position={[5, 5, 5]} intensity={1} color={color} />
       <pointLight position={[-5, -5, -5]} intensity={0.5} color="#ffffff" />

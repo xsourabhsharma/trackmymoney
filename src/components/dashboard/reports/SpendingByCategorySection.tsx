@@ -28,7 +28,7 @@ export function SpendingByCategorySection({ data }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Mode Toggle */}
+      {}
       <div className="flex gap-1.5 p-1 bg-[var(--bg-surface)] rounded-lg border border-[var(--border-light)] w-fit">
         {(['stacked', 'donut'] as ChartMode[]).map(m => (
           <button
@@ -43,7 +43,7 @@ export function SpendingByCategorySection({ data }: Props) {
 
       {mode === 'stacked' ? (
         <div className="flex flex-col gap-3">
-          {/* Stacked horizontal bar */}
+          {}
           <div className="flex h-6 rounded-lg overflow-hidden shadow-inner border border-[var(--border-light)]/20">
             {data.slice(0, 8).map((cat, i) => (
               <div
@@ -58,7 +58,7 @@ export function SpendingByCategorySection({ data }: Props) {
             ))}
           </div>
 
-          {/* Category rows */}
+          {}
           <div className="flex flex-col gap-2">
             {data.slice(0, 8).map((cat, i) => (
               <div key={cat.categoryName} className="flex items-center gap-3">
@@ -85,7 +85,7 @@ export function SpendingByCategorySection({ data }: Props) {
           </div>
         </div>
       ) : (
-        // Donut
+       
         <div className="flex items-center gap-8">
           <div className="relative w-36 h-36 flex-shrink-0">
             <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">

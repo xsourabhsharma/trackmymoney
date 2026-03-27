@@ -17,33 +17,9 @@ export function IntegrationsSettingsSection({ integrations }: Props) {
   const [connectingId, setConnectingId] = useState<string | null>(null)
   const [localConnected, setLocalConnected] = useState<Record<string, boolean>>({})
   
-  const bankCount = integrations.filter(i => i.type === 'bank' && i.status === 'connected').length
-  const cardCount = integrations.filter(i => i.type === 'card' && i.status === 'connected').length
-  const upiCount = integrations.filter(i => i.type === 'upi' && i.status === 'connected').length
   const csvEnabled = integrations.some(i => i.type === 'csv_import' && i.status === 'connected')
 
   const items = [
-    { 
-      id: 'bank', 
-      icon: '🏦', 
-      name: 'Bank Accounts', 
-      status: bankCount ? `${bankCount} Connected` : 'Offline', 
-      active: bankCount > 0 
-    },
-    { 
-      id: 'card', 
-      icon: '💳', 
-      name: 'Cards & Wallets', 
-      status: cardCount ? `${cardCount} Connected` : 'Offline', 
-      active: cardCount > 0 
-    },
-    { 
-      id: 'upi', 
-      icon: '📱', 
-      name: 'UPI / Local Providers', 
-      status: upiCount ? `${upiCount} Connected` : 'Offline', 
-      active: upiCount > 0 
-    },
     { 
       id: 'csv_import', 
       icon: '📄', 
@@ -59,7 +35,7 @@ export function IntegrationsSettingsSection({ integrations }: Props) {
       return
     }
 
-    // Simulate connect/disconnect flow
+   
     setConnectingId(id)
     await new Promise(resolve => setTimeout(resolve, 1200))
     

@@ -26,16 +26,16 @@ export function CashFlowChart({ data }: CashFlowChartProps) {
     )
   }
 
-  // Transform data values for the chart using the currency formatter
-  // We keep raw numeric values for Recharts to scale the Y-axis correctly,
-  // but format them in the Tooltip and YAxis.
+ 
+ 
+ 
   
-  // Wait, if the data amounts are in different base currencies, we assume they are USD for chart scaling. 
-  // Let's assume all DB aggregates are normalized or just apply fmt to them.
-  // Actually, we can just map over data and convert the raw numbers into the selected currency number so the chart bars scale relative to the *converted* amount.
+ 
+ 
+ 
   const convertedData = data.map(d => ({
     ...d,
-    // convert the value to the current currency numerically
+   
     incomeConverted: Number(fmt(d.income).replace(/[^0-9.-]+/g,"")),
     expenseConverted: Number(fmt(d.expense).replace(/[^0-9.-]+/g,""))
   }))

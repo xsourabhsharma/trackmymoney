@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { Search, Plus, Filter, Monitor } from 'lucide-react'
+import { Search, Plus, Filter } from 'lucide-react'
 import { useDebounce } from 'use-debounce'
 import { SubscriptionStatus } from '@/app/dashboard/subscriptions/data'
 import { Button } from '@/components/ui/button'
@@ -23,7 +23,7 @@ export function SubscriptionsFilterBar({ initialStatus, initialSearch, onAddSubC
   const [debouncedSearch] = useDebounce(search, 400)
 
   useEffect(() => {
-    // Only update if changes occurred compared to current URL state
+   
     const currentUrlStatus = searchParams.get('status') || 'all'
     const currentUrlSearch = searchParams.get('q') || ''
     
@@ -39,7 +39,7 @@ export function SubscriptionsFilterBar({ initialStatus, initialSearch, onAddSubC
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 py-4 border-b border-[var(--border-light)] mb-4 bg-transparent sticky top-0 z-10 backdrop-blur-sm">
       <div className="flex items-center gap-3">
-        {/* Status Filter */}
+        {}
         <div className="relative">
           <select 
             value={status}
@@ -55,7 +55,7 @@ export function SubscriptionsFilterBar({ initialStatus, initialSearch, onAddSubC
           <div className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 border-r-2 border-b-2 border-[var(--text-muted)] rotate-45 pointer-events-none transform -translate-y-[8px]"></div>
         </div>
 
-        {/* Search Input */}
+        {}
         <div className="relative w-full md:w-64 group">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] transition-colors group-focus-within:text-[var(--text-main)]">
             <Search className="w-full h-full" />
@@ -71,13 +71,7 @@ export function SubscriptionsFilterBar({ initialStatus, initialSearch, onAddSubC
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <Button 
-          variant="outline"
-          className="bg-[var(--bg-muted)] hover:bg-[var(--border-light)] text-[var(--text-main)] border border-[var(--border-light)] text-[12px] font-bold uppercase tracking-widest px-4 py-2 h-auto rounded-xl flex items-center gap-2 transition-all shadow-sm"
-        >
-          <Monitor className="w-4 h-4 text-[var(--accent)]" />
-          Import from Bank
-        </Button>
+
         <Button 
           onClick={onAddSubClick}
           className="bg-[var(--text-main)] hover:bg-[var(--text-main)]/90 text-[var(--bg-base)] text-[12px] font-bold uppercase tracking-widest px-4 py-2 h-auto rounded-xl flex items-center gap-2 shadow-sm transition-all shadow-[var(--border-light)]/50 border border-transparent"

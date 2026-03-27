@@ -26,20 +26,7 @@ export function KpiRow({ metrics, accountsCount }: KpiRowProps) {
       colorClass: 'text-[var(--income-green)]',
       subtext: 'NET THIS PERIOD',
     },
-    {
-      label: 'Account Balance',
-      value: fmt(metrics.totalBalance),
-      icon: Landmark,
-      colorClass: 'text-[var(--text-main)]',
-      subtext: 'ACROSS ALL ACCOUNTS',
-    },
-    {
-      label: 'Total Accounts',
-      value: accountsCount.toString(),
-      icon: Wallet,
-      colorClass: 'text-[var(--text-main)]',
-      subtext: `${accountsCount} LINKED`,
-    },
+
     {
       label: 'Inflow',
       value: fmt(metrics.totalInflow),
@@ -64,7 +51,7 @@ export function KpiRow({ metrics, accountsCount }: KpiRowProps) {
   ]
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 perspective-[1000px]">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 perspective-[1000px]">
       {kpis.map((kpi, idx) => (
         <TiltCard key={idx}>
           <div className="group relative flex flex-col p-4 bg-white border border-[var(--border-main)] rounded-2xl shadow-sm h-full w-full cursor-default text-center">

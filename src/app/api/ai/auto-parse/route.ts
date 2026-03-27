@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-     // Mock if no API key
+    
      if (!process.env.GROQ_API_KEY) {
         return NextResponse.json({
             candidates: [

@@ -23,7 +23,7 @@ export function CashFlowChartSection({ points, comparison }: Props) {
     )
   }
 
-  // Build SVG paths from data
+ 
   const maxVal = Math.max(...points.flatMap(p => [p.income, p.expense, Math.abs(p.net)]), 1)
   const W = 300
   const H = 150
@@ -47,10 +47,10 @@ export function CashFlowChartSection({ points, comparison }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* SVG Chart */}
+      {}
       <div className="relative overflow-hidden rounded-xl bg-[var(--bg-surface)]/30 border border-[var(--border-light)]/50 p-4">
         <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-48" preserveAspectRatio="xMidYMid meet">
-          {/* Grid lines */}
+          {}
           {[0.25, 0.5, 0.75, 1].map(frac => {
             const y = H - pad - (frac * (H - 2 * pad))
             return (
@@ -59,16 +59,16 @@ export function CashFlowChartSection({ points, comparison }: Props) {
             )
           })}
 
-          {/* Income line */}
+          {}
           <path d={buildPath(p => p.income)} fill="none" stroke="var(--income-green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
 
-          {/* Expense line */}
+          {}
           <path d={buildPath(p => p.expense)} fill="none" stroke="var(--expense-red)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 3" />
 
-          {/* Net line */}
-          <path d={buildPath(p => Math.max(0, p.net))} fill="none" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="3 3" opacity="0.7" />
+          {}
+          <path d={buildPath(p => Math.max(0, p.net))} fill="none" className="stroke-blue-600 dark:stroke-sky-400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="3 3" opacity="0.7" />
 
-          {/* Data points */}
+          {}
           {points.map((p, i) => {
             const x = pad + (i / Math.max(points.length - 1, 1)) * (W - 2 * pad)
             return (
@@ -80,7 +80,7 @@ export function CashFlowChartSection({ points, comparison }: Props) {
           })}
         </svg>
 
-        {/* X axis labels */}
+        {}
         <div className="flex justify-between px-4 mt-2">
           {points.map((p, i) => (
             <span key={i} className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
@@ -90,12 +90,12 @@ export function CashFlowChartSection({ points, comparison }: Props) {
         </div>
       </div>
 
-      {/* Legend */}
+      {}
       <div className="flex justify-center gap-6">
         {[
           { label: 'Income', color: 'bg-[var(--income-green)]', dashed: false },
           { label: 'Expense', color: 'bg-[var(--expense-red)]', dashed: true },
-          { label: 'Net', color: 'bg-[var(--accent)]', dashed: true },
+          { label: 'Net', color: 'bg-blue-600 dark:bg-sky-400', dashed: true },
         ].map(l => (
           <div key={l.label} className="flex items-center gap-1.5">
             <div className={`h-0.5 w-5 ${l.color} ${l.dashed ? 'opacity-60' : ''} rounded-full`} />
@@ -104,7 +104,7 @@ export function CashFlowChartSection({ points, comparison }: Props) {
         ))}
       </div>
 
-      {/* Caption */}
+      {}
       <div className="bg-[var(--bg-surface)] p-4 rounded-xl text-center border border-[var(--border-light)]/50">
         <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase leading-relaxed tracking-wide">
           In this period, your net cash flow is{' '}

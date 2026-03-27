@@ -46,36 +46,36 @@ export function AutoParseClientWrapper({
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Tab Headers */}
+      {}
       <div className="flex p-1 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-2xl w-fit">
         <button
           onClick={() => setActiveTab('csv')}
-          className={`relative px-6 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'csv' ? 'text-[var(--text-main)]' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'}`}
+          className={`relative px-6 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'csv' ? 'text-[var(--text-main)]' : 'text-[var(--text-main)] opacity-50 hover:opacity-100'}`}
         >
           {activeTab === 'csv' && (
-            <motion.div layoutId="activeTab" className="absolute inset-0 bg-[var(--bg-base)] border border-[var(--border-light)] shadow-sm rounded-xl" />
+            <motion.div layoutId="activeTab" className="absolute inset-0 bg-[var(--bg-base)] border border-[var(--border-dark)] shadow-sm rounded-xl" />
           )}
-          <span className="relative z-10"><FileText className="w-3.5 h-3.5" /></span>
+          <span className="relative z-10"><FileText className={`w-3.5 h-3.5 ${activeTab === 'csv' ? 'text-[var(--accent)]' : ''}`} /></span>
           <span className="relative z-10">CSV Importer</span>
         </button>
         <button
           onClick={() => setActiveTab('receipt')}
-          className={`relative px-6 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'receipt' ? 'text-[var(--text-main)]' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'}`}
+          className={`relative px-6 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'receipt' ? 'text-[var(--text-main)]' : 'text-[var(--text-main)] opacity-50 hover:opacity-100'}`}
         >
           {activeTab === 'receipt' && (
-            <motion.div layoutId="activeTab" className="absolute inset-0 bg-[var(--bg-base)] border border-[var(--border-light)] shadow-sm rounded-xl" />
+            <motion.div layoutId="activeTab" className="absolute inset-0 bg-[var(--bg-base)] border border-[var(--border-dark)] shadow-sm rounded-xl" />
           )}
-          <span className="relative z-10"><Camera className="w-3.5 h-3.5" /></span>
+          <span className="relative z-10"><Camera className={`w-3.5 h-3.5 ${activeTab === 'receipt' ? 'text-[var(--accent)]' : ''}`} /></span>
           <span className="relative z-10">Receipt Scanner</span>
         </button>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_2.5fr] gap-8">
-        {/* Left Column: Info & Instructions */}
+        {}
         {!initialJob || initialJob.status === 'pending' || initialJob.status === 'failed' ? (
           <div className="flex flex-col gap-6">
             <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
-              <h2 className="text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2 mb-4 text-[var(--accent)]">
+              <h2 className="text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2 mb-4 text-blue-600 dark:text-[var(--accent)]">
                 <Sparkles className="w-5 h-5" /> 
                 {activeTab === 'csv' ? 'CSV Auto-Parse' : 'AI Receipt Scanning'}
               </h2>
@@ -124,7 +124,7 @@ export function AutoParseClientWrapper({
           </div>
         ) : null}
 
-        {/* Right Column: Interactive Zone */}
+        {}
         <div className={`flex flex-col h-full ${initialJob && initialJob.status !== 'pending' && initialJob.status !== 'failed' ? 'xl:col-span-2' : ''}`}>
           <AnimatePresence mode="wait">
             {activeTab === 'csv' ? (
@@ -158,7 +158,7 @@ export function AutoParseClientWrapper({
         </div>
       </div>
 
-      {/* Recent Imports Section */}
+      {}
       {recentJobs.length > 0 && (
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
           <h3 className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">

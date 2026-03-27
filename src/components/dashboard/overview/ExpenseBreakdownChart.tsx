@@ -3,8 +3,7 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
 import { EmptyState } from './EmptyState'
 import { PieChart as PieChartIcon } from 'lucide-react'
-
-// Default neo-brutalist palette
+
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#6366f1']
 
 interface ExpenseBreakdownChartProps {
@@ -27,7 +26,7 @@ export function ExpenseBreakdownChart({ data }: ExpenseBreakdownChartProps) {
     )
   }
 
-  // Format data for Recharts
+ 
   const chartData = data.map(d => ({
     name: d.categoryName,
     value: d.amount

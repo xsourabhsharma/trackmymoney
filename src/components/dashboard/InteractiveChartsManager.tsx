@@ -44,7 +44,7 @@ export function InteractiveChartsManager({ donutData, donutTotal, cashFlowData, 
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Expense Breakdown */}
+        {}
         <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm flex flex-col items-center justify-between min-h-[400px]">
           <div className="w-full flex items-center justify-between mb-4">
             <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] flex items-center gap-2">
@@ -66,7 +66,7 @@ export function InteractiveChartsManager({ donutData, donutTotal, cashFlowData, 
           )}
         </div>
 
-        {/* Capital Flow */}
+        {}
         <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm flex flex-col min-h-[400px]">
           <div className="w-full flex items-center justify-between mb-8">
             <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] flex items-center gap-2">

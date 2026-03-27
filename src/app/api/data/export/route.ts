@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
 
 export async function GET() {
   try {
@@ -11,23 +10,24 @@ export async function GET() {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const admin = createAdminClient()
-
-    // Fetch all user data in parallel
     const [
+      profileResult,
       txResult,
       subResult,
       budgetsResult,
       goalsResult,
-      debtsResult,
-      settingsResult
+      debtsResult
     ] = await Promise.all([
-      admin.from('transactions').select('*').eq('user_id', user.id),
-      admin.from('subscriptions').select('*').eq('user_id', user.id),
-      admin.from('budgets').select('*').eq('user_id', user.id),
-      admin.from('savings_goals').select('*').eq('user_id', user.id),
-      admin.from('debts').select('*').eq('user_id', user.id),
-      admin.from('user_settings').select('*').eq('user_id', user.id).single()
+      supabase
+        .from('profiles')
+        .select('id, email, full_name, currency, locale, preferences, created_at, updated_at')
+        .eq('id', user.id)
+        .single(),
+      supabase.from('transactions').select('*').eq('user_id', user.id),
+      supabase.from('subscriptions').select('*').eq('user_id', user.id),
+      supabase.from('budgets').select('*').eq('user_id', user.id),
+      supabase.from('goals').select('*').eq('user_id', user.id),
+      supabase.from('debts').select('*').eq('user_id', user.id),
     ])
 
     const exportData = {
@@ -35,13 +35,13 @@ export async function GET() {
       user: {
         id: user.id,
         email: user.email,
-        settings: settingsResult.data || {}
+        profile: profileResult.data || null
       },
       data: {
         transactions: txResult.data || [],
         subscriptions: subResult.data || [],
         budgets: budgetsResult.data || [],
-        savings_goals: goalsResult.data || [],
+        goals: goalsResult.data || [],
         debts: debtsResult.data || []
       }
     }

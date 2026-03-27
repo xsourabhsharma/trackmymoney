@@ -34,7 +34,7 @@ export function TransactionDrillDown({ isOpen, onClose, categoryName, transactio
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -43,7 +43,7 @@ export function TransactionDrillDown({ isOpen, onClose, categoryName, transactio
             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 overflow-hidden"
           />
           
-          {/* Drawer */}
+          {}
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
@@ -51,7 +51,7 @@ export function TransactionDrillDown({ isOpen, onClose, categoryName, transactio
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="fixed top-0 right-0 h-full w-full max-w-[450px] bg-[var(--bg-base)] shadow-2xl z-[60] flex flex-col"
           >
-            {/* Header */}
+            {}
             <div className="p-6 border-b border-[var(--border-light)] flex items-center justify-between bg-[var(--bg-surface)]">
               <div>
                 <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--accent)] mb-1 flex items-center gap-2">
@@ -69,7 +69,7 @@ export function TransactionDrillDown({ isOpen, onClose, categoryName, transactio
               </button>
             </div>
 
-            {/* Summary Block */}
+            {}
             <div className="p-6 bg-gradient-to-br from-[var(--bg-surface)] to-[var(--bg-base)] border-b border-[var(--border-light)]">
                <div className="flex items-center justify-between">
                   <div className="space-y-1">
@@ -83,7 +83,7 @@ export function TransactionDrillDown({ isOpen, onClose, categoryName, transactio
                </div>
             </div>
 
-            {/* Transaction List */}
+            {}
             <div className="flex-grow overflow-y-auto p-4 space-y-3 bg-[var(--bg-surface)]/20">
               {filtered.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-48 opacity-40">
@@ -128,7 +128,7 @@ export function TransactionDrillDown({ isOpen, onClose, categoryName, transactio
               )}
             </div>
 
-            {/* Footer */}
+            {}
             <div className="p-6 border-t border-[var(--border-light)] bg-[var(--bg-base)]">
                <button 
                 onClick={onClose}

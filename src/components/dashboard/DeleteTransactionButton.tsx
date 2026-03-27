@@ -26,7 +26,7 @@ export function DeleteTransactionButton({ id }: { id: string }) {
     try {
       await deleteTransaction(id)
       setOpen(false)
-      router.refresh() // Force client UI refresh
+      router.refresh()
     } catch (error) {
       console.error(error)
       alert('Failed to delete transaction')
@@ -51,7 +51,7 @@ export function DeleteTransactionButton({ id }: { id: string }) {
           <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
           <AlertDialogAction 
             onClick={(e) => {
-              e.preventDefault(); // Prevent modal from immediately closing before action finishes
+              e.preventDefault();
               handleDelete();
             }}
             className="bg-red-600 hover:bg-red-700 text-white"

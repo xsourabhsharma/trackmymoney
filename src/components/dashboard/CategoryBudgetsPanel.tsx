@@ -32,7 +32,7 @@ export function CategoryBudgetsPanel({ categoryBudgets, onAddBudget, onEditBudge
           <p className="text-[13px] font-bold text-[var(--text-main)] tracking-tight mb-1">
             No category budgets yet
           </p>
-          <p className="text-[11px] text-[var(--text-muted)] max-w-xs mx-auto leading-relaxed">
+          <p className="text-[11px] text-[var(--text-main)] opacity-70 max-w-xs mx-auto leading-relaxed">
             Create monthly spending limits for key categories like Groceries, Dining, or Entertainment to start tracking your budget.
           </p>
         </div>
@@ -60,13 +60,13 @@ export function CategoryBudgetsPanel({ categoryBudgets, onAddBudget, onEditBudge
             className="group p-5 bg-[var(--bg-base)] border border-[var(--border-light)] hover:border-[var(--border-dark)] rounded-2xl transition-all hover:shadow-md cursor-pointer relative overflow-hidden hover-lift"
             onClick={() => onEditBudget(budget)}
           >
-            {/* Subtle background fill based on usage */}
+            {}
             <div
               className={`absolute inset-0 opacity-[0.02] transition-all ${isOver ? 'bg-red-500' : pct >= 80 ? 'bg-orange-500' : 'bg-[var(--accent)]'}`}
             />
 
             <div className="relative flex flex-col gap-3">
-              {/* Header Row */}
+              {}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-11 h-11 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition-transform">
@@ -76,7 +76,7 @@ export function CategoryBudgetsPanel({ categoryBudgets, onAddBudget, onEditBudge
                     <span className="text-[13px] font-bold text-[var(--text-main)] uppercase tracking-tight block">
                       {budget.categoryName}
                     </span>
-                    <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
+                    <span className="text-[11px] font-bold text-[var(--text-main)] opacity-70 uppercase tracking-widest">
                       {budget.period} budget
                       {budget.rollover && ' · rollover'}
                     </span>
@@ -90,7 +90,7 @@ export function CategoryBudgetsPanel({ categoryBudgets, onAddBudget, onEditBudge
                 </div>
               </div>
 
-              {/* Progress Bar */}
+              {}
               <div className="h-2 bg-[var(--bg-surface)] rounded-full overflow-hidden shadow-inner">
                 <div
                   className={`h-full rounded-full animate-progress-fill ${
@@ -100,18 +100,18 @@ export function CategoryBudgetsPanel({ categoryBudgets, onAddBudget, onEditBudge
                 />
               </div>
 
-              {/* Footer Row */}
+              {}
               <div className="flex items-center justify-between">
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-[15px] font-bold tabular-nums text-[var(--text-main)]">
                     {fmt(budget.spentAmount)}
                   </span>
-                  <span className="text-[11px] font-bold text-[var(--text-muted)]">
+                  <span className="text-[11px] font-bold text-[var(--text-main)] opacity-70">
                     / {fmt(budget.budgetAmount)}
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-tight">
-                  <TrendingUp className="w-3 h-3" />
+                <div className="flex items-center gap-1.5 text-[12px] font-bold text-[var(--text-main)] opacity-80 uppercase tracking-tight">
+                  <TrendingUp className="w-3 h-3 text-current" />
                   {fmt(Math.abs(budget.remainingAmount))} {isOver ? 'over' : 'left'}
                 </div>
               </div>

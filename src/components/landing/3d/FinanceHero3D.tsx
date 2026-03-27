@@ -31,7 +31,7 @@ function GlassCard({ position, rotation, scale, color }: any) {
           anisotropy={0.1}
           color={color}
         />
-        {/* Subtle glowing edge */}
+        {}
         <lineSegments>
           <edgesGeometry attach="geometry" args={[new THREE.BoxGeometry(2, 3, 0.1)]} />
           <lineBasicMaterial color={color} attach="material" linewidth={2} transparent opacity={0.3} />
@@ -79,7 +79,7 @@ function RisingBar({ position, scale, color, speedOffset }: any) {
 
   useFrame((state) => {
     if (meshRef.current) {
-      // Simulate data bars rising and falling gently
+     
       meshRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * speedOffset) * 0.5
     }
   })
@@ -113,16 +113,16 @@ export default function FinanceHero3D() {
         
         <Environment preset="city" />
 
-        {/* Abstract 3D Finance Elements */}
+        {}
         
-        {/* Central/Right Data Flow */}
+        {}
         <group position={[4, -1, -2]} rotation={[0.2, -0.4, 0]}>
           <RisingBar position={[-1.5, 0, 0]} scale={[1, 0.5, 1]} color="#10B981" speedOffset={1.2} />
           <RisingBar position={[0, 0.5, -1]} scale={[1, 0.8, 1]} color="#3B82F6" speedOffset={0.8} />
           <RisingBar position={[1.5, 1, 0]} scale={[1, 1.2, 1]} color="#F59E0B" speedOffset={1.5} />
         </group>
 
-        {/* Floating Glass Credit Cards */}
+        {}
         <GlassCard 
           position={[-5, 2, -3]} 
           rotation={[0.4, 0.5, 0.2]} 
@@ -136,7 +136,7 @@ export default function FinanceHero3D() {
           color={isDark ? "#10B981" : "#34D399"} 
         />
 
-        {/* Floating Glass Coins (Tokens/Currency) */}
+        {}
         <GlassCoin 
           position={[-3, -2, -1]} 
           rotation={[1.2, 0.4, 0]} 
@@ -156,7 +156,7 @@ export default function FinanceHero3D() {
           color="#8B5CF6" 
         />
 
-        {/* Soft shadow plane below the shapes */}
+        {}
         <ContactShadows position={[0, -4, 0]} opacity={isDark ? 0.4 : 0.1} scale={20} blur={2} far={4} />
 
       </Canvas>

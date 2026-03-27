@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Track your savings goals and manage debt payoff plans.',
 }
 import { GoalsDebtsClientOrchestrator } from '@/app/dashboard/goals/client-orchestrator'
-import { loadGoalsDebtsPageData } from '@/app/dashboard/goals/data'
+import { loadGoalsDebtsPageData } from '@/app/dashboard/goals/server-data'
 
 export default async function GoalsPage() {
   const supabase = await createClient()

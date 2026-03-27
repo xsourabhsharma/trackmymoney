@@ -21,7 +21,7 @@ export function ExpenseDonutChart({ data, total, onSectorClick }: Props) {
   if (!data || data.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 gap-3">
-        {/* Ghost donut outline */}
+        {}
         <div className="relative w-36 h-36">
           <svg className="w-full h-full -rotate-90 opacity-20" viewBox="0 0 128 128">
             <circle cx="64" cy="64" r="58" stroke="var(--border-dark)" strokeWidth="8" fill="none" strokeDasharray="12 8" />

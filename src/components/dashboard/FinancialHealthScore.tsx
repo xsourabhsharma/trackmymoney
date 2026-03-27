@@ -16,7 +16,7 @@ export function FinancialHealthScore({ details }: Props) {
     return { color: 'text-[var(--expense-red)]', bg: 'bg-red-50 dark:bg-red-950/30', border: 'border-red-200 dark:border-red-900/50' }
   }
 
-  // Check if user has no meaningful data (all sub-scores at default values)
+ 
   const isNewUser = savingsRateScore === 0 && budgetAdherenceScore <= 50 && goalProgressScore <= 50
 
   const validScore = Number.isNaN(score) ? 0 : score
@@ -27,11 +27,11 @@ export function FinancialHealthScore({ details }: Props) {
   if (isNewUser) {
     return (
       <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm flex flex-col items-center gap-4">
-        <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] self-start">Financial Health</h3>
+        <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-main)] opacity-80 self-start">Financial Health</h3>
         <div className="py-6 text-center flex flex-col items-center gap-3">
-          <div className="text-3xl opacity-40">💪</div>
-          <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Not enough data yet</p>
-          <p className="text-[11px] text-[var(--text-muted)] max-w-[200px] leading-relaxed">
+          <div className="text-3xl opacity-60">💪</div>
+          <p className="text-[12px] font-bold text-[var(--text-main)] uppercase tracking-widest">Not enough data yet</p>
+          <p className="text-[11px] text-[var(--text-main)] opacity-70 max-w-[200px] leading-relaxed">
             Start by adding income, expenses, and setting a budget to get your health score
           </p>
         </div>
@@ -41,9 +41,9 @@ export function FinancialHealthScore({ details }: Props) {
 
   return (
     <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm flex flex-col items-center gap-4">
-      <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] self-start">Financial Health</h3>
+      <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-main)] opacity-80 self-start">Financial Health</h3>
       
-      {/* Circular Score */}
+      {}
       <div className="relative w-36 h-36">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 128 128">
           <circle cx="64" cy="64" r="58" stroke="var(--border-light)" strokeWidth="8" fill="none" />
@@ -60,7 +60,7 @@ export function FinancialHealthScore({ details }: Props) {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className={`text-3xl font-bold tabular-nums tracking-tighter ${grade.color}`}>{validScore}</span>
-          <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">/100</span>
+          <span className="text-[11px] font-bold text-[var(--text-main)] opacity-60 uppercase tracking-widest">/100</span>
         </div>
       </div>
 
@@ -68,7 +68,7 @@ export function FinancialHealthScore({ details }: Props) {
         {label}
       </span>
 
-      {/* Breakdown */}
+      {}
       <div className="w-full flex flex-col gap-3 mt-2">
         {[
           { label: 'Savings Rate', value: savingsRateScore, weight: '30%' },
@@ -77,8 +77,8 @@ export function FinancialHealthScore({ details }: Props) {
           { label: 'Debt Management', value: debtManagementScore, weight: '20%' },
         ].map((item) => (
           <div key={item.label} className="flex flex-col gap-1">
-            <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest">
-              <span className="text-[var(--text-muted)]">{item.label}</span>
+            <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest mb-0.5">
+              <span className="text-[var(--text-main)] opacity-70">{item.label}</span>
               <span className="text-[var(--text-main)] tabular-nums">{item.value}%</span>
             </div>
             <div className="h-1.5 bg-[var(--bg-surface)] rounded-full overflow-hidden">

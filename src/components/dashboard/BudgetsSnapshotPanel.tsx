@@ -6,7 +6,7 @@ export async function BudgetsSnapshotPanel() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  // Fetch active budgets and their related categories
+ 
   const { data: budgets, error } = await supabase
     .from('budgets')
     .select(`

@@ -1,7 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { z } from 'zod';
 
 const MAX_BATCH_SIZE = 50;
+const categorizeImportRequestSchema = z.object({
+  importJobId: z.string().uuid(),
+});
+
+type CategoryRow = {
+  id: string;
+  name: string;
+};
+
+type ImportRow = {
+  id: string;
+  parsed_description: string | null;
+  parsed_amount: string | number | null;
+};
+
+type CategorizationResult = {
+  id: string;
+  merchant_name?: string | null;
+  category_id?: string | null;
+  confidence?: number | null;
+};
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -12,21 +34,32 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { importJobId } = await req.json();
-
-    if (!importJobId) {
+    const parsedBody = categorizeImportRequestSchema.safeParse(await req.json());
+    if (!parsedBody.success) {
       return NextResponse.json({ error: 'Missing importJobId' }, { status: 400 });
     }
 
-    // 1. Fetch categories
-    const { data: categories } = await supabase.from('categories').select('id, name');
-    const categoryMap = (categories || []).map(c => ({ id: c.id, name: c.name }));
+    const { importJobId } = parsedBody.data;
 
-    // 2. Fetch un-categorized rows for this job
+    const { data: importJob, error: importJobError } = await supabase
+      .from('import_jobs')
+      .select('id')
+      .eq('id', importJobId)
+      .eq('user_id', user.id)
+      .single();
+
+    if (importJobError || !importJob) {
+      return NextResponse.json({ error: 'Import job not found' }, { status: 404 });
+    }
+
+    const { data: categories } = await supabase.from('categories').select('id, name');
+    const categoryMap = (categories || []) as CategoryRow[];
+
     const { data: rowsToProcess, error: rowsError } = await supabase
       .from('import_rows')
       .select('id, parsed_description, parsed_amount, parsed_date')
       .eq('import_job_id', importJobId)
+      .eq('user_id', user.id)
       .eq('has_error', false)
       .is('parsed_category_id', null)
       .limit(MAX_BATCH_SIZE);
@@ -39,27 +72,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'No more rows to categorize.', remaining: 0 });
     }
 
-    await supabase.from('import_jobs').update({ status: 'ai_categorizing' }).eq('id', importJobId);
+    await supabase
+      .from('import_jobs')
+      .update({ status: 'ai_categorizing' })
+      .eq('id', importJobId)
+      .eq('user_id', user.id);
 
-    // 3. Check for AI API key
     const aiApiKey = process.env.AI_API_KEY;
     const aiBaseUrl = process.env.AI_BASE_URL || 'https://open.bigmodel.cn/api/paas/v4/';
     const aiModel = process.env.AI_MODEL || 'glm-4-flash';
 
     if (!aiApiKey) {
-      console.warn("No AI_API_KEY found. Falling back to rule-based parsing.");
-      await fallbackRuleCategorization(supabase, importJobId, rowsToProcess, categories || []);
+      console.warn('No AI_API_KEY found. Falling back to rule-based parsing.');
+      await fallbackRuleCategorization(supabase, user.id, importJobId, rowsToProcess as ImportRow[], categoryMap);
       return NextResponse.json({ message: 'Categorized via fallback.', remaining: 0 });
     }
 
-    // 4. Build prompt
     const payload = {
       available_categories: categoryMap,
-      transactions: rowsToProcess.map(r => ({
-        id: r.id,
-        desc: r.parsed_description || 'Unknown',
-        amount: Number(r.parsed_amount) || 0,
-      }))
+      transactions: (rowsToProcess as ImportRow[]).map((row) => ({
+        id: row.id,
+        desc: row.parsed_description || 'Unknown',
+        amount: Number(row.parsed_amount) || 0,
+      })),
     };
 
     const prompt = `You are an expert financial categorization AI.
@@ -79,7 +114,6 @@ Rules:
 
 Respond with ONLY a valid JSON array of objects with keys: id, merchant_name, category_id, confidence, notes (optional). No markdown formatting.`;
 
-    // 5. Call AI via OpenAI-compatible endpoint
     const chatUrl = `${aiBaseUrl.replace(/\/+$/, '')}/chat/completions`;
     const aiResponse = await fetch(chatUrl, {
       method: 'POST',
@@ -98,93 +132,137 @@ Respond with ONLY a valid JSON array of objects with keys: id, merchant_name, ca
     });
 
     if (!aiResponse.ok) {
-      const errText = await aiResponse.text();
-      console.error("AI API Error:", aiResponse.status, errText);
-      // Fallback to rule-based if AI fails
-      await fallbackRuleCategorization(supabase, importJobId, rowsToProcess, categories || []);
+      const errorText = await aiResponse.text();
+      console.error('AI API Error:', aiResponse.status, errorText);
+      await fallbackRuleCategorization(supabase, user.id, importJobId, rowsToProcess as ImportRow[], categoryMap);
       return NextResponse.json({ message: 'AI failed, categorized via fallback.', remaining: 0 });
     }
 
     const aiData = await aiResponse.json();
     const rawText = aiData.choices?.[0]?.message?.content || '';
 
-    // 6. Parse AI Response
-    let aiResults = [];
+    let aiResults: CategorizationResult[] = [];
     try {
       const cleaned = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-      aiResults = JSON.parse(cleaned);
-    } catch (e) {
-      console.error("Failed to parse LLM JSON:", rawText);
-      await fallbackRuleCategorization(supabase, importJobId, rowsToProcess, categories || []);
+      aiResults = JSON.parse(cleaned) as CategorizationResult[];
+    } catch {
+      console.error('Failed to parse LLM JSON:', rawText);
+      await fallbackRuleCategorization(supabase, user.id, importJobId, rowsToProcess as ImportRow[], categoryMap);
       return NextResponse.json({ message: 'AI response invalid, used fallback.', remaining: 0 });
     }
 
-    // 7. Update rows
-    for (const res of aiResults) {
-      const validCategory = categoryMap.find(c => c.id === res.category_id) ? res.category_id : null;
-      
-      await supabase.from('import_rows').update({
-        parsed_merchant: res.merchant_name || null,
-        parsed_category_id: validCategory,
-        ai_confidence: res.confidence || null,
-        ai_payload: { raw: res },
-      }).eq('id', res.id).eq('import_job_id', importJobId);
+    for (const result of aiResults) {
+      const validCategory = categoryMap.find((category) => category.id === result.category_id) ? result.category_id : null;
+
+      await supabase
+        .from('import_rows')
+        .update({
+          parsed_merchant: result.merchant_name || null,
+          parsed_category_id: validCategory,
+          ai_confidence: result.confidence || null,
+          ai_payload: { raw: result },
+        })
+        .eq('id', result.id)
+        .eq('import_job_id', importJobId)
+        .eq('user_id', user.id);
     }
 
-    // 8. Check if more remain
     const { count } = await supabase
       .from('import_rows')
       .select('id', { count: 'exact', head: true })
       .eq('import_job_id', importJobId)
+      .eq('user_id', user.id)
       .eq('has_error', false)
       .is('parsed_category_id', null);
 
     const remaining = count || 0;
     if (remaining === 0) {
-      await supabase.from('import_jobs').update({ status: 'ready_for_review' }).eq('id', importJobId);
+      await supabase
+        .from('import_jobs')
+        .update({ status: 'ready_for_review' })
+        .eq('id', importJobId)
+        .eq('user_id', user.id);
     }
 
     return NextResponse.json({ message: `Categorized ${aiResults.length} rows.`, remaining });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Categorize API Error:', error);
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
 
-// Very basic rule-based fallback if AI APIs are absent or fail
-async function fallbackRuleCategorization(supabase: any, jobId: string, rows: any[], categories: any[]) {
+async function fallbackRuleCategorization(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  jobId: string,
+  rows: ImportRow[],
+  categories: CategoryRow[]
+) {
   const dictionary: Record<string, string> = {
-    'uber': 'Transport', 'lyft': 'Transport', 'ola': 'Transport', 'rapido': 'Transport',
-    'doordash': 'Dining', 'ubereats': 'Dining', 'starbucks': 'Dining', 'mcdonald': 'Dining', 'zomato': 'Dining', 'swiggy': 'Dining',
-    'amazon': 'Shopping', 'target': 'Shopping', 'walmart': 'Shopping', 'flipkart': 'Shopping', 'myntra': 'Shopping',
-    'netflix': 'Entertainment', 'spotify': 'Entertainment', 'hotstar': 'Entertainment', 'prime video': 'Entertainment',
-    'safeway': 'Groceries', 'kroger': 'Groceries', 'trader joe': 'Groceries', 'bigbasket': 'Groceries',
-    'pge': 'Utilities', 'comcast': 'Utilities', 'airtel': 'Utilities', 'jio': 'Utilities',
-    'salary': 'Salary', 'payroll': 'Salary', 'stipend': 'Salary',
+    uber: 'Transport',
+    lyft: 'Transport',
+    ola: 'Transport',
+    rapido: 'Transport',
+    doordash: 'Dining',
+    ubereats: 'Dining',
+    starbucks: 'Dining',
+    mcdonald: 'Dining',
+    zomato: 'Dining',
+    swiggy: 'Dining',
+    amazon: 'Shopping',
+    target: 'Shopping',
+    walmart: 'Shopping',
+    flipkart: 'Shopping',
+    myntra: 'Shopping',
+    netflix: 'Entertainment',
+    spotify: 'Entertainment',
+    hotstar: 'Entertainment',
+    'prime video': 'Entertainment',
+    safeway: 'Groceries',
+    kroger: 'Groceries',
+    'trader joe': 'Groceries',
+    bigbasket: 'Groceries',
+    pge: 'Utilities',
+    comcast: 'Utilities',
+    airtel: 'Utilities',
+    jio: 'Utilities',
+    salary: 'Salary',
+    payroll: 'Salary',
+    stipend: 'Salary',
   };
 
-  const getCatId = (name: string) => categories.find((c: any) => c.name.toLowerCase() === name.toLowerCase())?.id || null;
+  const getCategoryId = (name: string) =>
+    categories.find((category) => category.name.toLowerCase() === name.toLowerCase())?.id || null;
 
   for (const row of rows) {
-    const desc = (row.parsed_description || '').toLowerCase();
+    const description = (row.parsed_description || '').toLowerCase();
     let merchant = row.parsed_description;
-    let fallbackCatName = null;
+    let fallbackCategoryName: string | null = null;
 
-    for (const [key, catName] of Object.entries(dictionary)) {
-      if (desc.includes(key)) {
-        merchant = key.charAt(0).toUpperCase() + key.slice(1);
-        fallbackCatName = catName;
+    for (const [keyword, categoryName] of Object.entries(dictionary)) {
+      if (description.includes(keyword)) {
+        merchant = keyword.charAt(0).toUpperCase() + keyword.slice(1);
+        fallbackCategoryName = categoryName;
         break;
       }
     }
 
-    await supabase.from('import_rows').update({
-      parsed_merchant: merchant,
-      parsed_category_id: fallbackCatName ? getCatId(fallbackCatName) : null,
-      ai_confidence: fallbackCatName ? 0.99 : 0.0,
-      ai_payload: { fallback: true },
-    }).eq('id', row.id).eq('import_job_id', jobId);
+    await supabase
+      .from('import_rows')
+      .update({
+        parsed_merchant: merchant,
+        parsed_category_id: fallbackCategoryName ? getCategoryId(fallbackCategoryName) : null,
+        ai_confidence: fallbackCategoryName ? 0.99 : 0.0,
+        ai_payload: { fallback: true },
+      })
+      .eq('id', row.id)
+      .eq('import_job_id', jobId)
+      .eq('user_id', userId);
   }
-  
-  await supabase.from('import_jobs').update({ status: 'ready_for_review' }).eq('id', jobId);
+
+  await supabase
+    .from('import_jobs')
+    .update({ status: 'ready_for_review' })
+    .eq('id', jobId)
+    .eq('user_id', userId);
 }

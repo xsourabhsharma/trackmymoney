@@ -28,7 +28,7 @@ export default async function SubscriptionsPage({
 
   const resolvedSearchParams = await searchParams
 
-  // Parse URL Search Params into Filter object
+ 
   const filter: SubscriptionsFilter = {
     status: (resolvedSearchParams.status as SubscriptionStatus) || 'all',
     searchQuery: resolvedSearchParams.q || ''
@@ -37,10 +37,10 @@ export default async function SubscriptionsPage({
   const page = Number(resolvedSearchParams.page) || 1
   const pageSize = 20
 
-  // Server-side Aggregation fetch
+ 
   const pageData = await loadSubscriptionsPageData(filter, page, pageSize)
 
-  // Fetch naked categories mapping for the Form Modal
+ 
   const { data: categories } = await supabase
     .from('categories')
     .select('id, name')
@@ -56,10 +56,10 @@ export default async function SubscriptionsPage({
 
       <SubscriptionsOverview metrics={pageData.overview} />
 
-      {/* Main Layout Grid */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* Left Column: Feed & Table (Takes up ~8/12) */}
+        {}
         <div className="lg:col-span-8 flex flex-col gap-6">
           <SubscriptionsClientOrchestrator 
             subscriptions={pageData.subscriptions}
@@ -71,22 +71,15 @@ export default async function SubscriptionsPage({
           />
         </div>
 
-        {/* Right Column: Analytics & Upcomings (Takes up ~4/12) */}
+        {}
         <div className="lg:col-span-4 flex flex-col gap-6">
-           <div className="h-[350px]">
-             <UpcomingChargesPanel charges={pageData.upcomingCharges} />
-           </div>
-           
-           <div className="h-[280px]">
-             <SubscriptionHealthPanel health={pageData.health} />
-           </div>
-           
-           <div className="flex-1 min-h-[300px]">
-             <SubscriptionCategoriesPanel categories={pageData.categoriesBreakdown} />
-           </div>
+           <UpcomingChargesPanel charges={pageData.upcomingCharges} />
+           <SubscriptionHealthPanel health={pageData.health} />
+           <SubscriptionCategoriesPanel categories={pageData.categoriesBreakdown} />
         </div>
 
       </div>
     </div>
   )
+
 }

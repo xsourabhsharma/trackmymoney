@@ -87,7 +87,7 @@ export async function applyBudgetSuggestion(suggestionId: string): Promise<void>
   const { user, supabase } = await getAuthUser()
 
   try {
-    // Fetch the suggestion
+   
     const { data: suggestion, error: fetchErr } = await supabase
       .from('budget_ai_suggestions')
       .select('*')
@@ -95,9 +95,9 @@ export async function applyBudgetSuggestion(suggestionId: string): Promise<void>
       .eq('user_id', user.id)
       .single()
 
-    if (fetchErr || !suggestion) return // Suggestion not found — silently no-op
+    if (fetchErr || !suggestion) return
 
-    // If linked to a budget, update the budget amount
+   
     if (suggestion.budget_id && suggestion.to_amount) {
       await supabase
         .from('budgets')
@@ -106,14 +106,14 @@ export async function applyBudgetSuggestion(suggestionId: string): Promise<void>
         .eq('user_id', user.id)
     }
 
-    // Mark suggestion as applied
+   
     await supabase
       .from('budget_ai_suggestions')
       .update({ status: 'applied', applied_at: new Date().toISOString() })
       .eq('id', suggestionId)
       .eq('user_id', user.id)
   } catch {
-    // Table may not exist — silently no-op
+   
   }
 
   revalidatePath('/dashboard/budgets', 'page')
@@ -129,13 +129,12 @@ export async function dismissBudgetSuggestion(suggestionId: string): Promise<voi
       .eq('id', suggestionId)
       .eq('user_id', user.id)
   } catch {
-    // Table may not exist — silently no-op
+   
   }
 
   revalidatePath('/dashboard/budgets', 'page')
 }
-
-// Legacy compatibility wrappers for existing buttons
+
 export async function addBudget(formData: FormData) {
   const categoryId = formData.get('categoryId') as string
   const amount = formData.get('amount') as string

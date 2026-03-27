@@ -18,13 +18,12 @@ const PERIODS: { key: ReportsPeriod; label: string }[] = [
 const VIEWS: { key: ReportsView; label: string }[] = [
   { key: 'summary', label: 'Summary' },
   { key: 'detailed', label: 'Detailed' },
-  { key: 'tax', label: 'Tax' },
 ]
 
 export function ReportsFilterBar({ filter, onChangeFilter }: Props) {
   return (
     <div className="flex flex-wrap items-center gap-6">
-      {/* Date Spectrum */}
+      {}
       <div className="flex flex-col gap-1.5">
         <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em]">Date Spectrum</span>
         <div className="flex gap-1 p-1 bg-[var(--bg-surface)] rounded-full border border-[var(--border-light)] shadow-inner">
@@ -44,24 +43,9 @@ export function ReportsFilterBar({ filter, onChangeFilter }: Props) {
         </div>
       </div>
 
-      {/* Scope */}
-      <div className="flex flex-col gap-1.5">
-        <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em]">Scope</span>
-        <div className="relative">
-          <select
-            value={filter.scope}
-            onChange={e => onChangeFilter({ scope: e.target.value as ReportsScope })}
-            className="pl-3 pr-8 py-2 bg-[var(--bg-base)] border border-[var(--border-light)] rounded-xl text-[12px] font-bold uppercase appearance-none outline-none focus:border-[var(--border-dark)] cursor-pointer transition-all"
-          >
-            <option value="all">All Accounts</option>
-            <option value="bank">Bank Accounts</option>
-            <option value="card">Card Accounts</option>
-          </select>
-          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[var(--text-muted)] pointer-events-none" />
-        </div>
-      </div>
 
-      {/* View Mode */}
+
+      {}
       <div className="flex flex-col gap-1.5">
         <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em]">View</span>
         <div className="flex gap-1 p-1 bg-[var(--bg-surface)] rounded-full border border-[var(--border-light)] shadow-inner">

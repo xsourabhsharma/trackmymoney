@@ -12,7 +12,7 @@ const fadeUp: Variants = {
 export default function FinalCTA() {
   return (
     <section className="py-[80px] md:py-[120px] bg-[#1C1B19] text-white relative overflow-hidden">
-      {/* Ambient blobs */}
+      {}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/[0.03] rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-white/[0.03] rounded-full blur-3xl translate-y-1/2 -translate-x-1/3 pointer-events-none" />
 

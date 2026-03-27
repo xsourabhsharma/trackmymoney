@@ -17,13 +17,13 @@ export default async function BudgetsPage() {
 
   const admin = createAdminClient()
 
-  // Fetch categories for the form modal
+ 
   const { data: allCategories } = await admin
     .from('categories')
     .select('id, name, icon, color, type')
     .order('name')
 
-  // Load all budgets page data
+ 
   const pageData = await loadBudgetsPageData({
     period: 'this_month',
     scope: 'all',

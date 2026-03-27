@@ -4,13 +4,13 @@ import { motion, Variants } from 'framer-motion'
 import { X, Check } from 'lucide-react'
 
 const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
 }
 
 const stagger: Variants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
 }
 
 const painPoints = [
@@ -27,78 +27,88 @@ const outcomes = [
 
 export default function ProblemOutcomeSection() {
   return (
-    <section className="py-[80px] md:py-[100px] bg-[var(--bg-base)]">
-      <div className="max-w-[1200px] mx-auto px-6">
+    <section className="py-[100px] md:py-[140px] bg-[var(--bg-base)] relative overflow-hidden">
+      {}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_20%,transparent_100%)] pointer-events-none" />
+
+      <div className="max-w-[1200px] mx-auto px-6 relative z-10">
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-80px' }}
           variants={fadeUp}
-          className="text-center mb-12 md:mb-16"
+          className="text-center mb-16 md:mb-24"
         >
-          <h2 className="text-[2rem] md:text-[2.75rem] font-bold tracking-tight leading-tight mb-4 text-[var(--text-main)]">
+          <h2 className="text-[2.5rem] md:text-[3.5rem] font-bold tracking-[-0.03em] leading-[1.1] mb-6 text-[var(--text-main)] text-balance">
             Stop guessing where your money<br className="hidden md:block" /> went last month
           </h2>
-          <p className="text-lg text-[var(--text-muted)] max-w-[550px] mx-auto">
-            Sound familiar? Here&apos;s how TrackMyMoney turns financial chaos into clarity.
+          <p className="text-lg md:text-xl text-[var(--text-muted)] max-w-[600px] mx-auto text-balance">
+            Sound familiar? Here&apos;s how TrackMyMoney turns financial chaos into absolute clarity.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-6 md:gap-8 max-w-[900px] mx-auto">
-          {/* Pain column */}
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 max-w-[1000px] mx-auto relative">
+          {}
+          <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-[var(--bg-base)] rounded-full border border-[var(--border-light)] z-20 flex items-center justify-center shadow-sm">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--text-muted)]"/>
+            </svg>
+          </div>
+
+          {}
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-60px' }}
             variants={stagger}
-            className="bg-[var(--bg-surface)] rounded-[24px] border border-[var(--border-light)] p-6 md:p-8"
+            className="bg-gradient-to-b from-[var(--bg-surface)] to-[var(--bg-base)] rounded-[32px] border border-[var(--border-light)] p-8 md:p-10 shadow-sm"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--expense-red)]/8 text-[var(--expense-red)] text-xs font-bold uppercase tracking-wider mb-5">
-              <X className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--expense-red)]/10 text-[var(--expense-red)] text-xs font-bold uppercase tracking-[0.15em] mb-8 border border-[var(--expense-red)]/20 shadow-inner">
+              <X className="w-4 h-4" />
               Without TrackMyMoney
             </div>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-6">
               {painPoints.map((point) => (
                 <motion.div
                   key={point}
                   variants={fadeUp}
-                  className="flex items-start gap-3"
+                  className="flex items-start gap-4 opacity-80"
                 >
-                  <div className="w-6 h-6 rounded-full bg-[var(--expense-red)]/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <X className="w-3.5 h-3.5 text-[var(--expense-red)]" />
+                  <div className="w-8 h-8 rounded-full bg-[var(--expense-red)]/10 flex items-center justify-center shrink-0 border border-[var(--expense-red)]/20">
+                    <X className="w-4 h-4 text-[var(--expense-red)]" />
                   </div>
-                  <p className="text-[15px] text-[var(--text-muted)] leading-relaxed">{point}</p>
+                  <p className="text-[16px] text-[var(--text-muted)] leading-relaxed mt-1">{point}</p>
                 </motion.div>
               ))}
             </div>
           </motion.div>
 
-          {/* Outcome column */}
+          {}
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-60px' }}
             variants={stagger}
-            className="bg-[var(--bg-surface)] rounded-[24px] border border-[var(--border-light)] p-6 md:p-8 relative overflow-hidden"
+            className="bg-gradient-to-br from-[#111111] to-[#050505] dark:from-[var(--bg-surface)] dark:to-[var(--bg-base)] rounded-[32px] border border-white/10 dark:border-[var(--income-green)]/30 p-8 md:p-10 relative overflow-hidden shadow-2xl shadow-[var(--income-green)]/5"
           >
-            {/* Subtle green glow */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--income-green)]/5 rounded-full blur-3xl pointer-events-none" />
+            {}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--income-green)]/10 rounded-full blur-[80px] pointer-events-none" />
 
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--income-green)]/8 text-[var(--income-green)] text-xs font-bold uppercase tracking-wider mb-5 relative z-10">
-              <Check className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--income-green)]/20 text-[var(--income-green)] text-xs font-bold uppercase tracking-[0.15em] mb-8 relative z-10 border border-[var(--income-green)]/30 shadow-inner">
+              <Check className="w-4 h-4" />
               With TrackMyMoney
             </div>
-            <div className="flex flex-col gap-4 relative z-10">
+            <div className="flex flex-col gap-6 relative z-10">
               {outcomes.map((point) => (
                 <motion.div
                   key={point}
                   variants={fadeUp}
-                  className="flex items-start gap-3"
+                  className="flex items-start gap-4"
                 >
-                  <div className="w-6 h-6 rounded-full bg-[var(--income-green)]/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5 text-[var(--income-green)]" />
+                  <div className="w-8 h-8 rounded-full bg-[var(--income-green)]/20 flex items-center justify-center shrink-0 border border-[var(--income-green)]/30 shadow-[0_0_15px_rgba(39,201,63,0.15)]">
+                    <Check className="w-4 h-4 text-[var(--income-green)]" />
                   </div>
-                  <p className="text-[15px] text-[var(--text-main)] leading-relaxed font-medium">{point}</p>
+                  <p className="text-[16px] text-white dark:text-[var(--text-main)] leading-relaxed font-medium mt-1">{point}</p>
                 </motion.div>
               ))}
             </div>

@@ -4,8 +4,7 @@ import { useState, useTransition } from 'react'
 import { X, Target, Loader2, CreditCard } from 'lucide-react'
 import { addSavingsGoal, updateSavingsGoal, addDebt, updateDebt } from '@/app/dashboard/goals/actions'
 import { SavingsGoalRow, DebtRow } from '@/app/dashboard/goals/data'
-
-// ─── Goal Form Modal ───────────────────────────────────────────────────────
+
 
 interface GoalModalProps {
   isOpen: boolean
@@ -66,7 +65,7 @@ export function GoalFormModal({ isOpen, onClose, editGoal }: GoalModalProps) {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-5">
-          {/* Icon Picker */}
+          {}
           <div className="flex flex-col gap-2">
             <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Icon</label>
             <div className="flex flex-wrap gap-2">
@@ -79,14 +78,14 @@ export function GoalFormModal({ isOpen, onClose, editGoal }: GoalModalProps) {
             </div>
           </div>
 
-          {/* Name */}
+          {}
           <div className="flex flex-col gap-2">
             <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Goal Name</label>
             <input name="name" required defaultValue={editGoal?.name || ''} placeholder="e.g. Emergency Fund"
               className="w-full px-4 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[13px] font-medium text-[var(--text-main)] focus:outline-none focus:border-[var(--border-dark)] transition-all" />
           </div>
 
-          {/* Target / Current */}
+          {}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">
               <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Target ($)</label>
@@ -102,7 +101,7 @@ export function GoalFormModal({ isOpen, onClose, editGoal }: GoalModalProps) {
             </div>
           </div>
 
-          {/* Target Date */}
+          {}
           <div className="flex flex-col gap-2">
             <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Target Date (optional)</label>
             <input name="deadline" type="date" defaultValue={editGoal?.targetDate ? editGoal.targetDate.slice(0, 10) : ''}
@@ -122,8 +121,7 @@ export function GoalFormModal({ isOpen, onClose, editGoal }: GoalModalProps) {
     </div>
   )
 }
-
-// ─── Debt Form Modal ───────────────────────────────────────────────────────
+
 
 interface DebtModalProps {
   isOpen: boolean

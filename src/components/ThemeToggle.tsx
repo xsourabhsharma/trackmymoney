@@ -4,15 +4,26 @@ import * as React from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
+import { upsertUserSettingsAction } from '@/app/dashboard/settings/actions'
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { theme, resolvedTheme, setTheme } = useTheme()
+
+  const handleToggle = async () => {
+    const nextTheme = resolvedTheme === 'dark' ? 'light' : 'dark'
+    setTheme(nextTheme)
+    try {
+      await upsertUserSettingsAction({ theme: nextTheme })
+    } catch (e) {
+     
+    }
+  }
 
   return (
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      onClick={handleToggle}
       className="rounded-full"
       title="Toggle Dark Mode"
     >

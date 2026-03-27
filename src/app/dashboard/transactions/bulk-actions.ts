@@ -15,7 +15,7 @@ export async function bulkInsertTransactions(transactions: any[]) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  // Format transactions for DB insertion
+ 
   const formattedTransactions = transactions.map((tx) => ({
     user_id: user.id,
     amount: parseFloat(tx.amount),

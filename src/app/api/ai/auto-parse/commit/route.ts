@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { z } from 'zod';
+
+const commitImportRequestSchema = z.object({
+  importJobId: z.string().uuid(),
+  accountId: z.string().uuid().optional().nullable(),
+});
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -10,17 +16,42 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { importJobId, accountId } = await req.json();
-
-    if (!importJobId) {
+    const parsedBody = commitImportRequestSchema.safeParse(await req.json());
+    if (!parsedBody.success) {
       return NextResponse.json({ error: 'Missing importJobId' }, { status: 400 });
     }
 
-    // 1. Fetch valid, selected rows
+    const { importJobId, accountId } = parsedBody.data;
+
+    const { data: importJob, error: importJobError } = await supabase
+      .from('import_jobs')
+      .select('id')
+      .eq('id', importJobId)
+      .eq('user_id', user.id)
+      .single();
+
+    if (importJobError || !importJob) {
+      return NextResponse.json({ error: 'Import job not found' }, { status: 404 });
+    }
+
+    if (accountId) {
+      const { data: account, error: accountError } = await supabase
+        .from('accounts')
+        .select('id')
+        .eq('id', accountId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (accountError || !account) {
+        return NextResponse.json({ error: 'Account not found' }, { status: 404 });
+      }
+    }
+
     const { data: rowsToImport, error: fetchError } = await supabase
       .from('import_rows')
       .select('*')
       .eq('import_job_id', importJobId)
+      .eq('user_id', user.id)
       .eq('is_selected_for_import', true)
       .eq('has_error', false);
 
@@ -29,23 +60,26 @@ export async function POST(req: NextRequest) {
     }
 
     if (rowsToImport.length === 0) {
-      // Nothing to import, just close the job
-      await supabase.from('import_jobs').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', importJobId);
+      await supabase
+        .from('import_jobs')
+        .update({ status: 'completed', completed_at: new Date().toISOString() })
+        .eq('id', importJobId)
+        .eq('user_id', user.id);
+
       return NextResponse.json({ importedCount: 0, duplicateSkippedCount: 0 });
     }
 
-    // Determine skipped duplicates
     const { data: duplicateRows } = await supabase
       .from('import_rows')
       .select('id')
       .eq('import_job_id', importJobId)
+      .eq('user_id', user.id)
       .eq('is_selected_for_import', false)
       .eq('is_duplicate_guess', true);
 
     const duplicateSkippedCount = duplicateRows ? duplicateRows.length : 0;
 
-    // 2. Map staging rows to transaction rows
-    const transactionsToInsert = rowsToImport.map(row => ({
+    const transactionsToInsert = rowsToImport.map((row) => ({
       user_id: user.id,
       account_id: accountId || null,
       amount: row.parsed_amount,
@@ -61,31 +95,33 @@ export async function POST(req: NextRequest) {
       source_metadata: { import_job_id: importJobId },
     }));
 
-    // 3. Bulk Insert into transactions in batches
     const BATCH_SIZE = 500;
     let importedCount = 0;
-    
-    for (let i = 0; i < transactionsToInsert.length; i += BATCH_SIZE) {
-      const batch = transactionsToInsert.slice(i, i + BATCH_SIZE);
+
+    for (let index = 0; index < transactionsToInsert.length; index += BATCH_SIZE) {
+      const batch = transactionsToInsert.slice(index, index + BATCH_SIZE);
       const { error: insertError } = await supabase.from('transactions').insert(batch);
-      
+
       if (insertError) {
-        console.error("Transaction Bulk Insert Error:", insertError);
+        console.error('Transaction Bulk Insert Error:', insertError);
         return NextResponse.json({ error: 'Failed to commit transactions to ledger' }, { status: 500 });
       }
+
       importedCount += batch.length;
     }
 
-    // 4. Update Import Job status
-    await supabase.from('import_jobs').update({ 
-      status: 'completed',
-      completed_at: new Date().toISOString(),
-    }).eq('id', importJobId);
+    await supabase
+      .from('import_jobs')
+      .update({
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+      })
+      .eq('id', importJobId)
+      .eq('user_id', user.id);
 
     return NextResponse.json({ importedCount, duplicateSkippedCount });
-
-  } catch (error: any) {
+  } catch (error) {
     console.error('Commit API Error:', error);
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

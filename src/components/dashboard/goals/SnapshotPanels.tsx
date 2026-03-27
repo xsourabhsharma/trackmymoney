@@ -16,12 +16,12 @@ export function GoalProgressSnapshotPanel({ snapshot }: SnapshotProps) {
 
   return (
     <div className="flex flex-col items-center text-center gap-5 h-full">
-      {/* Circular Progress */}
+      {}
       <div className="relative w-32 h-32">
         <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-          {/* Background track */}
+          {}
           <circle cx="50" cy="50" r="40" fill="none" stroke="var(--bg-surface)" strokeWidth="14" />
-          {/* Progress arc */}
+          {}
           <circle
             cx="50" cy="50" r="40"
             fill="none"
@@ -53,8 +53,7 @@ export function GoalProgressSnapshotPanel({ snapshot }: SnapshotProps) {
     </div>
   )
 }
-
-// ─── Debt-Free Countdown Panel ─────────────────────────────────────────────
+
 
 interface CountdownProps {
   countdown: DebtFreeCountdown | null

@@ -16,22 +16,25 @@ export function useVoiceToText({ onFinalTranscript }: { onFinalTranscript: (text
         recognitionRef.current.continuous = true
         recognitionRef.current.interimResults = true
 
+        let lastProcessedIndex = 0;
+
+        recognitionRef.current.onstart = () => {
+          lastProcessedIndex = 0;
+        }
+
         recognitionRef.current.onresult = (event: any) => {
           let currentInterim = ''
-          let currentFinal = ''
           
-          for (let i = event.resultIndex; i < event.results.length; ++i) {
+          for (let i = lastProcessedIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) {
-              currentFinal += event.results[i][0].transcript
+              onFinalTranscript(event.results[i][0].transcript.trim())
+              lastProcessedIndex = i + 1;
             } else {
               currentInterim += event.results[i][0].transcript
             }
           }
 
           setInterimText(currentInterim)
-          if (currentFinal) {
-            onFinalTranscript(currentFinal.trim())
-          }
         }
 
         recognitionRef.current.onend = () => {

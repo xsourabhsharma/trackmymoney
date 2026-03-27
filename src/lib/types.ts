@@ -1,4 +1,4 @@
-// ─── TypeScript Interfaces derived from Drizzle Schema ───
+
 
 export interface Profile {
   id: string
@@ -54,7 +54,7 @@ export interface Transaction {
   is_reviewed: boolean | null
   updated_at: string | null
   created_at: string | null
-  // Joined fields
+ 
   categories?: Category | null
 }
 
@@ -69,7 +69,7 @@ export interface Budget {
   rollover: boolean | null
   updated_at: string | null
   created_at: string | null
-  // Joined fields
+ 
   categories?: Category | null
 }
 
@@ -88,7 +88,7 @@ export interface RecurringTransaction {
   is_active: boolean | null
   updated_at: string | null
   created_at: string | null
-  // Joined fields
+ 
   categories?: Category | null
 }
 
@@ -124,8 +124,7 @@ export interface ChatMessage {
   content: string
   created_at: string | null
 }
-
-// ─── Utility types ───
+
 
 export interface NavItem {
   label: string
@@ -143,8 +142,7 @@ export const DASHBOARD_NAV_ITEMS: Omit<NavItem, 'active'>[] = [
   { label: 'Reports', href: '/dashboard/reports' },
   { label: 'Settings', href: '/dashboard/settings' },
 ]
-
-// ─── AI Auto-Parse Types ───
+
 
 export interface ImportJob {
   id: string;
@@ -171,7 +169,7 @@ export interface ImportRow {
   parsed_type: 'income' | 'expense' | null;
   parsed_merchant: string | null;
   parsed_category_id: string | null;
-  categories?: { id: string; name: string; icon: string | null; color: string | null } | null; // Joined relation
+  categories?: { id: string; name: string; icon: string | null; color: string | null } | null;
   ai_confidence: number | null;
   ai_payload: any | null;
   is_duplicate_guess: boolean;
@@ -180,8 +178,7 @@ export interface ImportRow {
   error_message: string | null;
   created_at: string;
 }
-
-// ─── Overview Dashboard Types ───
+
 
 export type OverviewPeriod = 'this-week' | 'this-month' | 'last-month' | 'last-3-months' | 'this-year' | 'all-time';
 

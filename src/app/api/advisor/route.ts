@@ -1,9 +1,20 @@
 import { createOpenAI } from '@ai-sdk/openai'
 import { streamText } from 'ai'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/utils/supabase/server'
 
-export async function POST(req: Request) {
+type AdvisorTransaction = {
+  amount: string
+  type: 'income' | 'expense' | 'transfer'
+  date: string
+  categories: { name: string } | { name: string }[] | null
+}
+
+function getCategoryName(categories: AdvisorTransaction['categories']) {
+  const category = Array.isArray(categories) ? categories[0] : categories
+  return category?.name || 'Other'
+}
+
+export async function POST() {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -12,17 +23,10 @@ export async function POST(req: Request) {
       return new Response('Unauthorized', { status: 401 })
     }
 
-    const supabaseAdmin = createSupabaseClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      { auth: { persistSession: false } }
-    )
-
-    // Gather User's Financial Data for the last 60 days to compare
     const sixtyDaysAgo = new Date()
     sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60)
-    
-    const { data: transactions } = await supabaseAdmin
+
+    const { data: transactions } = await supabase
       .from('transactions')
       .select('amount, type, date, categories(name)')
       .eq('user_id', user.id)
@@ -30,7 +34,7 @@ export async function POST(req: Request) {
       .order('date', { ascending: false })
 
     if (!transactions || transactions.length === 0) {
-      // Return a mock stream for empty state
+     
       const customOpenAI = createOpenAI({
         apiKey: process.env.AI_API_KEY,
         baseURL: process.env.AI_BASE_URL,
@@ -43,18 +47,17 @@ export async function POST(req: Request) {
       return result.toTextStreamResponse()
     }
 
-    // Prepare the data payload for the AI
     const currentMonthExp: Record<string, number> = {}
     const lastMonthExp: Record<string, number> = {}
     let currentMonthIncome = 0
     let lastMonthIncome = 0
     const now = new Date()
-    
-    transactions.forEach((tx: any) => {
+
+    ;(transactions as AdvisorTransaction[]).forEach((tx) => {
       const txDate = new Date(tx.date)
       const isCurrentMonth = txDate.getMonth() === now.getMonth() && txDate.getFullYear() === now.getFullYear()
       const amount = parseFloat(tx.amount)
-      const catName = (tx.categories as any)?.name || 'Other'
+      const catName = getCategoryName(tx.categories)
 
       if (tx.type === 'expense') {
         if (isCurrentMonth) {
@@ -86,7 +89,6 @@ Format your response as exactly 3 bullet points using a standard hyphen "- " fol
 Crucially, you MUST include comparative spending insights if the data exists, explicitly stating percentages. For example: "- You spent 40% more on food this month."
 Keep it concise, encouraging, and directly related to the data provided. Use plain text (no markdown formatting other than bullet points).
 Do not hallucinate numbers that are not in the data.`
-
     const customOpenAI = createOpenAI({
       apiKey: process.env.AI_API_KEY,
       baseURL: process.env.AI_BASE_URL,

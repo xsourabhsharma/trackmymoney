@@ -29,7 +29,7 @@ export function AdvancedFilterPanel({ categories }: { categories: any[] }) {
       if (value) params.set(key, value)
       else params.delete(key)
     })
-    params.set('page', '1') // Reset to page 1 on filter
+    params.set('page', '1')
     router.push(`${pathname}?${params.toString()}`)
   }
 

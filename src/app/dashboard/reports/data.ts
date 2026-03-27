@@ -4,8 +4,7 @@ import {
   startOfMonth, endOfMonth, startOfYear,
   subMonths, subDays, format, eachDayOfInterval, eachMonthOfInterval,
 } from 'date-fns'
-
-// ─── Filter Types ───────────────────────────────────────────────────────────
+
 
 export type ReportsPeriod = 'this_month' | 'last_month' | 'last_three_months' | 'year_to_date'
 export type ReportsScope = 'all' | 'bank' | 'card'
@@ -16,20 +15,18 @@ export interface ReportsFilter {
   scope: ReportsScope
   view: ReportsView
 }
-
-// ─── Output Types ───────────────────────────────────────────────────────────
+
 
 export interface SummaryMetrics {
-  totalBalance: number
   periodIncome: number
   periodExpenses: number
   savingsRate: number
-  incomeChangeVsPrev: number    // % change vs equivalent previous period
+  incomeChangeVsPrev: number   
   expenseChangeVsPrev: number
 }
 
 export interface CashFlowPoint {
-  date: string        // 'YYYY-MM-DD' or 'MMM' for monthly grouping
+  date: string       
   income: number
   expense: number
   net: number
@@ -76,8 +73,7 @@ export interface ReportsPageData {
   topMerchants: MerchantSpendingItem[]
   periodComparison: PeriodComparisonMetrics
 }
-
-// ─── Date Helpers ────────────────────────────────────────────────────────────
+
 
 export function getDateRangeForReports(
   period: ReportsPeriod,
@@ -97,7 +93,7 @@ export function getDateRangeForReports(
       }
     }
     case 'last_three_months': {
-      // Last 3 complete calendar months
+     
       const threeBack = subMonths(now, 3)
       return {
         startDate: format(startOfMonth(threeBack), 'yyyy-MM-dd'),
@@ -131,8 +127,7 @@ function changePct(current: number, previous: number): number {
   if (previous === 0) return current > 0 ? 100 : 0
   return ((current - previous) / Math.abs(previous)) * 100
 }
-
-// ─── Main Loader ─────────────────────────────────────────────────────────────
+
 
 export async function loadReportsPageData(filter: ReportsFilter): Promise<ReportsPageData> {
   const supabase = await createClient()
@@ -144,7 +139,7 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
   const { startDate, endDate } = getDateRangeForReports(filter.period, now)
   const prevRange = getPreviousPeriodRange(startDate, endDate)
 
-  // 1. Resolve account IDs by scope
+ 
   let accountIds: string[] | null = null
   if (filter.scope !== 'all') {
     const { data: accounts } = await admin
@@ -162,11 +157,11 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
       .filter(a => types.some(t => a.type?.toLowerCase().includes(t)))
       .map(a => a.id)
 
-    // If no accounts match, use empty array (no results)
+   
     if (accountIds.length === 0) accountIds = ['__none__']
   }
 
-  // 2. Fetch transactions for current period
+ 
   let txQuery = admin
     .from('transactions')
     .select(`amount, type, date, merchant, category_id, categories ( id, name, icon, color )`)
@@ -180,7 +175,7 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
   const { data: txRaw } = await txQuery
   const transactions = txRaw || []
 
-  // 3. Fetch transactions for previous period
+ 
   let prevTxQuery = admin
     .from('transactions')
     .select('amount, type')
@@ -193,19 +188,8 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
   const { data: prevTxRaw } = await prevTxQuery
   const prevTransactions = prevTxRaw || []
 
-  // 4. Fetch account balances
-  let balanceQuery = admin
-    .from('accounts')
-    .select('balance')
-    .eq('user_id', user.id)
 
-  if (filter.scope !== 'all' && accountIds) {
-    balanceQuery = balanceQuery.in('id', accountIds)
-  }
-  const { data: accountsData } = await balanceQuery
-  const totalBalance = (accountsData || []).reduce((s, a: any) => s + Number(a.balance || 0), 0)
-
-  // 5. Aggregate current period
+ 
   let periodIncome = 0
   let periodExpenses = 0
   const cashFlowMap: Record<string, { income: number; expense: number }> = {}
@@ -215,7 +199,7 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
   for (const tx of transactions) {
     const amt = Number(tx.amount || 0)
     const cat = tx.categories as unknown as { id: string; name: string; icon: string | null; color: string | null } | null
-    const dayKey = tx.date?.slice(0, 7) ?? '' // group by month for multi-month, by day for single-month
+    const dayKey = tx.date?.slice(0, 7) ?? ''
 
     if (!cashFlowMap[dayKey]) cashFlowMap[dayKey] = { income: 0, expense: 0 }
 
@@ -245,7 +229,7 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
     }
   }
 
-  // 6. Aggregate previous period
+ 
   let prevIncome = 0
   let prevExpenses = 0
   for (const tx of prevTransactions) {
@@ -254,7 +238,7 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
     else if (tx.type === 'expense') prevExpenses += amt
   }
 
-  // 7. Build cash flow series
+ 
   const cashFlowSeries: CashFlowPoint[] = Object.entries(cashFlowMap)
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([date, vals]) => ({
@@ -264,7 +248,7 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
       net: vals.income - vals.expense,
     }))
 
-  // 8. Build category spending
+ 
   const totalExp = periodExpenses || 1
   const categorySpending: CategorySpendingItem[] = Object.entries(categoryMap)
     .map(([id, val]) => ({
@@ -280,7 +264,7 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
 
   const topCategories = categorySpending.slice(0, 8)
 
-  // 9. Build merchant data
+ 
   const topMerchants: MerchantSpendingItem[] = Object.entries(merchantMap)
     .filter(([name]) => name !== 'Unknown' && name !== '')
     .sort((a, b) => b[1].total - a[1].total)
@@ -292,7 +276,7 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
       averageAmount: data.total / data.count,
     }))
 
-  // 10. Period comparison
+ 
   const netCurrent = periodIncome - periodExpenses
   const netPrevious = prevIncome - prevExpenses
   const efficiencyCurrent = periodIncome > 0 ? (netCurrent / periodIncome) * 100 : 0
@@ -318,7 +302,6 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
     filter,
     dateRange: { startDate, endDate },
     summary: {
-      totalBalance,
       periodIncome,
       periodExpenses,
       savingsRate,

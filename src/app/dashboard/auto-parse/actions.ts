@@ -49,7 +49,7 @@ export async function updateImportRow(rowId: string, updates: Partial<ImportRow>
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  // Verify row belongs to user via the import_job relationship
+ 
   const { data: row } = await supabase
     .from('import_rows')
     .select('import_job_id, import_jobs!inner(user_id)')

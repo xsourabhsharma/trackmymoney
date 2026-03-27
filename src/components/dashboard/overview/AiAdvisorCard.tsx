@@ -41,13 +41,13 @@ export function AiAdvisorCard({ insight }: AiAdvisorCardProps) {
   return (
     <div className="flex flex-col h-full bg-[#42423d] text-white rounded-[32px] overflow-hidden shadow-md relative">
       
-      {/* 3D Orb Background Top Half */}
+      {}
       <div className="absolute top-0 left-0 w-full h-[250px] opacity-70 pointer-events-none mix-blend-screen">
          <AiOrb3D state={insight.state} />
       </div>
 
       <div className="p-6 sm:p-8 flex flex-col h-full relative z-10">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between mb-8 z-10">
           <div>
             <h2 className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2">
@@ -64,10 +64,10 @@ export function AiAdvisorCard({ insight }: AiAdvisorCardProps) {
           </button>
         </div>
 
-        {/* Spacer to let the 3D orb show through clearly */}
+        {}
         <div className="flex-grow min-h-[40px]"></div>
 
-        {/* Insight Card (Glassmorphism) */}
+        {}
         <div className="flex flex-col gap-3 p-5 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 hover:bg-black/50 transition-colors z-10 mt-auto shadow-2xl">
           <div className="flex items-center gap-2 mb-1">
             <Icon className={`w-4 h-4 ${titleColor}`} strokeWidth={3} />
@@ -96,7 +96,7 @@ export function AiAdvisorCard({ insight }: AiAdvisorCardProps) {
         </div>
       </div>
       
-      {/* Background decoration */}
+      {}
       <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none" />
     </div>
   )

@@ -51,7 +51,7 @@ export function BulkUploadModal() {
       skipEmptyLines: true,
       complete: async (results) => {
         try {
-          // Verify headers
+         
           const expectedHeaders = ['amount', 'merchant', 'date', 'type']
           const headers = results.meta.fields?.map(h => h.toLowerCase()) || []
           
@@ -60,7 +60,7 @@ export function BulkUploadModal() {
             throw new Error(`Invalid CSV format. Missing headers: ${missingHeaders.join(', ')}. Expected: amount, merchant, date, type.`)
           }
 
-          // Format data
+         
           const validTransactions = results.data.map((row: any) => ({
             amount: parseFloat(row.amount || row.Amount),
             merchant: row.merchant || row.Merchant,

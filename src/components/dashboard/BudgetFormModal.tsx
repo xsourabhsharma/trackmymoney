@@ -86,15 +86,15 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
+      {}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Modal */}
+      {}
       <div className="relative w-full max-w-md bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between p-6 border-b border-[var(--border-light)]">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-[var(--accent)]/10 flex items-center justify-center">
@@ -117,9 +117,9 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
           </button>
         </div>
 
-        {/* Form */}
+        {}
         <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-5">
-          {/* Category Select */}
+          {}
           {!isEdit && (
             <div className="flex flex-col gap-2">
               <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
@@ -141,7 +141,7 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
             </div>
           )}
 
-          {/* Amount */}
+          {}
           <div className="flex flex-col gap-2">
             <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
               Budget Limit
@@ -161,7 +161,7 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
             </div>
           </div>
 
-          {/* Period */}
+          {}
           <div className="flex flex-col gap-2">
             <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
               Period
@@ -184,7 +184,7 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
             </div>
           </div>
 
-          {/* Rollover */}
+          {}
           <div className="flex items-center gap-3 p-4 bg-[var(--bg-surface)] rounded-xl border border-[var(--border-light)]">
             <button
               type="button"
@@ -201,14 +201,14 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
             </div>
           </div>
 
-          {/* Error */}
+          {}
           {error && (
             <p className="text-[11px] font-bold text-[var(--expense-red)] bg-red-50 border border-red-100 rounded-lg px-4 py-3">
               ⚠️ {error}
             </p>
           )}
 
-          {/* Actions */}
+          {}
           <div className="flex gap-3 pt-2">
             <button
               type="button"

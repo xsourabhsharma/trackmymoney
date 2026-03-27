@@ -98,8 +98,8 @@ export function AddTransactionButton({
     formData.set('accountId', selectedAccount)
     formData.set('currency', currentCurrency)
     
-    // tags is captured but in formData natively
-    // description is captured in formData natively
+   
+   
     
     setIsLoading(true)
     try {
@@ -143,13 +143,13 @@ export function AddTransactionButton({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button suppressHydrationWarning className="btn-primary gap-2 h-10 px-5 text-sm">
+          <Button suppressHydrationWarning className="bg-[var(--text-main)] text-[var(--bg-base)] gap-2 h-10 px-5 text-sm font-bold uppercase tracking-widest rounded-full hover:opacity-90 transition-all border border-[var(--border-light)] shadow-lg">
             <Plus className="h-4 w-4" />
             {buttonLabel}
           </Button>
         }
       />
-      <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden border-0 shadow-2xl rounded-2xl">
+      <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden border border-[var(--border-light)] shadow-2xl rounded-2xl bg-[var(--bg-base)]">
         <div className="p-6 pb-0 flex items-center justify-between">
           <DialogTitle className="text-xl font-semibold p-0 m-0">Add Transaction</DialogTitle>
           <DialogClose className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-[var(--bg-surface)] text-[var(--text-muted)] transition-colors" />
@@ -158,7 +158,7 @@ export function AddTransactionButton({
         <form action={handleSubmit} className="flex flex-col gap-5 p-6 pt-4 max-h-[80vh] overflow-y-auto w-full">
           
           <div className="flex flex-col gap-2">
-            <Label className="text-xs font-semibold text-[var(--text-muted)] tracking-wider uppercase">Type</Label>
+            <Label className="text-xs font-bold text-[var(--text-main)] opacity-70 tracking-wider uppercase">Type</Label>
             <div className="grid grid-cols-3 gap-2">
               <TypeButton type="income" label="Income" />
               <TypeButton type="expense" label="Expense" />
@@ -168,7 +168,7 @@ export function AddTransactionButton({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="date" className="text-xs font-semibold text-[var(--text-muted)] tracking-wider uppercase">Date</Label>
+              <Label htmlFor="date" className="text-xs font-bold text-[var(--text-main)] opacity-70 tracking-wider uppercase">Date</Label>
               <Input
                 id="date"
                 name="date"
@@ -180,7 +180,7 @@ export function AddTransactionButton({
             </div>
             
             <div className="flex flex-col gap-2 relative">
-              <Label htmlFor="amount" className="text-xs font-semibold text-[var(--text-muted)] tracking-wider uppercase">Amount</Label>
+              <Label htmlFor="amount" className="text-xs font-bold text-[var(--text-main)] opacity-70 tracking-wider uppercase">Amount</Label>
               <Input
                 id="amount"
                 name="amount"
@@ -197,7 +197,7 @@ export function AddTransactionButton({
           </div>
           
           <div className="flex flex-col gap-2 relative z-20">
-            <Label htmlFor="merchant" className="text-xs font-semibold text-[var(--text-muted)] tracking-wider uppercase">Merchant / Description</Label>
+            <Label htmlFor="merchant" className="text-xs font-bold text-[var(--text-main)] opacity-70 tracking-wider uppercase">Merchant / Description</Label>
             <Input
               id="merchant"
               name="merchant"
@@ -235,7 +235,7 @@ export function AddTransactionButton({
 
           <div className="grid grid-cols-1 gap-4">
             <div className="flex flex-col gap-2">
-              <Label className="text-xs font-semibold text-[var(--text-muted)] tracking-wider uppercase">Category</Label>
+              <Label className="text-xs font-bold text-[var(--text-main)] opacity-70 tracking-wider uppercase">Category</Label>
               <select
                 value={selectedCategory}
                 onChange={(e) => { setSelectedCategory(e.target.value); setErrors(prev => { const { category, ...rest } = prev; return rest }) }}
@@ -250,7 +250,7 @@ export function AddTransactionButton({
           </div>
 
           <div className="flex flex-col gap-2 z-10">
-            <Label htmlFor="tags" className="text-xs font-semibold text-[var(--text-muted)] tracking-wider uppercase">Tags (Comma Separated)</Label>
+            <Label htmlFor="tags" className="text-xs font-bold text-[var(--text-main)] opacity-70 tracking-wider uppercase">Tags (Comma Separated)</Label>
             <Input 
               id="tags" 
               name="source_metadata" 

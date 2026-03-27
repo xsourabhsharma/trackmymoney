@@ -23,7 +23,7 @@ export function SubscriptionsOverview({ metrics }: SubscriptionsOverviewProps) {
       <div className="flex items-center justify-between">
         <h2 className="text-[12px] font-bold text-[var(--text-muted)] tracking-[0.2em] uppercase">Subscriptions Overview</h2>
         
-        {/* Toggle Mode */}
+        {}
         <div className="flex items-center bg-[var(--bg-muted)] p-1 rounded-full border border-[var(--border-light)]">
           <button 
             onClick={() => setViewMode('monthly')}
@@ -41,7 +41,7 @@ export function SubscriptionsOverview({ metrics }: SubscriptionsOverviewProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-stagger">
-        {/* Total Outflow Card */}
+        {}
         <div className="p-6 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-light)] relative overflow-hidden group hover:border-[var(--expense-red)]/30 transition-colors hover-lift">
           <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
             <RefreshCw className="w-24 h-24" />
@@ -58,7 +58,7 @@ export function SubscriptionsOverview({ metrics }: SubscriptionsOverviewProps) {
           </div>
         </div>
 
-        {/* Active Subscriptions Card */}
+        {}
         <div className="p-6 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-light)] relative overflow-hidden group hover:border-[var(--accent)]/30 transition-colors hover-lift">
           <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] mb-2">Active Subscriptions</p>
           <div className="flex items-baseline gap-2 mb-4">
@@ -72,7 +72,7 @@ export function SubscriptionsOverview({ metrics }: SubscriptionsOverviewProps) {
           </div>
         </div>
 
-        {/* Potential Savings Card */}
+        {}
         <div className="p-6 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-light)] border-b-4 border-b-[var(--income-green)] relative overflow-hidden group shadow-sm hover-lift">
           <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity text-[var(--income-green)]">
             <PiggyBank className="w-24 h-24" />

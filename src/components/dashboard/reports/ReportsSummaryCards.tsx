@@ -27,57 +27,48 @@ export function ReportsSummaryCards({ summary }: Props) {
   const INCOME_TARGET = 8000
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 animate-stagger">
-      {/* Total Balance */}
-      <div className="group relative p-5 bg-[var(--bg-surface)] rounded-2xl border border-transparent hover:border-[var(--border-light)] hover:bg-white transition-all flex flex-col items-center text-center gap-2 hover-lift">
-        <div className="w-9 h-9 rounded-xl bg-[var(--bg-base)] border border-[var(--border-light)] flex items-center justify-center">
-          <Wallet className="w-4 h-4 text-[var(--text-main)]" />
-        </div>
-        <div className="text-2xl font-bold tabular-nums tracking-tighter text-[var(--text-main)] animate-count-up">{fmt(summary.totalBalance)}</div>
-        <div className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Total Balance</div>
-        <div className="text-[11px] font-bold text-[var(--text-muted)] opacity-60 uppercase tracking-tighter">Across all accounts</div>
-      </div>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-stagger">
 
-      {/* Period Income */}
+      {}
       <div className="group relative p-5 bg-[var(--bg-surface)] rounded-2xl border border-transparent hover:border-[var(--border-light)] hover:bg-white transition-all flex flex-col items-center text-center gap-2 hover-lift">
-        <div className="w-9 h-9 rounded-xl bg-green-100 flex items-center justify-center">
-          <TrendingUp className="w-4 h-4 text-[var(--income-green)]" />
+        <div className="w-9 h-9 rounded-xl bg-green-500/15 border border-green-500/10 flex items-center justify-center">
+          <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
         </div>
-        <div className="text-2xl font-bold tabular-nums tracking-tighter text-[var(--income-green)] animate-count-up">{fmt(summary.periodIncome)}</div>
-        <div className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Period Income</div>
-        <div className="text-[11px] font-bold text-[var(--text-muted)] opacity-60 uppercase tracking-tighter">
+        <div className="text-2xl font-bold tabular-nums tracking-tighter text-green-600 dark:text-green-400 animate-count-up">{fmt(summary.periodIncome)}</div>
+        <div className="text-[12px] font-bold text-[var(--text-main)] uppercase tracking-widest">Period Income</div>
+        <div className="text-[11px] font-bold text-[var(--text-main)] opacity-80 uppercase tracking-tighter">
           Target: {fmt(INCOME_TARGET)} · {((summary.periodIncome / INCOME_TARGET) * 100).toFixed(0)}%
         </div>
         <TrendBadge pct={summary.incomeChangeVsPrev} />
-        {/* Progress toward target */}
+        {}
         <div className="w-full h-1 bg-[var(--bg-base)] rounded-full overflow-hidden">
           <div className="h-full bg-[var(--income-green)] rounded-full" style={{ width: `${Math.min(100, (summary.periodIncome / INCOME_TARGET) * 100)}%` }} />
         </div>
       </div>
 
-      {/* Period Expenses */}
+      {}
       <div className="group relative p-5 bg-[var(--bg-surface)] rounded-2xl border border-transparent hover:border-[var(--border-light)] hover:bg-white transition-all flex flex-col items-center text-center gap-2 hover-lift">
-        <div className="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center">
-          <TrendingDown className="w-4 h-4 text-[var(--expense-red)]" />
+        <div className="w-9 h-9 rounded-xl bg-red-500/15 border border-red-500/10 flex items-center justify-center">
+          <TrendingDown className="w-4 h-4 text-red-600 dark:text-red-400" />
         </div>
-        <div className="text-2xl font-bold tabular-nums tracking-tighter text-[var(--expense-red)] animate-count-up">{fmt(summary.periodExpenses)}</div>
-        <div className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Period Expenses</div>
-        <div className="text-[11px] font-bold text-[var(--text-muted)] opacity-60 uppercase tracking-tighter">Selected range flow</div>
-        {/* Inverse: lower expenses = positive */}
+        <div className="text-2xl font-bold tabular-nums tracking-tighter text-red-600 dark:text-red-400 animate-count-up">{fmt(summary.periodExpenses)}</div>
+        <div className="text-[12px] font-bold text-[var(--text-main)] uppercase tracking-widest">Period Expenses</div>
+        <div className="text-[11px] font-bold text-[var(--text-main)] opacity-80 uppercase tracking-tighter">Selected range flow</div>
+        {}
         <TrendBadge pct={summary.expenseChangeVsPrev} inverse />
       </div>
 
-      {/* Savings Rate */}
+      {}
       <div className="group relative p-5 bg-[var(--bg-surface)] rounded-2xl border border-transparent hover:border-[var(--border-light)] hover:bg-white transition-all flex flex-col items-center text-center gap-2 hover-lift">
-        <div className="w-9 h-9 rounded-xl bg-[var(--accent)]/10 flex items-center justify-center">
-          <Percent className="w-4 h-4 text-[var(--accent)]" />
+        <div className="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-500/10 flex items-center justify-center">
+          <Percent className="w-4 h-4 text-blue-600 dark:text-sky-400" />
         </div>
-        <div className="text-2xl font-bold tabular-nums tracking-tighter text-[var(--accent)]">{summary.savingsRate.toFixed(1)}%</div>
-        <div className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Savings Rate</div>
-        <div className="text-[11px] font-bold text-[var(--text-muted)] opacity-60 uppercase tracking-tighter">(Income − Expenses) / Income</div>
+        <div className="text-2xl font-bold tabular-nums tracking-tighter text-blue-600 dark:text-sky-400">{summary.savingsRate.toFixed(1)}%</div>
+        <div className="text-[12px] font-bold text-[var(--text-main)] uppercase tracking-widest">Savings Rate</div>
+        <div className="text-[11px] font-bold text-[var(--text-main)] opacity-80 uppercase tracking-tighter">(Income − Expenses) / Income</div>
         <div className="w-full h-1 bg-[var(--bg-base)] rounded-full overflow-hidden">
           <div
-            className={`h-full rounded-full ${summary.savingsRate >= 20 ? 'bg-[var(--income-green)]' : summary.savingsRate >= 10 ? 'bg-[var(--accent)]' : 'bg-orange-400'}`}
+            className={`h-full rounded-full ${summary.savingsRate >= 20 ? 'bg-[var(--income-green)]' : summary.savingsRate >= 10 ? 'bg-blue-600 dark:bg-sky-400' : 'bg-orange-400'}`}
             style={{ width: `${Math.min(100, summary.savingsRate)}%` }}
           />
         </div>
