@@ -5,6 +5,16 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { PerspectiveCamera, Environment, Float, Sparkles, MeshTransmissionMaterial, ContactShadows } from '@react-three/drei'
 import * as THREE from 'three'
 import { useTheme } from 'next-themes'
+
+if (typeof window !== 'undefined') {
+  const originalWarn = console.warn
+  console.warn = (...args) => {
+    if (args[0] && typeof args[0] === 'string' && args[0].includes('THREE.Clock: This module has been deprecated')) {
+      return
+    }
+    originalWarn(...args)
+  }
+}
 
 function GlassDiamond({ position, scale }: { position: [number, number, number], scale: number }) {
   const mesh = useRef<THREE.Mesh>(null)

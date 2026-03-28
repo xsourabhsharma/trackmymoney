@@ -22,7 +22,7 @@ export function GlobalAiWidget() {
   } as any)
 
  
-  const { messages, isLoading } = chatHook
+  const { messages, isLoading } = chatHook as any
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -198,7 +198,7 @@ export function GlobalAiWidget() {
                   <p className="text-[14px] md:text-[15px] text-gray-100">Ask a question to get started.</p>
                 </div>
               ) : (
-                messages.map((m) => (
+                messages.map((m: any) => (
                   <div key={m.id} className={cn("flex w-full", m.role === 'user' ? "justify-end" : "justify-start")}>
                     <div className={cn(
                       "max-w-[90%] md:max-w-[85%] rounded-2xl p-3 md:p-4 text-[14px] md:text-[15px]",

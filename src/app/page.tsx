@@ -13,7 +13,7 @@ import Footer from '@/components/landing/Footer'
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-main)] font-sans antialiased overflow-x-hidden">
+    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-main)] font-sans antialiased">
       <LandingNav />
       <HeroSection />
       <ProblemOutcomeSection />

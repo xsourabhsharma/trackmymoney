@@ -5,6 +5,16 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { Sphere, MeshDistortMaterial, Float } from '@react-three/drei'
 import * as THREE from 'three'
 
+if (typeof window !== 'undefined') {
+  const originalWarn = console.warn
+  console.warn = (...args) => {
+    if (args[0] && typeof args[0] === 'string' && args[0].includes('THREE.Clock: This module has been deprecated')) {
+      return
+    }
+    originalWarn(...args)
+  }
+}
+
 function AnimatedOrb({ state }: { state: 'neutral' | 'warning' | 'opportunity' | 'no_data' }) {
   const meshRef = useRef<THREE.Mesh>(null)
 

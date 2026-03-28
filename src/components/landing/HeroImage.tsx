@@ -33,9 +33,9 @@ export default function HeroImage() {
   }
 
   return (
-    <div className="relative w-full max-w-[1100px] mx-auto mt-20 z-20 hidden md:block px-6">
-      {}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[50%] bg-[var(--income-green)]/20 rounded-full blur-[100px] pointer-events-none" />
+    <div className="relative w-full max-w-[1100px] mx-auto mt-12 md:mt-20 z-20 px-4 sm:px-6 block">
+      
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] md:w-[80%] h-[50%] bg-[var(--income-green)]/20 rounded-full blur-[80px] md:blur-[100px] pointer-events-none" />
       
       <div style={{ perspective: '2000px' }} className="w-full relative">
         <motion.div

@@ -104,7 +104,7 @@ export default function DashboardClient({ initialData }: Props) {
       {}
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_2.2fr] gap-x-6 gap-y-8 items-start">
         {}
-        <div className="xl:row-span-2 sticky top-6">
+        <div className="xl:row-span-2 xl:sticky xl:top-6 relative z-10 w-full mb-4 xl:mb-0">
            <AIAdvisorCard stats={data} lastInsight={data.lastInsight} />
         </div>
 

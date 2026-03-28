@@ -5,9 +5,11 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { User, ChevronDown, Loader2, Check, Camera, AlertCircle } from 'lucide-react'
+import { User, ChevronDown, Loader2, Check, Camera, AlertCircle, LogOut } from 'lucide-react'
 import { UserSettings } from '@/app/dashboard/settings/data'
 import { uploadAvatar } from '@/app/dashboard/settings/avatar-actions'
+import { createClient } from '@/utils/supabase/client'
+import { useRouter } from 'next/navigation'
 
 interface Props {
   settings: UserSettings
@@ -23,6 +25,8 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
   const [avatarPending, setAvatarPending] = useState(false)
   const [localAvatarUrl, setLocalAvatarUrl] = useState<string | null>(avatarUrl ?? null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const router = useRouter()
+  const supabase = createClient()
 
   const [formData, setFormData] = useState({
     full_name: settings.full_name,
@@ -171,6 +175,17 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
             ) : (
               'Save Profile'
             )}
+          </Button>
+
+          <Button
+            onClick={async () => {
+              await supabase.auth.signOut()
+              router.push('/login')
+            }}
+            variant="outline"
+            className="w-full h-12 rounded-full text-xs font-bold uppercase tracking-widest text-[var(--expense-red)] border-[var(--expense-red)]/20 hover:bg-[var(--expense-red)]/10 mt-3"
+          >
+            <LogOut className="w-4 h-4 mr-2" /> Sign Out
           </Button>
         </div>
       </div>
