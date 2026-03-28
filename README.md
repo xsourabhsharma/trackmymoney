@@ -1,5 +1,9 @@
 # TrackMyMoney
 
+<div align="center">
+  <img src="./public/images/screenshots/dashboard.png" alt="TrackMyMoney Dashboard Hero" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
+</div>
+
 TrackMyMoney is an AI-assisted personal finance website designed to turn scattered financial activity into a clear, usable operating system for everyday money management. Instead of forcing users to live inside spreadsheets, it combines transaction tracking, budgeting, goals, debt visibility, subscription monitoring, reporting, and AI-powered import workflows in one product.
 
 Built on Next.js, Supabase, Drizzle, and modern AI tooling, the product is structured around one idea: make financial clarity feel fast, visual, and low-friction.
@@ -59,9 +63,15 @@ Once signed in, users move into the main application, which is organized into fo
 
 This structure keeps the website easy to navigate while still supporting a broad set of finance workflows.
 
+### Account Settings
+<div align="center">
+  <img src="./public/images/screenshots/settings.png" alt="Settings View" width="100%" style="border-radius: 8px; border: 1px solid #333;" />
+</div>
+
 ## Main feature set
 
 ### Overview dashboard
+![Dashboard Overview](./public/images/screenshots/dashboard.png)
 
 The overview area is the command center of the product. It is designed to give users an immediate sense of financial health through metrics, summaries, and visual analytics. This includes:
 
@@ -72,6 +82,7 @@ The overview area is the command center of the product. It is designed to give u
 - quick actions for common finance tasks
 
 ### Transactions
+![Transactions](./public/images/screenshots/transactions.png)
 
 The transaction system is the core financial ledger of the website. It supports:
 
@@ -86,6 +97,7 @@ The transaction system is the core financial ledger of the website. It supports:
 The schema is designed to support both manually created records and AI/import-generated records in the same product flow.
 
 ### Budgets
+![Budgets](./public/images/screenshots/budgets.png)
 
 The budgeting area focuses on category-level spending control rather than a generic spreadsheet-style experience. It supports:
 
@@ -96,6 +108,7 @@ The budgeting area focuses on category-level spending control rather than a gene
 - higher-level budget summaries for fast review
 
 ### Goals and debts
+![Goals and Debt](./public/images/screenshots/goals.png)
 
 TrackMyMoney treats goals and debts as first-class planning objects instead of side notes. The product includes:
 
@@ -108,6 +121,7 @@ TrackMyMoney treats goals and debts as first-class planning objects instead of s
 This makes the website useful for both offensive planning (saving) and defensive planning (paying down liabilities).
 
 ### Subscription monitoring
+![Subscriptions](./public/images/screenshots/subscriptions.png)
 
 Subscription tracking is built into the core product rather than added as a separate tool. The system supports:
 
@@ -120,6 +134,7 @@ Subscription tracking is built into the core product rather than added as a sepa
 This helps users identify silent recurring costs and reduce unnecessary spend.
 
 ### Reports and exports
+![Reports](./public/images/screenshots/reports.png)
 
 The reports area turns raw financial activity into shareable output. The website supports:
 
@@ -132,6 +147,8 @@ The reports area turns raw financial activity into shareable output. The website
 This is important for freelancers, operators, and users who still need portable records outside the app.
 
 ### AI-assisted auto-parse
+![AI Auto Parse CSV](./public/images/screenshots/auto-parse-csv.png)
+![AI Auto Parse Receipt](./public/images/screenshots/auto-parse-receipt.png)
 
 One of the strongest product differentiators is the auto-parse workflow. The website includes AI-supported handling for:
 

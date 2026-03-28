@@ -117,13 +117,11 @@ export function ReceiptScanner() {
                 className="hidden" 
                 accept="image/*"
               />
-              <div className="w-16 h-16 rounded-full bg-[var(--bg-base)] border border-[var(--border-light)] shadow-sm flex items-center justify-center mb-6">
-                <Upload className="w-8 h-8 text-[var(--text-muted)]" />
+              <div className="w-16 h-16 rounded-full bg-[var(--income-green)]/10 text-[var(--income-green)] flex items-center justify-center mb-4">
+                <Upload className="w-8 h-8" />
               </div>
-              <p className="text-sm font-bold text-[var(--text-main)] uppercase tracking-wider mb-2">Upload Receipt</p>
-              <p className="text-[11px] font-medium text-[var(--text-muted)] text-center max-w-[200px] leading-relaxed">
-                Take a photo or upload an image of your receipt.
-              </p>
+              <h4 className="text-[14px] font-bold tracking-widest uppercase mb-2">Upload Receipt</h4>
+              <p className="text-[12px] text-[var(--text-muted)] text-center max-w-[200px]">Click to drop an image of your physical receipt. AI will do the rest.</p>
             </motion.div>
           )}
 
@@ -132,12 +130,10 @@ export function ReceiptScanner() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="flex-grow flex flex-col gap-6"
+              className="flex flex-col gap-6"
             >
-              <div className="relative aspect-[3/4] w-full max-w-[300px] mx-auto rounded-[16px] overflow-hidden border border-[var(--border-light)] shadow-lg">
-                <Image src={image} alt="Receipt Preview" fill className="object-cover" />
-                
-                {/* 3D Hologram Scan Line */}
+              <div className="relative w-full aspect-[4/5] sm:aspect-square bg-[#050505] rounded-[16px] border border-[var(--border-light)] overflow-hidden shadow-inner flex items-center justify-center">
+                <Image src={image} alt="Uploaded Receipt" fill className="object-contain" />
                 {isProcessing && (
                   <motion.div
                     className="absolute left-0 right-0 h-[2px] bg-[var(--income-green)] shadow-[0_0_20px_4px_var(--income-green)] z-20"

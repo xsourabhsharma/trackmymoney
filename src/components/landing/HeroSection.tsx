@@ -4,7 +4,13 @@ import React from 'react'
 import Link from 'next/link'
 import { motion, Variants, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { ArrowRight, Shield, Download, CreditCard, Sparkles } from 'lucide-react'
-import FinanceWorld3D from './3d/FinanceWorld3D'
+import dynamic from 'next/dynamic'
+import HeroImage from './HeroImage'
+
+const FinanceWorld3D = dynamic(() => import('./3d/FinanceWorld3D'), { 
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_center,transparent_0%,var(--bg-base)_90%)] pointer-events-none" />
+})
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 40 },
@@ -53,7 +59,9 @@ export default function HeroSection() {
   return (
     <section className="relative min-h-[95vh] flex items-center pt-24 pb-20 overflow-hidden bg-[var(--bg-base)] text-[var(--text-main)] border-b border-[var(--border-light)]">
       {}
-      <FinanceWorld3D />
+      <div className="hidden md:block absolute inset-0 pointer-events-none z-0">
+        <FinanceWorld3D />
+      </div>
 
       {}
       <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-base)]/90 via-[var(--bg-base)]/50 to-[var(--bg-base)] pointer-events-none z-0" />
@@ -118,6 +126,8 @@ export default function HeroSection() {
             ))}
           </motion.div>
         </motion.div>
+
+        <HeroImage />
       </div>
     </section>
   )

@@ -120,13 +120,13 @@ export default function DashboardClient({ initialData }: Props) {
               </span>
             </div>
             
-            <div className="flex w-full sm:w-auto">
-              <div className="flex flex-wrap items-center gap-1.5 w-full">
+            <div className="flex w-full sm:w-auto overflow-hidden">
+              <div className="flex overflow-x-auto hide-scrollbar sm:flex-wrap items-center gap-1.5 w-full pb-2 md:pb-0">
                 {PERIOD_OPTIONS.map((p) => (
                   <button 
                     key={p.val} 
                     onClick={() => handleRangeChange(p.val)}
-                    className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all border ${
+                    className={`whitespace-nowrap flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all border ${
                       range === p.val 
                         ? 'bg-[var(--text-main)] text-[var(--bg-base)] border-[var(--text-main)] shadow-sm' 
                         : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-light)] hover:border-[var(--border-dark)]'
@@ -135,7 +135,6 @@ export default function DashboardClient({ initialData }: Props) {
                     {p.label}
                   </button>
                 ))}
-                
               </div>
             </div>
           </div>
@@ -231,18 +230,18 @@ export default function DashboardClient({ initialData }: Props) {
               </div>
             ) : (
               data.recentTransactions.map((tx: any) => (
-                <div className="group grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 py-4 transition-all hover:bg-[var(--bg-surface)] hover:px-4 -mx-0 hover:-mx-4 rounded-xl" key={tx.id}>
+                <div className="group grid grid-cols-[auto_1fr_auto] sm:grid-cols-[auto_1fr_auto_auto] items-center gap-3 sm:gap-4 py-4 transition-all hover:bg-[var(--bg-surface)] sm:hover:px-4 -mx-0 sm:hover:-mx-4 rounded-xl" key={tx.id}>
                   <div className="w-10 h-10 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl flex items-center justify-center text-lg shadow-sm group-hover:scale-110 transition-transform">
                     {tx.categories?.icon || '💸'}
                   </div>
                   <div className="flex flex-col gap-0.5 overflow-hidden">
                     <span className="text-[13px] font-bold truncate text-[var(--text-main)] uppercase tracking-tight">{tx.merchant || tx.description || 'Transaction'}</span>
-                    <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">{tx.categories?.name || 'Uncategorized'}</span>
+                    <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest truncate">{tx.categories?.name || 'Uncategorized'}</span>
                   </div>
                   <div className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-tighter text-right hidden sm:block">
                     {format(new Date(tx.date), 'MMM dd, yyyy')}
                   </div>
-                  <div className={`text-[13px] font-bold tabular-nums text-right min-w-[90px] ${tx.type === 'income' ? 'text-[var(--income-green)]' : 'text-[var(--text-main)]'}`}>
+                  <div className={`text-[13px] font-bold tabular-nums text-right min-w-[70px] sm:min-w-[90px] ${tx.type === 'income' ? 'text-[var(--income-green)]' : 'text-[var(--text-main)]'}`}>
                     {tx.type === 'income' ? '+ ' : '- '}{safeFormatCurrency(Number(tx.amount))}
                   </div>
                 </div>

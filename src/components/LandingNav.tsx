@@ -80,14 +80,21 @@ export default function LandingNav() {
             </Link>
           </div>
 
-          {}
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden relative z-[110] w-10 h-10 flex items-center justify-center rounded-xl border border-[var(--border-light)] bg-[var(--bg-surface)] text-[var(--text-main)]"
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-          >
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          <div className="flex md:hidden items-center gap-2">
+            <Link
+              href="/login"
+              className="relative z-[110] inline-flex items-center justify-center px-4 py-2 rounded-full text-[12px] font-bold border border-[var(--border-light)] text-[var(--text-main)] hover:bg-[var(--bg-surface)]"
+            >
+              Log in
+            </Link>
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="relative z-[110] w-10 h-10 flex items-center justify-center rounded-xl border border-[var(--border-light)] bg-[var(--bg-surface)] text-[var(--text-main)]"
+              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            >
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
       </nav>
 

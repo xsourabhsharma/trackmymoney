@@ -9,7 +9,7 @@ import Image from 'next/image'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useTheme } from 'next-themes'
 import { ToastProvider } from '@/components/ui/toast-provider'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, LogOut } from 'lucide-react'
 import { useCurrencyStore } from '@/store/useCurrencyStore'
 
 interface Props {
@@ -109,28 +109,32 @@ export default function DashboardLayoutClient({ user, initialTheme, initialCurre
             <ThemeToggle />
           </div>
 
-          <div className="flex items-center gap-3 pl-4 border-l border-[var(--border-light)]">
-            <div className="hidden md:flex flex-col items-end">
-              <span className="text-[11px] font-bold text-[var(--text-main)] truncate max-w-[150px]">{user.email}</span>
+            <div className="flex items-center gap-3 pl-4 border-l border-[var(--border-light)]">
+              <div className="hidden md:flex flex-col items-end">
+                <span className="text-[11px] font-bold text-[var(--text-main)] truncate max-w-[150px]">{user.email}</span>
+                <button
+                  onClick={handleSignOut}
+                  className="text-[12px] font-medium text-[var(--text-muted)] hover:text-[var(--expense-red)] transition-colors underline underline-offset-2"
+                >
+                  Sign Out
+                </button>
+              </div>
+              <div className="w-9 h-9 rounded-full bg-[var(--bg-surface)] border border-[var(--border-light)] flex items-center justify-center overflow-hidden font-bold text-sm text-[var(--text-muted)]">
+                {avatarUrl ? (
+                  <Image src={avatarUrl} alt="Avatar" width={36} height={36} className="w-full h-full object-cover" unoptimized />
+                ) : (
+                  initials
+                )}
+              </div>
               <button
                 onClick={handleSignOut}
-                className="text-[12px] font-medium text-[var(--text-muted)] hover:text-[var(--expense-red)] transition-colors underline underline-offset-2"
+                className="flex md:hidden items-center justify-center w-9 h-9 rounded-full bg-[var(--bg-surface)] border border-[var(--border-light)] text-[var(--text-muted)] hover:text-[var(--expense-red)] transition-colors"
               >
-                Sign Out
+                <LogOut className="w-4 h-4" />
               </button>
             </div>
-            <div className="w-9 h-9 rounded-full bg-[var(--bg-surface)] border border-[var(--border-light)] flex items-center justify-center overflow-hidden font-bold text-sm text-[var(--text-muted)]">
-              {avatarUrl ? (
-                <Image src={avatarUrl} alt="Avatar" width={36} height={36} className="w-full h-full object-cover" unoptimized />
-              ) : (
-                initials
-              )}
-            </div>
           </div>
-        </div>
       </header>
-
-      {}
       <nav className="lg:hidden fixed bottom-4 left-4 right-4 z-50 bg-[var(--bg-base)]/80 backdrop-blur-3xl border border-[var(--border-light)] rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] p-2">
         <ul className="flex items-center overflow-x-auto hide-scrollbar gap-2 snap-x snap-mandatory">
           {navLinks.map(link => {

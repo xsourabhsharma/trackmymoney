@@ -256,8 +256,13 @@ function SignupFormInner() {
     setIsPending(true)
     setError(null)
     try {
-      await signup(formData)
-    } catch {
+      const result = await signup(formData)
+      if (result?.error) {
+        setError(result.error)
+        setIsPending(false)
+      }
+    } catch (e: any) {
+      if (e?.message === 'NEXT_REDIRECT') throw e;
       setError('Signup failed. The email might already be in use.')
       setIsPending(false)
     }

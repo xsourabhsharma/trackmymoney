@@ -22,16 +22,14 @@ function GlassDiamond({ position, scale }: { position: [number, number, number],
         <icosahedronGeometry args={[1, 0]} />
         <MeshTransmissionMaterial 
           backside
-          samples={4}
+          samples={2}
           thickness={1.5}
           chromaticAberration={0.05}
           anisotropy={0.2}
           distortion={0}
           distortionScale={0}
           temporalDistortion={0}
-          iridescence={1}
-          iridescenceIOR={1.3}
-          iridescenceThicknessRange={[100, 400]}
+          iridescence={0}
           clearcoat={1}
           roughness={0.15}
           transmission={0.9}
@@ -151,7 +149,7 @@ export default function FinanceWorld3D() {
         <DataStreams />
 
         {}
-        <Sparkles count={150} scale={20} size={isDark ? 2 : 4} speed={0.4} opacity={isDark ? 0.5 : 0.8} color="#10B981" />
+        <Sparkles count={50} scale={20} size={isDark ? 2 : 4} speed={0.4} opacity={isDark ? 0.3 : 0.6} color="#10B981" />
 
         {}
         <Environment resolution={128}>

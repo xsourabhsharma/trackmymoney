@@ -88,8 +88,13 @@ function LoginPageContent() {
 
     setIsPending(true)
     try {
-      await login(formData)
-    } catch {
+      const result = await login(formData)
+      if (result?.error) {
+        setError(result.error)
+        setIsPending(false)
+      }
+    } catch (e: any) {
+      if (e?.message === 'NEXT_REDIRECT') throw e;
       setError('Invalid email or password. Please try again.')
       setIsPending(false)
     }

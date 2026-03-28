@@ -21,7 +21,7 @@ export function GlobalAiWidget() {
     onError: (error: any) => console.error("Chat error:", error)
   } as any)
 
-  // @ts-ignore
+ 
   const { messages, isLoading } = chatHook
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -33,14 +33,14 @@ export function GlobalAiWidget() {
     }
   })
 
-  // Auto-scroll
+ 
   useEffect(() => {
     if (messagesEndRef.current && widgetState !== 'minimized') {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
     }
   }, [messages, widgetState])
 
-  // Keyboard shortcuts: Escape to close, Cmd/Ctrl+K to toggle
+ 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && widgetState !== 'minimized') {
@@ -57,7 +57,7 @@ export function GlobalAiWidget() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (isLoading) return // Hard blocking preventing submission while generating...
+    if (isLoading) return
     
     const safeInput = myInput || ''
     if (!safeInput.trim() && files.length === 0) return
@@ -68,7 +68,7 @@ export function GlobalAiWidget() {
 
       if (files.length > 0) {
         try {
-          // Read all selected files concurrently
+         
           const base64Images = await Promise.all(
             files.map(file => new Promise<string>((resolve, reject) => {
               const reader = new FileReader()
@@ -94,7 +94,7 @@ export function GlobalAiWidget() {
                submitSuccess = true;
             } catch (networkErr: any) {
                console.error("Network append failed on try 1:", networkErr);
-               // Try fallback payload without embedding data inside message to avoid strict SDK signature checks
+              
                try {
                  await safeAppend(
                    { role: 'user', content: myInput || 'Please analyze these images.' },
@@ -157,7 +157,7 @@ export function GlobalAiWidget() {
               widgetState === 'expanded' ? "max-w-[800px] md:h-[80vh]" : "max-w-[400px]"
             )}
           >
-            {/* Header */}
+            {}
             <div className="flex items-center justify-between px-3 py-2.5 md:px-4 md:py-3 border-b border-white/5 bg-[#0f0f0f] shrink-0">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-pink-400" />
@@ -176,7 +176,7 @@ export function GlobalAiWidget() {
               </div>
             </div>
 
-            {/* Messages Area */}
+            {}
             <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 md:p-5 space-y-4 scrollbar-thin scrollbar-thumb-white/10 relative">
               {messages.length === 0 ? (
                 <div className="h-full flex flex-col items-start justify-center max-w-sm mx-auto w-full">
@@ -206,7 +206,7 @@ export function GlobalAiWidget() {
                         ? "bg-[#272727] text-white rounded-br-sm" 
                         : "bg-transparent text-gray-100 pr-0"
                     )}>
-                      {/* Render Multiple Image Data if attached as user */}
+                      {}
                       {(m as any).data?.imageUrls && (
                         <div className="flex flex-wrap gap-2 mb-3">
                           {(m as any).data.imageUrls.map((url: string, idx: number) => (
@@ -215,13 +215,13 @@ export function GlobalAiWidget() {
                         </div>
                       )}
                       
-                      {/* Old single image fallback */}
+                      {}
                       {(m as any).data?.imageUrl && (
                         <img src={(m as any).data.imageUrl} alt="Uploaded" className="max-w-full sm:max-w-[200px] h-auto rounded-xl mb-3 border border-white/10" />
                       )}
                       
                       <div className="whitespace-pre-wrap leading-relaxed flex flex-col gap-3 font-light">
-                        {/* 1. Safely render the assistant's natural language reply FIRST */}
+                        {}
                         {(() => {
                           let textToRender = '';
                           if (typeof (m as any).content === 'string') {
@@ -234,7 +234,7 @@ export function GlobalAiWidget() {
                           return textToRender ? <span>{textToRender}</span> : null;
                         })()}
 
-                        {/* 2. Render discrete tool invocations as technical logs beneath the text */}
+                        {}
                         {(() => {
                           let tools: any[] = (m as any).toolInvocations || [];
                           if (tools.length === 0 && Array.isArray((m as any).parts)) {
@@ -246,7 +246,7 @@ export function GlobalAiWidget() {
                                 <Sparkles className="w-3.5 h-3.5 text-pink-400/70" />
                                 Working: <span className="text-gray-300">{tool.toolName}</span>
                               </div>
-                              {/* Safely check for the tool roundtrip result */}
+                              {}
                               {(tool.state === 'result' || 'result' in tool) && (
                                 <div className={tool.result?.error || tool.result?.success === false ? "text-red-400 font-medium" : "text-emerald-400 font-medium"}>
                                   {tool.result?.error || tool.result?.success === false ? "✖ Action Failed" : "✔ Successfully Completed"}
@@ -271,7 +271,7 @@ export function GlobalAiWidget() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Area */}
+            {}
             <div className="p-2 md:p-4 bg-[#0f0f0f] border-t border-white/5 shrink-0 z-10 w-full">
               {files.length > 0 && (
                  <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -293,7 +293,7 @@ export function GlobalAiWidget() {
               <form onSubmit={onSubmit} className="flex flex-col gap-2">
                 <div className="flex items-center bg-transparent rounded-2xl border border-white/10 focus-within:border-pink-500/50 transition-colors p-2 gap-2 relative group">
                   
-                  {/* Plus Icon Button (File Upload) */}
+                  {}
                   <button 
                     type="button" 
                     onClick={() => fileInputRef.current?.click()}
@@ -306,12 +306,10 @@ export function GlobalAiWidget() {
                     type="file" 
                     ref={fileInputRef} 
                     onChange={handleFileChange} 
-                    accept="image/*" 
+                    accept="image/*"
                     multiple
-                    className="hidden" 
+                    className="hidden"
                   />
-                  
-                  {/* Main Input Text */}
                   <input
                     value={myInput}
                     onChange={(e) => setMyInput(e.target.value)}
@@ -320,7 +318,7 @@ export function GlobalAiWidget() {
                     disabled={isLoading}
                   />
 
-                  {/* Mic Button */}
+                  {}
                   {isSupported && (
                     <button 
                       type="button" 
@@ -335,7 +333,7 @@ export function GlobalAiWidget() {
                     </button>
                   )}
                   
-                  {/* Send Button */}
+                  {}
                   <button 
                     type="submit" 
                     disabled={isLoading || (!(myInput || '').trim() && files.length === 0)}
@@ -358,7 +356,7 @@ export function GlobalAiWidget() {
         )}
       </AnimatePresence>
 
-      {/* Floating Orb State */}
+      {}
       <AnimatePresence>
         {widgetState === 'minimized' && (
           <motion.button
@@ -369,7 +367,7 @@ export function GlobalAiWidget() {
             className="group relative w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-tr from-pink-600 to-purple-600 shadow-[0_0_30px_rgba(236,72,153,0.3)] flex items-center justify-center hover:scale-105 transition-transform overflow-hidden pointer-events-auto"
           >
             <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity">
-               {/* Tiny 3D orb inside the button */}
+               {}
                <AiOrb3D state="neutral" />
             </div>
             <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-white relative z-10 drop-shadow-md" />

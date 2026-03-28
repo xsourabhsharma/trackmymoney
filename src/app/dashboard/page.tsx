@@ -41,10 +41,9 @@ export default async function DashboardOverviewPage({
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-500">
-      {}
-      <div className="flex flex-wrap items-center justify-between gap-4 overflow-x-auto pb-4 border-b border-[var(--border-light)]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 overflow-x-auto pb-4 border-b border-[var(--border-light)]">
         <DashboardSubNav />
-        <div className="ml-auto">
+        <div className="w-full sm:w-auto sm:ml-auto">
           <AddTransactionButton 
             categories={allCategories || []} 
             accounts={userAccounts || []} 

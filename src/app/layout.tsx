@@ -35,12 +35,19 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  appleWebApp: {
+    capable: true,
+    title: 'TrackMyMoney',
+    statusBarStyle: 'default',
+  },
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
- 
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#1C1B19',
 };
 
 export default function RootLayout({
