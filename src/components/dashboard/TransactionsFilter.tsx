@@ -26,14 +26,6 @@ export function TransactionsFilter({ categories }: TransactionsFilterProps) {
   const [type, setType] = useState(searchParams.get('type') || 'all')
   const [categoryId, setCategoryId] = useState(searchParams.get('cat') || 'all')
 
- 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      createQueryString('q', query)
-    }, 500)
-    return () => clearTimeout(handler)
-  }, [query])
-
   const createQueryString = useCallback(
     (name: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString())
@@ -54,6 +46,13 @@ export function TransactionsFilter({ categories }: TransactionsFilterProps) {
     },
     [searchParams, pathname, router]
   )
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      createQueryString('q', query)
+    }, 500)
+    return () => clearTimeout(handler)
+  }, [query, createQueryString])
 
   const handleReset = () => {
     setQuery('')

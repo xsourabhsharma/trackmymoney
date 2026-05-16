@@ -30,7 +30,7 @@ export function OnboardingWizard({ userName }: OnboardingWizardProps) {
           </h1>
           
           <p className="text-lg text-[var(--text-muted)] max-w-xl mx-auto mb-12 font-medium">
-            Your financial intelligence hub is ready. Setup takes less than 2 minutes. Let's build your unified dashboard.
+            Your financial intelligence hub is ready. Setup takes less than 2 minutes. Let&apos;s build your unified dashboard.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left max-w-2xl mx-auto">

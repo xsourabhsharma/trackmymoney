@@ -7,11 +7,6 @@ interface Props {
   comparison: PeriodComparisonMetrics
 }
 
-function fmt(n: number) {
-  if (Math.abs(n) >= 1000) return `$${(n / 1000).toFixed(1)}k`
-  return `$${n.toFixed(0)}`
-}
-
 export function CashFlowChartSection({ points, comparison }: Props) {
   if (points.length === 0) {
     return (

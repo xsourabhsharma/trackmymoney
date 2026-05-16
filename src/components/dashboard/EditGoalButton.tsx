@@ -17,7 +17,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { updateSavingsGoal } from '@/app/dashboard/goals/actions'
 
-export function EditGoalButton({ goal }: { goal: any }) {
+interface EditableGoal {
+  id: string
+  name: string
+  target_amount: string | number
+  current_amount: string | number
+  deadline?: string | null
+}
+
+export function EditGoalButton({ goal }: { goal: EditableGoal }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)

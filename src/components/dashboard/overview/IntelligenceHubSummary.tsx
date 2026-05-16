@@ -1,6 +1,5 @@
 'use client'
 
-import { Activity } from 'lucide-react'
 import { useCurrency } from '@/hooks/useCurrency'
 
 interface Props {

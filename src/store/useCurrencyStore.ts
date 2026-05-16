@@ -9,7 +9,7 @@ interface CurrencyState {
 }
 
 export const useCurrencyStore = create<CurrencyState>()((set) => ({
-  currency: 'INR',
+  currency: 'USD',
   setCurrency: (currency: CurrencyCode) => set({ currency }),
   toggleCurrency: () => set((state: CurrencyState) => ({ currency: state.currency === 'USD' ? 'INR' : 'USD' }))
 }))

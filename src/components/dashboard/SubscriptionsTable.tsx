@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useTransition, useOptimistic } from 'react'
-import { MoreHorizontal, Pause, Play, Download, Trash2, ArrowUpDown } from 'lucide-react'
+import { MoreHorizontal, Pause, Trash2 } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import type { SubscriptionRow } from '@/app/dashboard/subscriptions/data'
 import { pauseSubscriptions, deleteSubscriptions } from '@/app/dashboard/subscriptions/actions'
@@ -17,9 +17,6 @@ interface SubscriptionsTableProps {
 
 export function SubscriptionsTable({
   subscriptions,
-  totalCount,
-  page,
-  pageSize,
   onEdit
 }: SubscriptionsTableProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())

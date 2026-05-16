@@ -20,7 +20,14 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from '@/components/ui/toast-provider'
 
-export function AddBudgetButton({ categories }: { categories: any[] }) {
+interface BudgetCategory {
+  id: string
+  name: string
+  icon?: string | null
+  type?: string | null
+}
+
+export function AddBudgetButton({ categories }: { categories: BudgetCategory[] }) {
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>('')

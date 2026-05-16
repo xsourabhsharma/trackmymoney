@@ -3,7 +3,7 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
 import { EmptyState } from './EmptyState'
 import { PieChart as PieChartIcon } from 'lucide-react'
-
+
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#6366f1']
 
 interface ExpenseBreakdownChartProps {
@@ -26,7 +26,7 @@ export function ExpenseBreakdownChart({ data }: ExpenseBreakdownChartProps) {
     )
   }
 
- 
+
   const chartData = data.map(d => ({
     name: d.categoryName,
     value: d.amount
@@ -37,7 +37,7 @@ export function ExpenseBreakdownChart({ data }: ExpenseBreakdownChartProps) {
       <h3 className="w-full text-left text-sm font-bold uppercase tracking-wider text-[var(--text-main)] mb-2">
         Expense Breakdown
       </h3>
-      <ResponsiveContainer width="100%" height="90%">
+      <ResponsiveContainer width="100%" height="90%" initialDimension={{ width: 560, height: 300 }}>
         <PieChart>
           <Pie
             data={chartData}
@@ -54,13 +54,13 @@ export function ExpenseBreakdownChart({ data }: ExpenseBreakdownChartProps) {
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
-          <Tooltip 
-            formatter={(value: any) => [
+          <Tooltip
+            formatter={(value: unknown) => [
               `₹${Number(value).toLocaleString()}`,
               'Amount'
             ]}
-            contentStyle={{ 
-              backgroundColor: 'var(--bg-base)', 
+            contentStyle={{
+              backgroundColor: 'var(--bg-base)',
               border: '3px solid var(--border-main)',
               borderRadius: '12px',
               boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)',
@@ -68,11 +68,11 @@ export function ExpenseBreakdownChart({ data }: ExpenseBreakdownChartProps) {
               color: 'var(--text-main)'
             }}
           />
-          <Legend 
-            verticalAlign="bottom" 
-            height={36} 
-            iconType="circle" 
-            wrapperStyle={{ fontWeight: 'bold', fontSize: '12px' }} 
+          <Legend
+            verticalAlign="bottom"
+            height={36}
+            iconType="circle"
+            wrapperStyle={{ fontWeight: 'bold', fontSize: '12px' }}
           />
         </PieChart>
       </ResponsiveContainer>

@@ -2,15 +2,13 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
 
 export async function deleteTransaction(id: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  const admin = createAdminClient()
-  const { error } = await admin
+  const { error } = await supabase
     .from('transactions')
     .delete()
     .eq('id', id)

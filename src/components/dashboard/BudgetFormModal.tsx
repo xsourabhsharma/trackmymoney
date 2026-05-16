@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { X, Plus, Edit3, Loader2 } from 'lucide-react'
 import { createBudget, updateBudget } from '@/app/dashboard/budgets/actions'
-import { CategoryBudgetItem } from '@/app/dashboard/budgets/data'
+import type { CategoryBudgetItem } from '@/app/dashboard/budgets/data'
 
 interface Category {
   id: string
@@ -76,8 +76,8 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
           })
         }
         onClose()
-      } catch (err: any) {
-        setError(err.message || 'Something went wrong.')
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Something went wrong.')
       }
     })
   }

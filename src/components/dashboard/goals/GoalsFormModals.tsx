@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { X, Target, Loader2, CreditCard } from 'lucide-react'
 import { addSavingsGoal, updateSavingsGoal, addDebt, updateDebt } from '@/app/dashboard/goals/actions'
-import { SavingsGoalRow, DebtRow } from '@/app/dashboard/goals/data'
+import type { SavingsGoalRow, DebtRow } from '@/app/dashboard/goals/data'
 
 
 interface GoalModalProps {
@@ -35,8 +35,8 @@ export function GoalFormModal({ isOpen, onClose, editGoal }: GoalModalProps) {
         if (isEdit) await updateSavingsGoal(data)
         else await addSavingsGoal(data)
         onClose()
-      } catch (err: any) {
-        setError(err.message || 'Something went wrong.')
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Something went wrong.')
       }
     })
   }
@@ -147,8 +147,8 @@ export function DebtFormModal({ isOpen, onClose, editDebt }: DebtModalProps) {
         if (isEdit) await updateDebt(data)
         else await addDebt(data)
         onClose()
-      } catch (err: any) {
-        setError(err.message || 'Something went wrong.')
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Something went wrong.')
       }
     })
   }

@@ -8,7 +8,7 @@ import {
   goals
 } from '@/db/schema'
 import { eq, and, gte, lte, sum, desc, sql, count } from 'drizzle-orm'
-import { addDays, differenceInDays, format } from 'date-fns'
+import { addDays, differenceInDays } from 'date-fns'
 
 export async function getOverviewMetrics(userId: string, from: Date, to: Date) {
  

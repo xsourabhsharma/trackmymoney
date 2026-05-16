@@ -1,7 +1,6 @@
 'use client'
 
-import { ReportsFilter, ReportsPeriod, ReportsScope, ReportsView } from '@/app/dashboard/reports/data'
-import { Calendar, ChevronDown } from 'lucide-react'
+import type { ReportsFilter, ReportsPeriod, ReportsView } from '@/app/dashboard/reports/data'
 
 interface Props {
   filter: ReportsFilter

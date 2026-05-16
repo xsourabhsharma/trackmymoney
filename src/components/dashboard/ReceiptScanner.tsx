@@ -46,16 +46,16 @@ export function ReceiptScanner() {
       })
 
       if (!response.ok) {
-        const errData = await response.json().catch(() => null)
+        const errData = await response.json().catch(() => null) as { details?: string } | null
         throw new Error(errData?.details || 'OCR failed')
       }
 
-      const data = await response.json()
+      const data = await response.json() as OCRResult
       setResult(data)
       addToast('Receipt scanned successfully!', 'success')
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error)
-      addToast(`Error: ${error.message}`, 'error')
+      addToast(`Error: ${error instanceof Error ? error.message : 'OCR failed'}`, 'error')
     } finally {
       setIsProcessing(false)
     }
@@ -78,8 +78,8 @@ export function ReceiptScanner() {
         })
         addToast('Transaction saved!', 'success')
         handleClear()
-      } catch (error: any) {
-        addToast(error.message || 'Failed to save transaction.', 'error')
+      } catch (error: unknown) {
+        addToast(error instanceof Error ? error.message : 'Failed to save transaction.', 'error')
       }
     })
   }

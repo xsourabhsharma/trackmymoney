@@ -13,7 +13,18 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { bulkInsertTransactions } from '@/app/dashboard/transactions/bulk-actions'
+import { bulkInsertTransactions, type BulkTransactionInput } from '@/app/dashboard/transactions/bulk-actions'
+
+interface CsvTransactionRow {
+  amount?: string
+  Amount?: string
+  merchant?: string
+  Merchant?: string
+  date?: string
+  Date?: string
+  type?: string
+  Type?: string
+}
 
 export function BulkUploadModal() {
   const [open, setOpen] = useState(false)
@@ -46,7 +57,7 @@ export function BulkUploadModal() {
     setIsUploading(true)
     setError(null)
 
-    Papa.parse(file, {
+    Papa.parse<CsvTransactionRow>(file, {
       header: true,
       skipEmptyLines: true,
       complete: async (results) => {
@@ -61,10 +72,10 @@ export function BulkUploadModal() {
           }
 
          
-          const validTransactions = results.data.map((row: any) => ({
-            amount: parseFloat(row.amount || row.Amount),
+          const validTransactions: BulkTransactionInput[] = results.data.map((row) => ({
+            amount: parseFloat(row.amount || row.Amount || ''),
             merchant: row.merchant || row.Merchant,
-            date: row.date || row.Date,
+            date: row.date || row.Date || '',
             type: (row.type || row.Type || 'expense').toLowerCase(),
           })).filter(tx => !isNaN(tx.amount) && tx.merchant && tx.date)
 
@@ -81,13 +92,13 @@ export function BulkUploadModal() {
             setSuccessCount(null)
           }, 2000)
 
-        } catch (err: any) {
-          setError(err.message)
+        } catch (err: unknown) {
+          setError(err instanceof Error ? err.message : 'Failed to import CSV.')
         } finally {
           setIsUploading(false)
         }
       },
-      error: (err) => {
+      error: () => {
         setError("Failed to parse CSV file.")
         setIsUploading(false)
       }

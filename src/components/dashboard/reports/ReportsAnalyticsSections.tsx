@@ -1,6 +1,6 @@
 'use client'
 
-import { CategorySpendingItem, MerchantSpendingItem, PeriodComparisonMetrics } from '@/app/dashboard/reports/data'
+import type { CategorySpendingItem, MerchantSpendingItem, PeriodComparisonMetrics } from '@/app/dashboard/reports/data'
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
 
 
@@ -9,7 +9,7 @@ interface TopCatsProps {
   totalExpenses: number
 }
 
-export function TopCategoriesSection({ topCategories, totalExpenses }: TopCatsProps) {
+export function TopCategoriesSection({ topCategories }: TopCatsProps) {
   function fmt(n: number) {
     return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }

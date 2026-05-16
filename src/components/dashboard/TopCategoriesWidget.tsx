@@ -1,13 +1,22 @@
 'use client'
 import { Progress } from "@/components/ui/progress"
 
-export function TopCategoriesWidget({ expenses }: { expenses: any[] }) {
+interface TopCategoryTransaction {
+  type: string
+  amount: string | number
+  categories?: {
+    name?: string | null
+    icon?: string | null
+  } | null
+}
+
+export function TopCategoriesWidget({ expenses }: { expenses: TopCategoryTransaction[] }) {
   const categoryMap: Record<string, { name: string, icon: string, amount: number }> = {}
   let total = 0
   
   expenses.forEach(e => {
     if (e.type === 'expense') {
-      const amt = parseFloat(e.amount)
+      const amt = Number(e.amount)
       total += amt
       const catId = e.categories?.name || 'Other'
       if (!categoryMap[catId]) {

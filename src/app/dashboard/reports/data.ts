@@ -1,10 +1,8 @@
 import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
 import {
   startOfMonth, endOfMonth, startOfYear,
-  subMonths, subDays, format, eachDayOfInterval, eachMonthOfInterval,
+  subMonths, format,
 } from 'date-fns'
-
 
 export type ReportsPeriod = 'this_month' | 'last_month' | 'last_three_months' | 'year_to_date'
 export type ReportsScope = 'all' | 'bank' | 'card'
@@ -15,18 +13,17 @@ export interface ReportsFilter {
   scope: ReportsScope
   view: ReportsView
 }
-
 
 export interface SummaryMetrics {
   periodIncome: number
   periodExpenses: number
   savingsRate: number
-  incomeChangeVsPrev: number   
+  incomeChangeVsPrev: number
   expenseChangeVsPrev: number
 }
 
 export interface CashFlowPoint {
-  date: string       
+  date: string
   income: number
   expense: number
   net: number
@@ -72,8 +69,69 @@ export interface ReportsPageData {
   topCategories: CategorySpendingItem[]
   topMerchants: MerchantSpendingItem[]
   periodComparison: PeriodComparisonMetrics
+  dataWarning?: string
 }
-
+
+interface ReportAccountRow {
+  id: string
+  type: string | null
+}
+
+interface ReportCategory {
+  id: string
+  name: string
+  icon: string | null
+  color: string | null
+}
+
+interface ReportTransactionRow {
+  amount: string | number
+  type: 'income' | 'expense' | 'transfer'
+  date: string | null
+  merchant: string | null
+  category_id: string | null
+  categories: ReportCategory | ReportCategory[] | null
+}
+
+interface PreviousTransactionRow {
+  amount: string | number
+  type: 'income' | 'expense' | 'transfer'
+}
+
+const REPORT_PERIODS: readonly ReportsPeriod[] = ['this_month', 'last_month', 'last_three_months', 'year_to_date']
+const REPORT_SCOPES: readonly ReportsScope[] = ['all', 'bank', 'card']
+const REPORT_VIEWS: readonly ReportsView[] = ['summary', 'detailed', 'tax']
+
+export function normalizeReportsPeriod(value: unknown): ReportsPeriod {
+  return typeof value === 'string' && REPORT_PERIODS.includes(value as ReportsPeriod)
+    ? value as ReportsPeriod
+    : 'this_month'
+}
+
+export function normalizeReportsScope(value: unknown): ReportsScope {
+  return typeof value === 'string' && REPORT_SCOPES.includes(value as ReportsScope)
+    ? value as ReportsScope
+    : 'all'
+}
+
+export function normalizeReportsView(value: unknown): ReportsView {
+  return typeof value === 'string' && REPORT_VIEWS.includes(value as ReportsView)
+    ? value as ReportsView
+    : 'summary'
+}
+
+function normalizeReportsFilter(filter: ReportsFilter): ReportsFilter {
+  return {
+    period: normalizeReportsPeriod(filter.period),
+    scope: normalizeReportsScope(filter.scope),
+    view: normalizeReportsView(filter.view),
+  }
+}
+
+function unwrapJoin<T>(value: T | T[] | null | undefined): T | null {
+  if (!value) return null
+  return Array.isArray(value) ? value[0] ?? null : value
+}
 
 export function getDateRangeForReports(
   period: ReportsPeriod,
@@ -86,14 +144,13 @@ export function getDateRangeForReports(
         endDate: format(now, 'yyyy-MM-dd'),
       }
     case 'last_month': {
-      const lm = subMonths(now, 1)
+      const lastMonth = subMonths(now, 1)
       return {
-        startDate: format(startOfMonth(lm), 'yyyy-MM-dd'),
-        endDate: format(endOfMonth(lm), 'yyyy-MM-dd'),
+        startDate: format(startOfMonth(lastMonth), 'yyyy-MM-dd'),
+        endDate: format(endOfMonth(lastMonth), 'yyyy-MM-dd'),
       }
     }
     case 'last_three_months': {
-     
       const threeBack = subMonths(now, 3)
       return {
         startDate: format(startOfMonth(threeBack), 'yyyy-MM-dd'),
@@ -127,44 +184,47 @@ function changePct(current: number, previous: number): number {
   if (previous === 0) return current > 0 ? 100 : 0
   return ((current - previous) / Math.abs(previous)) * 100
 }
-
 
 export async function loadReportsPageData(filter: ReportsFilter): Promise<ReportsPageData> {
   const supabase = await createClient()
   const { data: { user }, error: authErr } = await supabase.auth.getUser()
   if (authErr || !user) throw new Error('Unauthorized')
 
-  const admin = createAdminClient()
+  const safeFilter = normalizeReportsFilter(filter)
   const now = new Date()
-  const { startDate, endDate } = getDateRangeForReports(filter.period, now)
+  const { startDate, endDate } = getDateRangeForReports(safeFilter.period, now)
   const prevRange = getPreviousPeriodRange(startDate, endDate)
+  const warnings: string[] = []
 
- 
   let accountIds: string[] | null = null
-  if (filter.scope !== 'all') {
-    const { data: accounts } = await admin
+  if (safeFilter.scope !== 'all') {
+    const { data: accountsRaw, error: accountsError } = await supabase
       .from('accounts')
       .select('id, type')
       .eq('user_id', user.id)
 
-    const typeMap: Record<ReportsScope, string[]> = {
-      all: [],
-      bank: ['bank', 'checking', 'savings'],
-      card: ['card', 'credit_card', 'credit'],
-    }
-    const types = typeMap[filter.scope]
-    accountIds = (accounts || [])
-      .filter(a => types.some(t => a.type?.toLowerCase().includes(t)))
-      .map(a => a.id)
+    if (accountsError) {
+      console.error('Reports account fetch error:', accountsError.message, accountsError.hint)
+      warnings.push('Account filters could not be loaded.')
+      accountIds = ['__none__']
+    } else {
+      const typeMap: Record<ReportsScope, string[]> = {
+        all: [],
+        bank: ['bank', 'checking', 'savings'],
+        card: ['card', 'credit_card', 'credit'],
+      }
+      const types = typeMap[safeFilter.scope]
+      accountIds = ((accountsRaw || []) as ReportAccountRow[])
+        .filter(account => types.some(type => account.type?.toLowerCase().includes(type)))
+        .map(account => account.id)
 
-   
-    if (accountIds.length === 0) accountIds = ['__none__']
+      if (accountIds.length === 0) accountIds = ['__none__']
+    }
   }
 
- 
-  let txQuery = admin
+  let txQuery = supabase
     .from('transactions')
-    .select(`amount, type, date, merchant, category_id, categories ( id, name, icon, color )`)
+    .select('amount, type, date, merchant, category_id, categories ( id, name, icon, color )')
     .eq('user_id', user.id)
     .gte('date', startDate)
     .lte('date', endDate)
@@ -172,11 +232,14 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
 
   if (accountIds) txQuery = txQuery.in('account_id', accountIds)
 
-  const { data: txRaw } = await txQuery
-  const transactions = txRaw || []
+  const { data: txRaw, error: txError } = await txQuery
+  if (txError) {
+    console.error('Reports transaction fetch error:', txError.message, txError.hint)
+    warnings.push('Transactions for this report could not be loaded.')
+  }
+  const transactions = (txRaw || []) as unknown as ReportTransactionRow[]
 
- 
-  let prevTxQuery = admin
+  let prevTxQuery = supabase
     .from('transactions')
     .select('amount, type')
     .eq('user_id', user.id)
@@ -185,11 +248,13 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
 
   if (accountIds) prevTxQuery = prevTxQuery.in('account_id', accountIds)
 
-  const { data: prevTxRaw } = await prevTxQuery
-  const prevTransactions = prevTxRaw || []
+  const { data: prevTxRaw, error: prevTxError } = await prevTxQuery
+  if (prevTxError) {
+    console.error('Reports previous transaction fetch error:', prevTxError.message, prevTxError.hint)
+    warnings.push('Previous period comparison could not be loaded.')
+  }
+  const prevTransactions = (prevTxRaw || []) as PreviousTransactionRow[]
 
-
- 
   let periodIncome = 0
   let periodExpenses = 0
   const cashFlowMap: Record<string, { income: number; expense: number }> = {}
@@ -197,74 +262,71 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
   const merchantMap: Record<string, { count: number; total: number }> = {}
 
   for (const tx of transactions) {
-    const amt = Number(tx.amount || 0)
-    const cat = tx.categories as unknown as { id: string; name: string; icon: string | null; color: string | null } | null
+    const amount = Number(tx.amount || 0)
+    const category = unwrapJoin(tx.categories)
     const dayKey = tx.date?.slice(0, 7) ?? ''
 
     if (!cashFlowMap[dayKey]) cashFlowMap[dayKey] = { income: 0, expense: 0 }
 
     if (tx.type === 'income') {
-      periodIncome += amt
-      cashFlowMap[dayKey].income += amt
+      periodIncome += amount
+      cashFlowMap[dayKey].income += amount
     } else if (tx.type === 'expense') {
-      periodExpenses += amt
-      cashFlowMap[dayKey].expense += amt
+      periodExpenses += amount
+      cashFlowMap[dayKey].expense += amount
 
-      const catKey = tx.category_id || '__none__'
-      if (!categoryMap[catKey]) {
-        categoryMap[catKey] = {
-          amount: 0, count: 0,
-          name: cat?.name || 'Uncategorized',
-          icon: cat?.icon || null,
-          color: cat?.color || null,
+      const categoryKey = tx.category_id || '__none__'
+      if (!categoryMap[categoryKey]) {
+        categoryMap[categoryKey] = {
+          amount: 0,
+          count: 0,
+          name: category?.name || 'Uncategorized',
+          icon: category?.icon || null,
+          color: category?.color || null,
         }
       }
-      categoryMap[catKey].amount += amt
-      categoryMap[catKey].count++
+      categoryMap[categoryKey].amount += amount
+      categoryMap[categoryKey].count += 1
 
       const merchant = tx.merchant || 'Unknown'
       if (!merchantMap[merchant]) merchantMap[merchant] = { count: 0, total: 0 }
-      merchantMap[merchant].count++
-      merchantMap[merchant].total += amt
+      merchantMap[merchant].count += 1
+      merchantMap[merchant].total += amount
     }
   }
 
- 
   let prevIncome = 0
   let prevExpenses = 0
   for (const tx of prevTransactions) {
-    const amt = Number(tx.amount || 0)
-    if (tx.type === 'income') prevIncome += amt
-    else if (tx.type === 'expense') prevExpenses += amt
+    const amount = Number(tx.amount || 0)
+    if (tx.type === 'income') prevIncome += amount
+    else if (tx.type === 'expense') prevExpenses += amount
   }
 
- 
   const cashFlowSeries: CashFlowPoint[] = Object.entries(cashFlowMap)
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([date, vals]) => ({
+    .map(([date, values]) => ({
       date,
-      income: vals.income,
-      expense: vals.expense,
-      net: vals.income - vals.expense,
+      income: values.income,
+      expense: values.expense,
+      net: values.income - values.expense,
     }))
 
- 
-  const totalExp = periodExpenses || 1
+  const totalExpensesForShare = periodExpenses || 1
   const categorySpending: CategorySpendingItem[] = Object.entries(categoryMap)
-    .map(([id, val]) => ({
+    .map(([id, value]) => ({
       categoryId: id === '__none__' ? null : id,
-      categoryName: val.name,
-      categoryIcon: val.icon,
-      categoryColor: val.color,
-      amount: val.amount,
-      transactionCount: val.count,
-      percentOfTotal: Math.round((val.amount / totalExp) * 100),
+      categoryName: value.name,
+      categoryIcon: value.icon,
+      categoryColor: value.color,
+      amount: value.amount,
+      transactionCount: value.count,
+      percentOfTotal: Math.round((value.amount / totalExpensesForShare) * 100),
     }))
     .sort((a, b) => b.amount - a.amount)
 
   const topCategories = categorySpending.slice(0, 8)
 
- 
   const topMerchants: MerchantSpendingItem[] = Object.entries(merchantMap)
     .filter(([name]) => name !== 'Unknown' && name !== '')
     .sort((a, b) => b[1].total - a[1].total)
@@ -276,7 +338,6 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
       averageAmount: data.total / data.count,
     }))
 
- 
   const netCurrent = periodIncome - periodExpenses
   const netPrevious = prevIncome - prevExpenses
   const efficiencyCurrent = periodIncome > 0 ? (netCurrent / periodIncome) * 100 : 0
@@ -299,7 +360,7 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
   const savingsRate = periodIncome > 0 ? Math.max(0, (netCurrent / periodIncome) * 100) : 0
 
   return {
-    filter,
+    filter: safeFilter,
     dateRange: { startDate, endDate },
     summary: {
       periodIncome,
@@ -313,5 +374,8 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
     topCategories,
     topMerchants,
     periodComparison,
+    dataWarning: warnings.length > 0
+      ? `${warnings.join(' ')} Refresh the page or adjust the report filters.`
+      : undefined,
   }
 }

@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { requestPasswordReset } from '../login/actions'
 import { Mail, ArrowLeft, CheckCircle, Loader2, Shield, Lock, Send, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default function ForgotPasswordPage() {
   const [isPending, setIsPending] = useState(false)
@@ -34,6 +35,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)] flex flex-col items-center justify-center px-6 py-12 font-sans relative overflow-hidden">
+      <ThemeToggle variant="public" className="fixed right-5 top-5 z-30" />
       {}
       <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[var(--income-green)]/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />

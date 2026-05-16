@@ -41,7 +41,7 @@ export function ExpenseDonutChart({ data, total, onSectorClick }: Props) {
   return (
     <div className="flex flex-col items-center">
       <div className="w-44 h-44 relative">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 176, height: 176 }}>
           <PieChart>
             <Pie
               data={data}

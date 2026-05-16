@@ -74,6 +74,7 @@ export interface GoalsDebtsPageData {
   goalProgressSnapshot: GoalProgressSnapshot
   debtFreeCountdown: DebtFreeCountdown | null
   aiSuggestions: AiGoalDebtSuggestion[]
+  dataWarning?: string
 }
 
 

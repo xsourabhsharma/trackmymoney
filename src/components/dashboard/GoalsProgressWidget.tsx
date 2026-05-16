@@ -1,22 +1,29 @@
 import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
 import { Progress } from "@/components/ui/progress"
+
+type GoalProgressRow = {
+  id: string
+  name: string
+  icon: string | null
+  target_amount: string | number
+  current_amount: string | number
+}
 
 export async function GoalsProgressWidget() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  const supabaseAdmin = createAdminClient()
-
-  const { data: goals } = await supabaseAdmin
-    .from('savings_goals')
-    .select('*')
+  const { data: goals } = await supabase
+    .from('goals')
+    .select('id, name, icon, target_amount, current_amount')
     .eq('user_id', user.id)
     .order('target_amount', { ascending: false })
     .limit(3)
 
   if (!goals || goals.length === 0) return null
+
+  const rows = goals as GoalProgressRow[]
 
   return (
     <div className="panel shadow-[4px_4px_0px_0px_rgba(20,20,20,1)]">
@@ -24,9 +31,9 @@ export async function GoalsProgressWidget() {
         <h3 className="panel-title">Goals</h3>
       </div>
       <div className="p-4 space-y-5">
-        {goals.map((goal) => {
-          const target = parseFloat(goal.target_amount)
-          const current = parseFloat(goal.current_amount)
+        {rows.map((goal) => {
+          const target = Number(goal.target_amount || 0)
+          const current = Number(goal.current_amount || 0)
           const percentage = target > 0 ? Math.min(Math.round((current / target) * 100), 100) : 0
           
           return (

@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { parseCsvFile } from '@/lib/csv-parser';
-
-const MAX_UPLOAD_FILE_SIZE = 5 * 1024 * 1024;
-const ALLOWED_CSV_TYPES = new Set([
-  'text/csv',
-  'application/vnd.ms-excel',
-  'application/csv',
-  'text/plain',
-  '',
-]);
+import {
+  IMPORT_CSV_ALLOWED_MIME_TYPE_SET,
+  IMPORT_CSV_MAX_FILE_SIZE_BYTES,
+  IMPORT_CSV_MAX_FILE_SIZE_LABEL,
+} from '@/lib/import/constants';
+import {
+  findDuplicateImportRowIds,
+  parseExistingTransactionsForDuplicateCheck,
+  type ImportDuplicateCandidate,
+} from '@/lib/import/duplicates';
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -31,12 +32,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Only CSV files are supported' }, { status: 400 });
     }
 
-    if (!ALLOWED_CSV_TYPES.has(file.type)) {
+    if (!IMPORT_CSV_ALLOWED_MIME_TYPE_SET.has(file.type)) {
       return NextResponse.json({ error: 'Unsupported file type' }, { status: 400 });
     }
 
-    if (file.size > MAX_UPLOAD_FILE_SIZE) {
-      return NextResponse.json({ error: 'CSV file must be 5 MB or smaller' }, { status: 413 });
+    if (file.size > IMPORT_CSV_MAX_FILE_SIZE_BYTES) {
+      return NextResponse.json({ error: `CSV file must be ${IMPORT_CSV_MAX_FILE_SIZE_LABEL} or smaller` }, { status: 413 });
     }
 
     const { data: job, error: jobError } = await supabase
@@ -116,7 +117,7 @@ export async function POST(req: NextRequest) {
 
       const { data: existingTransactions } = await supabase
         .from('transactions')
-        .select('id, amount, date')
+        .select('id, amount, date, merchant, description, account_id')
         .eq('user_id', user.id)
         .gte('date', minDate.toISOString())
         .lte('date', maxDate.toISOString());
@@ -124,32 +125,39 @@ export async function POST(req: NextRequest) {
       if (existingTransactions && existingTransactions.length > 0) {
         const { data: currentStaged } = await supabase
           .from('import_rows')
-          .select('id, parsed_amount, parsed_date, has_error')
+          .select('id, parsed_amount, parsed_date, parsed_merchant, parsed_description, has_error')
           .eq('import_job_id', jobId)
           .eq('user_id', user.id);
 
         if (currentStaged) {
-          const duplicateIds: string[] = [];
+          const duplicateCandidates: ImportDuplicateCandidate[] = [];
 
           currentStaged.forEach((staged) => {
             if (staged.has_error || !staged.parsed_amount || !staged.parsed_date) {
               return;
             }
 
-            const stagedDate = new Date(staged.parsed_date);
             const amount = Number(staged.parsed_amount);
-
-            const isDuplicate = existingTransactions.some((transaction) => {
-              const transactionDate = new Date(transaction.date);
-              const diffTime = Math.abs(transactionDate.getTime() - stagedDate.getTime());
-              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-              return diffDays <= 3 && Math.abs(Number(transaction.amount) - amount) < 0.01;
-            });
-
-            if (isDuplicate) {
-              duplicateIds.push(staged.id);
+            if (!Number.isFinite(amount) || amount <= 0) {
+              return;
             }
+
+            duplicateCandidates.push({
+              id: staged.id,
+              amount,
+              date: staged.parsed_date,
+              merchant: staged.parsed_merchant,
+              description: staged.parsed_description,
+              accountId: null,
+            });
           });
+
+          const duplicateIds = [
+            ...findDuplicateImportRowIds(
+              duplicateCandidates,
+              parseExistingTransactionsForDuplicateCheck(existingTransactions)
+            ),
+          ];
 
           if (duplicateIds.length > 0) {
             for (let index = 0; index < duplicateIds.length; index += BATCH_SIZE) {

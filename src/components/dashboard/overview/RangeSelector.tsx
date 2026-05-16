@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Calendar } from 'lucide-react'
 
 const RANGES = [
   { label: 'Week', value: 'week' },
@@ -22,8 +21,6 @@ export function RangeSelector() {
     params.set('range', value)
     router.push(`?${params.toString()}`, { scroll: false })
   }
-
-  const activeLabel = RANGES.find(r => r.value === currentRange)?.label || 'Month'
 
   return (
     <div className="flex flex-wrap gap-2">

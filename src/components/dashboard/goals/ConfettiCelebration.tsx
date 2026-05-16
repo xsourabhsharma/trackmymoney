@@ -1,19 +1,20 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import confetti from 'canvas-confetti'
 
 export function ConfettiCelebration({ percentage }: { percentage: number }) {
-  const [fired, setFired] = useState(false)
+  const firedRef = useRef(false)
 
   useEffect(() => {
-    if (percentage >= 100 && !fired) {
+    if (percentage >= 100 && !firedRef.current) {
+      firedRef.current = true
       const duration = 3 * 1000;
       const animationEnd = Date.now() + duration;
       const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
 
       const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
-      const interval: any = setInterval(function() {
+      const interval: ReturnType<typeof setInterval> = setInterval(function() {
         const timeLeft = animationEnd - Date.now();
 
         if (timeLeft <= 0) {
@@ -28,10 +29,8 @@ export function ConfettiCelebration({ percentage }: { percentage: number }) {
           origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
         }));
       }, 250);
-      
-      setFired(true)
     }
-  }, [percentage, fired])
+  }, [percentage])
 
   return null
 }

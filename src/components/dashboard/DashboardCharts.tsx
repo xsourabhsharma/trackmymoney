@@ -2,15 +2,17 @@
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
 
-export function DashboardCharts({ transactions }: { transactions: any[] }) {
+import type { TransactionRow } from '@/app/dashboard/transactions/data'
+
+export function DashboardCharts({ transactions }: { transactions: TransactionRow[] }) {
  
   const expenseTransactions = transactions.filter(t => t.type === 'expense')
   const categoryDataMap: Record<string, { name: string; value: number; color?: string }> = {}
 
   expenseTransactions.forEach(t => {
     const categoryName = t.categories?.name || 'Uncategorized'
-    const color = t.categories?.color
-    const amount = parseFloat(t.amount) || 0
+    const color = t.categories?.color ?? undefined
+    const amount = Number(t.amount) || 0
 
     if (!categoryDataMap[categoryName]) {
       categoryDataMap[categoryName] = { name: categoryName, value: 0, color }
@@ -35,7 +37,7 @@ export function DashboardCharts({ transactions }: { transactions: any[] }) {
   transactions.forEach(t => {
     const dateObj = new Date(t.date)
     const sortKey = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`
-    const amount = parseFloat(t.amount)
+    const amount = Number(t.amount)
 
    
     if (timeDataMap[sortKey]) {
@@ -56,7 +58,7 @@ export function DashboardCharts({ transactions }: { transactions: any[] }) {
         <h3 className="text-lg font-medium text-gray-900 mb-4">Expense Breakdown</h3>
         {pieData.length > 0 ? (
           <div className="flex-1 min-h-0">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 560, height: 300 }}>
               <PieChart>
                 <Pie
                   data={pieData}
@@ -71,7 +73,7 @@ export function DashboardCharts({ transactions }: { transactions: any[] }) {
                     <Cell key={`cell-${index}`} fill={entry.color || `hsl(${index * 137.5 % 360}, 70%, 50%)`} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value: any) => `$${Number(value).toFixed(2)}`} />
+                <Tooltip formatter={(value: unknown) => `$${Number(value).toFixed(2)}`} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -86,12 +88,12 @@ export function DashboardCharts({ transactions }: { transactions: any[] }) {
         <h3 className="text-lg font-medium text-gray-900 mb-4">Cash Flow</h3>
         {barData.length > 0 ? (
           <div className="flex-1 min-h-0">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 560, height: 300 }}>
               <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
                 <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12 }} tickFormatter={(val) => `$${val}`} />
-                <Tooltip formatter={(value: any) => `$${Number(value).toFixed(2)}`} cursor={{ fill: 'transparent' }} />
+                <Tooltip formatter={(value: unknown) => `$${Number(value).toFixed(2)}`} cursor={{ fill: 'transparent' }} />
                 <Legend />
                 <Bar dataKey="income" name="Income" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={40} />
                 <Bar dataKey="expense" name="Expense" fill="#EF4444" radius={[4, 4, 0, 0]} maxBarSize={40} />

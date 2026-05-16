@@ -1,7 +1,6 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
 
 export async function uploadAvatar(formData: FormData) {
   const supabase = await createClient()
@@ -18,14 +17,13 @@ export async function uploadAvatar(formData: FormData) {
   const ext = file.name.split('.').pop()
   const path = `${user.id}/avatar.${ext}`
 
-  const admin = createAdminClient()
-  const { error: uploadError } = await admin.storage
+  const { error: uploadError } = await supabase.storage
     .from('avatars')
     .upload(path, file, { upsert: true, contentType: file.type })
 
   if (uploadError) throw new Error(uploadError.message)
 
-  const { data: { publicUrl } } = admin.storage.from('avatars').getPublicUrl(path)
+  const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
 
   await supabase.auth.updateUser({
     data: { avatar_url: publicUrl },

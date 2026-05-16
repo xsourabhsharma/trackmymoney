@@ -1,8 +1,40 @@
 import { createClient } from '@/utils/supabase/server'
 import { normalizeToMonthlyCost } from '@/lib/subscription-utils'
+import {
+  DEFAULT_SUBSCRIPTION_INTERVAL,
+  subscriptionIntervalSchema,
+  subscriptionStatusSchema,
+  type SubscriptionInterval,
+  type SubscriptionStatus,
+} from '@/lib/contracts'
 
-export type SubscriptionStatus = 'active' | 'paused' | 'cancelled'
-export type SubscriptionInterval = 'weekly' | 'monthly' | 'yearly' | 'custom'
+export type { SubscriptionInterval, SubscriptionStatus } from '@/lib/contracts'
+
+type SubscriptionQueryRow = {
+  id: string
+  merchant: string
+  service_name: string | null
+  amount: string | number
+  currency: string
+  interval: string
+  status: string
+  next_charge_date: string | null
+  last_charge_date: string | null
+  category_id: string | null
+  linked_account_id: string | null
+  usage_score: string | number | null
+  potential_savings: boolean | null
+  categories?: {
+    id?: string | null
+    name?: string | null
+    icon?: string | null
+    color?: string | null
+  } | null
+  accounts?: {
+    id?: string | null
+    name?: string | null
+  } | null
+}
 
 export interface SubscriptionRow {
   id: string
@@ -41,7 +73,7 @@ export interface UpcomingChargeItem {
   amount: number
   currency: string
   nextChargeDate: string
-  interval: string
+  interval: SubscriptionInterval
 }
 
 export interface SubscriptionHealthMetrics {
@@ -70,6 +102,16 @@ export interface SubscriptionsPageData {
   categoriesBreakdown: SubscriptionCategoryItem[]
 }
 
+function normalizeInterval(interval: string): SubscriptionInterval {
+  const parsed = subscriptionIntervalSchema.safeParse(interval)
+  return parsed.success ? parsed.data : DEFAULT_SUBSCRIPTION_INTERVAL
+}
+
+function normalizeStatus(status: string): SubscriptionStatus {
+  const parsed = subscriptionStatusSchema.safeParse(status)
+  return parsed.success ? parsed.data : 'active'
+}
+
 export async function loadSubscriptionsPageData(
   filter: SubscriptionsFilter,
   page: number = 1,
@@ -92,7 +134,7 @@ export async function loadSubscriptionsPageData(
 
   if (allSubsError) console.error("Error fetching Subscriptions: ", allSubsError.message, allSubsError.details, allSubsError.hint)
 
-  const rows = allSubs || []
+  const rows = (allSubs || []) as SubscriptionQueryRow[]
   
  
   let totalMonthlyOutflow = 0
@@ -112,17 +154,20 @@ export async function loadSubscriptionsPageData(
 
   for (const sub of rows) {
     const amount = Number(sub.amount) || 0
-    const normalizedMonthly = normalizeToMonthlyCost(amount, sub.interval)
+    const interval = normalizeInterval(sub.interval)
+    const status = normalizeStatus(sub.status)
+    const usageScore = sub.usage_score !== null ? Number(sub.usage_score) : null
+    const normalizedMonthly = normalizeToMonthlyCost(amount, interval)
 
-    if (sub.status === 'active') {
+    if (status === 'active') {
       activeCount++
       totalMonthlyOutflow += normalizedMonthly
 
-      if (sub.potential_savings || (sub.usage_score !== null && sub.usage_score < 30)) {
+      if (sub.potential_savings || (usageScore !== null && usageScore < 30)) {
         potentialSavingsMonthly += normalizedMonthly
       }
 
-      if (sub.usage_score !== null && sub.usage_score < 30) rarelyUsedCount++
+      if (usageScore !== null && usageScore < 30) rarelyUsedCount++
 
      
       if (sub.next_charge_date) {
@@ -137,7 +182,7 @@ export async function loadSubscriptionsPageData(
             amount,
             currency: sub.currency,
             nextChargeDate: sub.next_charge_date,
-            interval: sub.interval
+            interval
           })
         }
       }
@@ -184,7 +229,7 @@ export async function loadSubscriptionsPageData(
   let filteredRows = [...rows]
   
   if (filter.status !== 'all') {
-    filteredRows = filteredRows.filter(r => r.status === filter.status)
+    filteredRows = filteredRows.filter(r => normalizeStatus(r.status) === filter.status)
   }
   
   if (filter.searchQuery) {
@@ -208,8 +253,8 @@ export async function loadSubscriptionsPageData(
     serviceName: r.service_name,
     amount: Number(r.amount),
     currency: r.currency,
-    interval: r.interval as SubscriptionInterval,
-    status: r.status as SubscriptionStatus,
+    interval: normalizeInterval(r.interval),
+    status: normalizeStatus(r.status),
     nextChargeDate: r.next_charge_date,
     lastChargeDate: r.last_charge_date,
     categoryId: r.category_id,

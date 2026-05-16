@@ -1,12 +1,32 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
+import type { Database } from '@/lib/database.types'
+import {
+  getSupabasePublishableKey,
+  getSupabaseUrl,
+  isSupabasePreviewMode,
+} from './env'
+import { createPreviewSupabaseClient } from './preview-client'
 
-export async function createClient() {
+export type AppSupabaseServerClient = SupabaseClient<Database>
+
+export async function createClient(): Promise<AppSupabaseServerClient> {
+  const supabaseUrl = getSupabaseUrl()
+  const supabaseKey = getSupabasePublishableKey()
+
+  if (!supabaseUrl || !supabaseKey) {
+    if (isSupabasePreviewMode()) {
+      return createPreviewSupabaseClient()
+    }
+    throw new Error('Supabase environment variables are not configured')
+  }
+
   const cookieStore = await cookies()
 
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  return createServerClient<Database>(
+    supabaseUrl,
+    supabaseKey,
     {
       cookies: {
         getAll() {
@@ -18,9 +38,7 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             )
           } catch {
-           
-           
-           
+            // Server Components can read cookies but cannot persist refreshed ones.
           }
         },
       },

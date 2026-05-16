@@ -5,8 +5,13 @@ import Papa from 'papaparse'
 import { Download, FileText } from 'lucide-react'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import type { TransactionRow } from '@/app/dashboard/transactions/data'
 
-export function ExportTransactionsButton({ transactions }: { transactions: any[] }) {
+type ExportableTransaction = TransactionRow & {
+  source?: string | null
+}
+
+export function ExportTransactionsButton({ transactions }: { transactions: ExportableTransaction[] }) {
   const handleExportCSV = () => {
     if (!transactions || transactions.length === 0) {
       alert("No transactions to export")
@@ -52,7 +57,7 @@ export function ExportTransactionsButton({ transactions }: { transactions: any[]
     doc.text(`Generated on ${new Date().toLocaleDateString()}`, 14, 30)
 
     const tableColumn = ["Date", "Merchant", "Category", "Type", "Amount"]
-    const tableRows: any[] = []
+    const tableRows: string[][] = []
 
     transactions.forEach(tx => {
       const txData = [
@@ -60,7 +65,7 @@ export function ExportTransactionsButton({ transactions }: { transactions: any[]
         tx.merchant,
         tx.categories?.name || 'Uncategorized',
         tx.type,
-        `$${parseFloat(tx.amount).toFixed(2)}`
+        `$${Number(tx.amount).toFixed(2)}`
       ]
       tableRows.push(txData)
     })

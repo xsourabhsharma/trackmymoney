@@ -12,6 +12,7 @@ const pool = new Pool({
 });
 
 const db = drizzle(pool, { schema });
+type TransactionInsert = typeof schema.transactions.$inferInsert;
 
 async function seed() {
   console.log('Seeding data for demotest@gmail.com...');
@@ -64,13 +65,11 @@ async function seed() {
 
  
   console.log('Inserting transactions...');
-  const txData: any[] = [];
+  const txData: TransactionInsert[] = [];
   const now = new Date();
   
  
   for (let m = 0; m < 4; m++) {
-    const monthDate = new Date(now.getFullYear(), now.getMonth() - m, 15);
-   
     txData.push({ id: uuidv4(), userId, accountId: accountsData[0].id, categoryId: catSalary.id, amount: '3250.00', currency: 'USD', type: 'income', merchant: 'Tech Corp Inc.', date: new Date(now.getFullYear(), now.getMonth() - m, 1), status: 'cleared', source: 'manual' });
     txData.push({ id: uuidv4(), userId, accountId: accountsData[0].id, categoryId: catSalary.id, amount: '3250.00', currency: 'USD', type: 'income', merchant: 'Tech Corp Inc.', date: new Date(now.getFullYear(), now.getMonth() - m, 15), status: 'cleared', source: 'manual' });
    

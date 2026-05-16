@@ -20,7 +20,9 @@ export default async function SettingsPage() {
   return (
     <div className="flex flex-col gap-8">
       {}
-      <DashboardSubNav />
+      <div className="rounded-[24px] border border-[var(--border-light)] bg-[var(--bg-surface)] p-3">
+        <DashboardSubNav />
+      </div>
 
       {}
       <SettingsClientOrchestrator 

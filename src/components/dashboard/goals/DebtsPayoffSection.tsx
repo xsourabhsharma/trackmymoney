@@ -1,8 +1,7 @@
 'use client'
 
-import { DebtRow, DebtFreeCountdown, PayoffStrategy } from '@/app/dashboard/goals/data'
+import type { DebtRow, DebtFreeCountdown, PayoffStrategy } from '@/app/dashboard/goals/data'
 import { Plus, Info } from 'lucide-react'
-import { format, addMonths } from 'date-fns'
 import { useCurrency } from '@/hooks/useCurrency'
 
 interface Props {
@@ -35,7 +34,6 @@ const STRATEGY_CONFIG: Record<PayoffStrategy, { label: string; tooltip: string; 
 
 export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeStrategy, onAddDebt, onEditDebt, onMoveDebt }: Props) {
   const { fmt } = useCurrency()
-  const totalOriginal = debts.reduce((s, d) => s + d.originalPrincipal, 0)
 
   return (
     <div className="flex flex-col gap-4">
@@ -99,7 +97,7 @@ export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeS
               No debts tracked
             </p>
             <p className="text-[11px] text-[var(--text-muted)] max-w-xs mx-auto leading-relaxed">
-              Either you're debt-free (amazing!) or you haven't added any yet. Track loans, credit cards, and more.
+              Either you&apos;re debt-free (amazing!) or you haven&apos;t added any yet. Track loans, credit cards, and more.
             </p>
           </div>
           <button

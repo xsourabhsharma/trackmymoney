@@ -1,7 +1,7 @@
 'use client'
 
-import { SummaryMetrics } from '@/app/dashboard/reports/data'
-import { Wallet, TrendingUp, TrendingDown, Percent, ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import type { SummaryMetrics } from '@/app/dashboard/reports/data'
+import { TrendingUp, TrendingDown, Percent, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { useCurrency } from '@/hooks/useCurrency'
 
 interface Props {

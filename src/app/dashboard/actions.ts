@@ -2,7 +2,6 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
 import { z } from 'zod'
 
 const transactionSchema = z.object({
@@ -70,7 +69,6 @@ export async function addTransaction(formData: FormData) {
   }
   const parsedDateISO = parsedDate.toISOString()
 
-  const admin = createAdminClient()
   let receiptUrl: string | null = null
 
   const receiptFile = formData.get('receipt') as File | null
@@ -85,14 +83,14 @@ export async function addTransaction(formData: FormData) {
     const fileExt = receiptFile.name.split('.').pop()
     const fileName = `${user.id}/${Date.now()}.${fileExt}`
 
-    const { data: uploadData, error: uploadError } = await admin.storage
+    const { error: uploadError } = await supabase.storage
       .from('receipts')
       .upload(fileName, receiptFile)
 
     if (uploadError) {
       console.error('Receipt upload failed:', uploadError)
     } else {
-      const { data: publicUrlData } = admin.storage.from('receipts').getPublicUrl(fileName)
+      const { data: publicUrlData } = supabase.storage.from('receipts').getPublicUrl(fileName)
       receiptUrl = publicUrlData.publicUrl
     }
   }

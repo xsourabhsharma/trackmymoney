@@ -3,6 +3,19 @@ import { generateText } from 'ai';
 import { createGroq } from '@ai-sdk/groq';
 import { createClient } from '@/utils/supabase/server';
 
+interface ParsedTransactionCandidate {
+  date: string
+  description: string
+  amount: number
+  type: 'income' | 'expense'
+  inferredCategoryId: string
+  confidence: number
+}
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : 'Unexpected error'
+}
+
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -50,17 +63,17 @@ export async function POST(req: NextRequest) {
       prompt: prompt,
     });
 
-    let candidates = [];
+    let candidates: ParsedTransactionCandidate[] = [];
     try {
         const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
-        candidates = JSON.parse(cleaned);
-    } catch (e) {
+        candidates = JSON.parse(cleaned) as ParsedTransactionCandidate[];
+    } catch {
         return NextResponse.json({ error: "Failed to parse AI response" }, { status: 500 });
     }
 
     return NextResponse.json({ candidates });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Auto Parse Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

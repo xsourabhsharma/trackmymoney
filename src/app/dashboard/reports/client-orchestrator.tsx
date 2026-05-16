@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ReportsPageData, ReportsFilter } from '@/app/dashboard/reports/data'
 import { ReportsFilterBar } from '@/components/dashboard/reports/ReportsFilterBar'
@@ -33,10 +32,6 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
     router.push(`?${params.toString()}`, { scroll: false })
   }
 
-  const showGoals = filter.view === 'summary' || filter.view === 'detailed'
-  const showTax = filter.view === 'tax'
-  const isDetailed = filter.view === 'detailed'
-
   return (
     <div className="flex flex-col gap-8">
       {}
@@ -45,6 +40,11 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
         <div className="pt-4 border-t border-[var(--border-light)]">
           <ReportsSummaryCards summary={data.summary} />
         </div>
+        {data.dataWarning && (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
+            {data.dataWarning}
+          </div>
+        )}
       </div>
 
       {}

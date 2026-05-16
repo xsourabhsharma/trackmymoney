@@ -1,6 +1,18 @@
 import { createClient } from '@/utils/supabase/server'
 import { Target, AlertTriangle } from 'lucide-react'
 
+type BudgetSnapshotRow = {
+  id: string
+  limit_amount: string | number
+  spent: string | number | null
+  categories?: {
+    id?: string | null
+    name?: string | null
+    icon?: string | null
+    color?: string | null
+  } | null
+}
+
 export async function BudgetsSnapshotPanel() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -41,7 +53,7 @@ export async function BudgetsSnapshotPanel() {
         <Target className="w-3.5 h-3.5" /> Budgets Snapshot
       </h3>
       <div className="flex flex-col gap-6">
-        {budgets.map((b: any) => {
+        {(budgets as BudgetSnapshotRow[]).map((b) => {
           const limit = Number(b.limit_amount) || 1
           const spent = Number(b.spent) || 0
           const rawPercent = (spent / limit) * 100

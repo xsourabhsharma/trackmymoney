@@ -6,10 +6,8 @@ import { Plus, Loader2 } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
   DialogClose
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -19,24 +17,34 @@ import { Textarea } from "@/components/ui/textarea"
 import { addTransaction } from '@/app/dashboard/actions'
 import { useCurrencyStore } from '@/store/useCurrencyStore'
 
+type TransactionType = 'expense' | 'income' | 'transfer'
+
+interface TransactionCategory {
+  id?: string
+  name?: string
+  icon?: string | null
+  type?: TransactionType | string | null
+}
+
+interface AddTransactionButtonProps {
+  categories: TransactionCategory[]
+  accounts?: Array<{ id?: string; name?: string }>
+  defaultType?: TransactionType
+  buttonLabel?: string
+}
+
 export function AddTransactionButton({ 
   categories, 
-  accounts = [], 
   defaultType = 'expense', 
   buttonLabel = 'New Transaction' 
-}: { 
-  categories: any[], 
-  accounts?: any[], 
-  defaultType?: 'expense' | 'income' | 'transfer', 
-  buttonLabel?: string 
-}) {
+}: AddTransactionButtonProps) {
   const router = useRouter()
   const currentCurrency = useCurrencyStore((state) => state.currency)
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [transactionType, setTransactionType] = useState<'expense' | 'income' | 'transfer'>(defaultType)
+  const [transactionType, setTransactionType] = useState<TransactionType>(defaultType)
   const [selectedCategory, setSelectedCategory] = useState<string>('')
-  const [selectedAccount, setSelectedAccount] = useState<string>('')
+  const [selectedAccount] = useState<string>('')
   const [errors, setErrors] = useState<{ amount?: string; merchant?: string; category?: string; account?: string }>({})
   const [merchantSuggestions, setMerchantSuggestions] = useState<string[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -56,7 +64,7 @@ export function AddTransactionButton({
             const data = await res.json()
             if (data.merchants) setMerchantSuggestions(data.merchants)
           }
-        } catch (e) {
+        } catch {
           console.error("Failed to fetch merchants")
         }
       }
@@ -64,10 +72,10 @@ export function AddTransactionButton({
     }
   }, [open])
 
-  const handleTypeChange = (val: 'expense' | 'income' | 'transfer') => {
+  const handleTypeChange = (val: TransactionType) => {
     setTransactionType(val)
     setSelectedCategory('')
-    setErrors(prev => { const { category, ...rest } = prev; return rest })
+    setErrors(prev => ({ ...prev, category: undefined }))
   }
 
   async function handleSubmit(formData: FormData) {
@@ -122,7 +130,7 @@ export function AddTransactionButton({
     }
   }
 
-  const TypeButton = ({ type, label }: { type: 'income' | 'expense' | 'transfer', label: string }) => {
+  const TypeButton = ({ type, label }: { type: TransactionType, label: string }) => {
     const isActive = transactionType === type
     return (
       <button 
@@ -143,15 +151,15 @@ export function AddTransactionButton({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button suppressHydrationWarning className="bg-[var(--text-main)] text-[var(--bg-base)] gap-2 h-10 px-5 text-sm font-bold uppercase tracking-widest rounded-full hover:opacity-90 transition-all border border-[var(--border-light)] shadow-lg">
+          <Button suppressHydrationWarning className="h-11 rounded-[14px] border border-[var(--accent)] bg-[var(--accent)] px-5 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-black shadow-none hover:brightness-110">
             <Plus className="h-4 w-4" />
             {buttonLabel}
           </Button>
         }
       />
-      <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden border border-[var(--border-light)] shadow-2xl rounded-2xl bg-[var(--bg-base)]">
+      <DialogContent className="overflow-hidden rounded-[26px] border border-[var(--border-light)] bg-[var(--bg-surface)] p-0 shadow-2xl sm:max-w-[425px]">
         <div className="p-6 pb-0 flex items-center justify-between">
-          <DialogTitle className="text-xl font-semibold p-0 m-0">Add Transaction</DialogTitle>
+          <DialogTitle className="m-0 p-0 font-mono text-sm font-bold uppercase tracking-[0.18em]">Add Transaction</DialogTitle>
           <DialogClose className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-[var(--bg-surface)] text-[var(--text-muted)] transition-colors" />
         </div>
         
@@ -238,7 +246,7 @@ export function AddTransactionButton({
               <Label className="text-xs font-bold text-[var(--text-main)] opacity-70 tracking-wider uppercase">Category</Label>
               <select
                 value={selectedCategory}
-                onChange={(e) => { setSelectedCategory(e.target.value); setErrors(prev => { const { category, ...rest } = prev; return rest }) }}
+                onChange={(e) => { setSelectedCategory(e.target.value); setErrors(prev => ({ ...prev, category: undefined })) }}
                 className={`h-10 w-full rounded-lg border bg-[var(--bg-surface)] text-[var(--text-main)] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/30 border-[var(--border-light)] ${errors.category ? 'border-red-500' : ''}`}
               >
                 <option value="">Select category</option>

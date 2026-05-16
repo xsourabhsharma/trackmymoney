@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useRef } from 'react'
+import { useState } from 'react'
 import { UserSettings, Integration } from '@/app/dashboard/settings/data'
 import { upsertUserSettingsAction } from '@/app/dashboard/settings/actions'
 import { ProfileSettingsSection } from './ProfileSettingsSection'
@@ -11,14 +11,12 @@ import { DataPrivacySettingsSection } from './DataPrivacySettingsSection'
 
 interface Props {
   initialSettings: UserSettings
-  integrations: [Integration] | Integration[]
+  integrations: Integration[]
   email: string
 }
 
 export function SettingsClientOrchestrator({ initialSettings, integrations, email }: Props) {
   const [settings, setSettings] = useState<UserSettings>(initialSettings)
-  const lastSavedRef = useRef<UserSettings>(initialSettings)
-  const [isPending, startTransition] = useTransition()
 
  
   async function handleSaveSetting(partial: Partial<UserSettings>) {
@@ -28,8 +26,6 @@ export function SettingsClientOrchestrator({ initialSettings, integrations, emai
     
     try {
       await upsertUserSettingsAction(partial)
-     
-      lastSavedRef.current = { ...settings, ...partial }
     } catch (err) {
       console.error('Failed to save setting:', err)
      
@@ -53,7 +49,7 @@ export function SettingsClientOrchestrator({ initialSettings, integrations, emai
 
       {}
       <div className="flex flex-col gap-8 flex-1 min-w-0">
-        <IntegrationsSettingsSection integrations={integrations as Integration[]} />
+        <IntegrationsSettingsSection integrations={integrations} />
         <DataPrivacySettingsSection settings={settings} onSave={handleSaveSetting} />
       </div>
     </div>

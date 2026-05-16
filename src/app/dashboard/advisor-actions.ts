@@ -1,10 +1,14 @@
 'use server'
 
-import OpenAI from 'openai'
 import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
-
-
+import {
+  generateAiText,
+  getAiDisabledClientMessage,
+  getAiTextState,
+  isAiDisabledError,
+  logAiServiceError,
+} from '@/lib/ai/server'
+import { requireAiConsent } from '@/lib/ai/privacy'
 interface TxRow {
   amount: string | number
   type: 'income' | 'expense'
@@ -17,16 +21,20 @@ export async function generateFinancialInsights() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  const admin = createAdminClient()
+  const consent = await requireAiConsent(supabase, user.id, 'advisor')
+  if (!consent.allowed) {
+    return consent.message
+  }
+
+  const textState = getAiTextState()
+  if (!textState.enabled) {
+    return getAiDisabledClientMessage(textState)
+  }
+
   const sixtyDaysAgo = new Date()
   sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60)
 
-  const aiClient = new OpenAI({
-    apiKey: process.env.AI_API_KEY || '',
-    baseURL: process.env.AI_BASE_URL,
-  })
-
-  const { data: transactions } = await admin
+  const { data: transactions } = await supabase
     .from('transactions')
     .select('amount, type, date, categories(name)')
     .eq('user_id', user.id)
@@ -70,19 +78,20 @@ Give exactly 3 bullet points of actionable, specific insights. Include percentag
 Format: "- insight". Plain text only. Be concise. Do not invent numbers.`
 
   try {
-    const response = await aiClient.chat.completions.create({
-      model: process.env.AI_MODEL ?? 'glm-4-flash',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: JSON.stringify(promptData) },
-      ],
+    const response = await generateAiText({
+      system: systemPrompt,
+      prompt: JSON.stringify(promptData),
       temperature: 0.5,
-      max_tokens: 250,
+      maxOutputTokens: 250,
     })
 
-    return response.choices[0].message.content ?? "Couldn't generate insights at this time."
+    return response.text || "Couldn't generate insights at this time."
   } catch (error) {
-    console.error('AI insight generation failed:', error)
+    logAiServiceError('dashboard advisor action failed', error)
+    if (isAiDisabledError(error)) {
+      return getAiDisabledClientMessage(error.state)
+    }
+
     return 'AI Advisor is temporarily unavailable. Please try again shortly.'
   }
 }

@@ -8,17 +8,29 @@ export async function updatePassword(formData: FormData) {
   const confirmPassword = formData.get('confirm_password') as string
 
   if (password !== confirmPassword) {
-      redirect('/update-password?error=Passwords do not match')
+    return { error: 'Passwords do not match' }
+  }
+
+  if (password.length < 8) {
+    return { error: 'Password must be at least 8 characters.' }
   }
 
   const supabase = await createClient()
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Password reset link is invalid or expired. Please request a new reset email.' }
+  }
+
   const { error } = await supabase.auth.updateUser({
-    password: password
+    password,
   })
 
   if (error) {
-    redirect(`/update-password?error=${encodeURIComponent(error.message)}`)
+    return { error: error.message }
   }
 
   redirect('/dashboard')

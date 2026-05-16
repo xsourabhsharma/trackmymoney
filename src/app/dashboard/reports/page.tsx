@@ -7,7 +7,16 @@ export const metadata: Metadata = {
   description: 'Detailed analytics, spending trends, and financial breakdown reports.',
 }
 import { ReportsClientOrchestrator } from '@/app/dashboard/reports/client-orchestrator'
-import { loadReportsPageData } from '@/app/dashboard/reports/data'
+import {
+  loadReportsPageData,
+  normalizeReportsPeriod,
+  normalizeReportsScope,
+  normalizeReportsView,
+} from '@/app/dashboard/reports/data'
+
+function firstSearchParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value
+}
 
 export default async function ReportsPage({
   searchParams,
@@ -19,9 +28,9 @@ export default async function ReportsPage({
   if (!user) return null
 
   const resolvedSearchParams = await searchParams
-  const period = (resolvedSearchParams?.period as any) || 'this_month'
-  const scope = (resolvedSearchParams?.scope as any) || 'all'
-  const view = (resolvedSearchParams?.view as any) || 'summary'
+  const period = normalizeReportsPeriod(firstSearchParam(resolvedSearchParams?.period))
+  const scope = normalizeReportsScope(firstSearchParam(resolvedSearchParams?.scope))
+  const view = normalizeReportsView(firstSearchParam(resolvedSearchParams?.view))
 
   const pageData = await loadReportsPageData({
     period,
@@ -31,7 +40,9 @@ export default async function ReportsPage({
 
   return (
     <div className="flex flex-col gap-8">
-      <DashboardSubNav />
+      <div className="rounded-[24px] border border-[var(--border-light)] bg-[var(--bg-surface)] p-3">
+        <DashboardSubNav />
+      </div>
       <ReportsClientOrchestrator initialData={pageData} />
     </div>
   )

@@ -41,14 +41,14 @@ export async function updateTransaction(id: string, payload: Partial<CreateTrans
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Unauthorized");
 
- 
   const { error } = await supabase
     .from('transactions')
     .update({ 
       ...payload,
       updated_at: new Date().toISOString()
     })
-    .eq('id', id);
+    .eq('id', id)
+    .eq('user_id', user.id);
 
   if (error) {
     console.error("Update transaction error", error);
@@ -69,6 +69,7 @@ export async function deleteTransactions(ids: string[]) {
   const { error } = await supabase
     .from('transactions')
     .delete()
+    .eq('user_id', user.id)
     .in('id', ids);
 
   if (error) {

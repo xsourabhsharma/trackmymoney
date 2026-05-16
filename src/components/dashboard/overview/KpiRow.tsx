@@ -1,6 +1,6 @@
 'use client'
 
-import { TrendingDown, TrendingUp, Wallet, Percent, CircleDollarSign, Landmark, Activity } from 'lucide-react'
+import { TrendingDown, TrendingUp, Percent } from 'lucide-react'
 import { useCurrency } from '@/hooks/useCurrency'
 import { TiltCard } from '@/components/3d/TiltCard'
 
@@ -15,7 +15,7 @@ interface KpiRowProps {
   accountsCount: number
 }
 
-export function KpiRow({ metrics, accountsCount }: KpiRowProps) {
+export function KpiRow({ metrics }: KpiRowProps) {
   const { fmt } = useCurrency()
 
   const kpis = [

@@ -1,7 +1,7 @@
 'use client'
 
-import { SavingsGoalRow, GoalStatus } from '@/app/dashboard/goals/data'
-import { Plus, Flag, Clock } from 'lucide-react'
+import type { SavingsGoalRow, GoalStatus } from '@/app/dashboard/goals/data'
+import { Plus, Clock } from 'lucide-react'
 import { format } from 'date-fns'
 import { ConfettiCelebration } from '@/components/dashboard/goals/ConfettiCelebration'
 import { useCurrency } from '@/hooks/useCurrency'

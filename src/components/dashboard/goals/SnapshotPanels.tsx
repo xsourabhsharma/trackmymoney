@@ -1,6 +1,6 @@
 'use client'
 
-import { GoalProgressSnapshot, DebtFreeCountdown } from '@/app/dashboard/goals/data'
+import type { GoalProgressSnapshot, DebtFreeCountdown } from '@/app/dashboard/goals/data'
 
 interface SnapshotProps {
   snapshot: GoalProgressSnapshot
@@ -8,7 +8,6 @@ interface SnapshotProps {
 
 export function GoalProgressSnapshotPanel({ snapshot }: SnapshotProps) {
   const pct = Math.round(snapshot.percentFunded)
-  const deg = (pct / 100) * 360
 
   function fmt(n: number) {
     return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -40,7 +39,7 @@ export function GoalProgressSnapshotPanel({ snapshot }: SnapshotProps) {
 
       <div className="space-y-3">
         <p className="text-[11px] font-bold text-[var(--text-main)] uppercase leading-relaxed px-2">
-          You've saved ${fmt(snapshot.totalSaved)} out of ${fmt(snapshot.totalTarget)} in savings goals.
+          You&apos;ve saved ${fmt(snapshot.totalSaved)} out of ${fmt(snapshot.totalTarget)} in savings goals.
         </p>
         <span className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest inline-block shadow-sm border ${
           pct >= 75 ? 'bg-green-50 text-[var(--income-green)] border-green-100' :
@@ -81,8 +80,6 @@ export function DebtFreeCountdownPanel({ countdown, totalDebt }: CountdownProps)
     )
   }
 
-  const now = new Date()
-  const freeDate = new Date(now.getFullYear(), now.getMonth() + countdown.monthsToDebtFree)
   const progressPct = Math.max(5, Math.min(95, (1 / (1 + countdown.monthsToDebtFree / 12)) * 100))
 
   return (

@@ -2,7 +2,7 @@
 
 import { LayoutDashboard, ChevronDown } from 'lucide-react'
 import { Label } from '@/components/ui/label'
-import { UserSettings, Landing, DateSpectrum, AccountScope } from '@/app/dashboard/settings/data'
+import { UserSettings, Landing, DateSpectrum } from '@/app/dashboard/settings/data'
 
 interface Props {
   settings: UserSettings

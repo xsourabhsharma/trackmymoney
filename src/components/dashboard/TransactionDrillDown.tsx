@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ArrowRight, Calendar, Receipt, DollarSign, Tag } from 'lucide-react'
+import { X, ArrowRight, Calendar, Receipt, Tag } from 'lucide-react'
 import { format } from 'date-fns'
 
 interface Transaction {
@@ -9,7 +9,7 @@ interface Transaction {
   amount: string
   merchant: string | null
   date: string
-  type: 'income' | 'expense'
+  type: 'income' | 'expense' | 'transfer'
   categories?: {
     name: string
     icon: string | null
@@ -25,8 +25,8 @@ interface Props {
 }
 
 export function TransactionDrillDown({ isOpen, onClose, categoryName, transactions }: Props) {
-  const filtered = transactions.filter(t => 
-    categoryName ? t.categories?.name === categoryName : true
+  const filtered = transactions.filter(t =>
+    t.type === 'expense' && (categoryName ? t.categories?.name === categoryName : true)
   )
   const total = filtered.reduce((s, t) => s + parseFloat(t.amount), 0)
 

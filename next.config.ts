@@ -4,12 +4,14 @@ import withSerwistInit from "@serwist/next";
 const withSerwist = withSerwistInit({
   swSrc: "src/app/sw.ts",
   swDest: "public/sw.js",
-  disable: process.env.NODE_ENV === "development",
+  disable: process.env.NODE_ENV === "development" || Boolean(process.env.TURBOPACK),
 });
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
-  turbopack: {},
+  turbopack: {
+    root: process.cwd(),
+  },
   async headers() {
     return [
       {

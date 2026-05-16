@@ -1,42 +1,22 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Activity, Calendar, PieChart as PieChartIcon, TrendingUp, ArrowUpRight, ArrowDownRight, Percent, Plus } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Clock3, DollarSign, Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
 import Link from 'next/link'
 
-import type { OverviewPeriod, OverviewData } from '@/lib/types'
+import type { OverviewData, OverviewPeriod } from '@/lib/types'
 import { InteractiveChartsManager } from '@/components/dashboard/InteractiveChartsManager'
 import { FinancialHealthScore } from '@/components/dashboard/FinancialHealthScore'
-import { AIAdvisorCard } from '@/components/dashboard/advisor/AIAdvisorCard'
+import { ConsoleHeader, ConsoleMetric, ConsolePanel, RailMeter, AmountPill } from '@/components/dashboard/FinanceConsole'
 import { useCurrencyStore } from '@/store/useCurrencyStore'
-import { formatCurrency } from '@/lib/currency'
-
-function useAnimatedValue(target: number, duration = 800): number {
-  const [value, setValue] = useState(0)
-  const prevTarget = useRef(0)
-  useEffect(() => {
-    const start = prevTarget.current
-    prevTarget.current = target
-    const startTime = performance.now()
-    let raf: number
-    function animate(now: number) {
-      const elapsed = now - startTime
-      const progress = Math.min(elapsed / duration, 1)
-      const eased = 1 - Math.pow(1 - progress, 3)
-      setValue(start + (target - start) * eased)
-      if (progress < 1) raf = requestAnimationFrame(animate)
-    }
-    raf = requestAnimationFrame(animate)
-    return () => cancelAnimationFrame(raf)
-  }, [target, duration])
-  return value
-}
 
 interface Props {
   initialData: OverviewData
 }
+
+type OverviewTransaction = OverviewData['recentTransactions'][number]
 
 const PERIOD_OPTIONS: { label: string; val: OverviewPeriod }[] = [
   { label: 'Week', val: 'this-week' },
@@ -47,11 +27,33 @@ const PERIOD_OPTIONS: { label: string; val: OverviewPeriod }[] = [
   { label: 'All', val: 'all-time' },
 ]
 
-function getPeriodLabel(period: OverviewPeriod): string {
-  const option = PERIOD_OPTIONS.find(p => p.val === period)
-  return option?.label || 'This Month'
+function fullMoney(value: number, currency: 'USD' | 'INR') {
+  return new Intl.NumberFormat(currency === 'INR' ? 'en-IN' : 'en-US', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value)
 }
-
+
+function splitMoney(value: number, currency: 'USD' | 'INR') {
+  const full = fullMoney(value, currency)
+  const match = full.match(/^(.+?)(\d{2})$/)
+  if (!match) return { main: full, cents: '' }
+  return { main: match[1].replace(/\.$/, ''), cents: match[2] }
+}
+
+function getTransactionAmount(tx: OverviewTransaction) {
+  return Number(tx.amount || 0)
+}
+
+function getTransactionMerchant(tx: OverviewTransaction) {
+  return tx.merchant || tx.description || 'Transaction'
+}
+
+function getTransactionCategoryColor(tx: OverviewTransaction) {
+  return tx.categories?.color || (tx.type === 'income' ? 'var(--income-green)' : 'var(--accent)')
+}
 
 export default function DashboardClient({ initialData }: Props) {
   const router = useRouter()
@@ -59,9 +61,8 @@ export default function DashboardClient({ initialData }: Props) {
   const [data, setData] = useState<OverviewData>(initialData)
   const [loading, setLoading] = useState(false)
   const range = (searchParams.get('range') as OverviewPeriod) || 'this-month'
-  const { currency, toggleCurrency } = useCurrencyStore()
-
-  const safeFormatCurrency = (val: number) => formatCurrency(val, currency, 'USD')
+  const { currency } = useCurrencyStore()
+  const displayCurrency = currency === 'INR' ? 'INR' : 'USD'
 
   const fetchData = useCallback(async (newRange: OverviewPeriod) => {
     setLoading(true)
@@ -89,268 +90,227 @@ export default function DashboardClient({ initialData }: Props) {
     router.push(`?${params.toString()}`, { scroll: false })
   }
 
-  const { metrics } = data
+  const { metrics, budgetSnapshot } = data
+  const accountTotal = metrics.accountBalance || metrics.netPosition
+  const net = splitMoney(accountTotal, displayCurrency)
+  const checking = data.accounts?.find((account) => /check|bank/i.test(account.name)) ?? data.accounts?.[0]
+  const savings = data.accounts?.find((account) => /saving/i.test(account.name)) ?? data.accounts?.[1]
+  const currentDate = useMemo(() => format(new Date(), 'EEEE, dd, MMM'), [])
+  const monthlyLimit = budgetSnapshot?.monthlyLimit || Math.max(metrics.outflow * 1.4, 5000)
+  const monthlySpent = budgetSnapshot?.monthlySpent || metrics.outflow
+  const discretionaryLimit = budgetSnapshot?.discretionaryLimit || 1000
+  const discretionarySpent = budgetSnapshot?.discretionarySpent || Math.min(metrics.outflow, 850)
+  const remainingDays = Math.max(0, Math.ceil((new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).getTime() - Date.now()) / 86400000))
+  const monthGrowth = metrics.inflow > 0 ? (metrics.netPosition / metrics.inflow) * 100 : metrics.savingsRate
 
   return (
-    <div className={`flex flex-col gap-8 transition-opacity duration-300 ${loading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
-
-      {}
-      {loading && (
-        <div className="fixed top-0 left-0 right-0 z-40 h-1 bg-[var(--bg-surface)] overflow-hidden">
-          <div className="h-full w-1/3 bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent animate-shimmer" />
+    <div className={`tm-console -mx-4 -mt-2 min-h-[calc(100dvh-7rem)] px-4 pb-8 transition-opacity duration-300 md:-mx-6 md:px-6 lg:-mx-10 lg:px-10 ${loading ? 'opacity-70' : 'opacity-100'}`}>
+      {loading ? (
+        <div className="fixed left-0 right-0 top-0 z-40 h-1 overflow-hidden bg-[var(--bg-surface)]">
+          <div className="h-full w-1/3 animate-shimmer bg-[var(--accent)]" />
         </div>
-      )}
-      
-      {}
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_2.2fr] gap-x-6 gap-y-8 items-start">
-        {}
-        <div className="xl:row-span-2 xl:sticky xl:top-6 relative z-10 w-full mb-4 xl:mb-0">
-           <AIAdvisorCard stats={data} lastInsight={data.lastInsight} />
-        </div>
+      ) : null}
 
-        {}
-        <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-4 sm:p-6 shadow-sm h-fit">
-          <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-6 sm:mb-8">
-            <div>
-              <h3 className="text-sm font-bold uppercase tracking-[0.1em] text-[var(--text-main)] flex items-center gap-2 mb-1">
-                <Activity className="w-4 h-4" /> Intelligence Hub
-              </h3>
-              <span className="text-[12px] font-mono text-[var(--text-muted)] uppercase tracking-wider block mt-1">
-                Live · Synced with your accounts
+      <div className="mx-auto grid max-w-[1220px] grid-cols-1 gap-6 pt-6 xl:grid-cols-[minmax(0,2.1fr)_minmax(320px,1fr)]">
+        <div className="space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="font-mono text-[14px] font-bold tracking-normal text-[var(--text-main)]">
+              {currentDate}
+            </div>
+            <div className="flex items-center gap-2 text-[var(--text-muted)]">
+              <DollarSign className="h-4 w-4" />
+              <Clock3 className="h-4 w-4" />
+            </div>
+          </div>
+
+          <ConsolePanel className="p-7 sm:p-9">
+            <div className="tm-label mb-4">Net Liquid Assets</div>
+            <div className="flex items-end gap-2">
+              <span className="tm-value text-[clamp(3.4rem,8vw,5.8rem)] font-light leading-none">
+                {net.main}
               </span>
+              {net.cents ? (
+                <span className="tm-value pb-3 text-3xl font-light text-[var(--text-muted)]">
+                  .{net.cents}
+                </span>
+              ) : null}
             </div>
-            
-            <div className="flex w-full sm:w-auto overflow-hidden">
-              <div className="flex overflow-x-auto hide-scrollbar sm:flex-wrap items-center gap-1.5 w-full pb-2 md:pb-0">
-                {PERIOD_OPTIONS.map((p) => (
-                  <button 
-                    key={p.val} 
-                    onClick={() => handleRangeChange(p.val)}
-                    className={`whitespace-nowrap flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all border ${
-                      range === p.val 
-                        ? 'bg-[var(--text-main)] text-[var(--bg-base)] border-[var(--text-main)] shadow-sm' 
-                        : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-light)] hover:border-[var(--border-dark)]'
-                    }`}
-                  >
-                    {p.label}
-                  </button>
-                ))}
-              </div>
+
+            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <ConsoleMetric
+                label={checking?.name || 'Checking'}
+                value={fullMoney(checking?.balance ?? metrics.inflow, displayCurrency)}
+              />
+              <ConsoleMetric
+                label={savings?.name || 'Savings'}
+                value={fullMoney(savings?.balance ?? Math.max(accountTotal - metrics.inflow, 0), displayCurrency)}
+              />
             </div>
-          </div>
+          </ConsolePanel>
 
-          {}
-          <div className="bg-[var(--bg-surface)] rounded-xl p-4 mb-6 border border-[var(--border-light)]/50">
-            <p className="text-[11px] font-bold leading-relaxed text-[var(--text-main)] uppercase tracking-wide">
-              {metrics.inflow === 0 && metrics.outflow === 0 ? (
-                <>No activity recorded for this period. Add your first transaction to see insights here.</>
-              ) : (
-                <>
-                  {getPeriodLabel(data.period)} Summary: You earned {safeFormatCurrency(metrics.inflow)} and spent {safeFormatCurrency(metrics.outflow)}.
-                  {' '}Net {metrics.netPosition >= 0 ? 'saved' : 'deficit'}: {safeFormatCurrency(Math.abs(metrics.netPosition))} ({metrics.savingsRate.toFixed(1)}% efficiency).
-                </>
-              )}
-            </p>
-          </div>
+          <ConsolePanel className="min-h-[440px] p-7 sm:p-8">
+            <ConsoleHeader
+              title="Recent Activity"
+              action={
+                <Link href="/dashboard/transactions" className="rounded-full border border-[var(--border-dark)] px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--text-main)] hover:border-[var(--text-main)]">
+                  View All
+                </Link>
+              }
+              className="mb-8"
+            />
 
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-            <MetricCard 
-              label="Net Position" 
-              value={safeFormatCurrency(metrics.netPosition)} 
-              hint="Net this period"
-              icon={<TrendingUp className="w-3.5 h-3.5" />}
-              color={metrics.netPosition >= 0 ? 'text-[var(--income-green)]' : 'text-[var(--expense-red)]'}
-            />
-            <MetricCard 
-              label="Inflow" 
-              value={safeFormatCurrency(metrics.inflow)} 
-              hint="Total income"
-              icon={<ArrowUpRight className="w-3.5 h-3.5" />}
-              color="text-[var(--income-green)]"
-            />
-            <MetricCard 
-              label="Outflow" 
-              value={safeFormatCurrency(metrics.outflow)} 
-              hint="Total expenses"
-              icon={<ArrowDownRight className="w-3.5 h-3.5" />}
-              color="text-[var(--expense-red)]"
-            />
-            <MetricCard 
-              label="Savings Rate" 
-              value={`${metrics.savingsRate.toFixed(1)}%`} 
-              hint="Efficiency"
-              icon={<Percent className="w-3.5 h-3.5" />}
-              color={metrics.savingsRate >= 20 ? 'text-[var(--income-green)]' : metrics.savingsRate > 0 ? 'text-[var(--warning)]' : 'text-[var(--text-muted)]'}
-            />
-          </div>
-        </div>
-
-        {}
-        <div className="w-full">
-          <InteractiveChartsManager 
-            donutData={data.expenseBreakdown.map(c => ({
-                name: c.categoryName,
-                value: c.amount,
-                icon: c.icon,
-                color: c.color
-            }))}
-            donutTotal={metrics.outflow}
-            cashFlowData={data.cashflowSeries.map(f => ({
-                month: format(new Date(f.date), 'MMM dd'),
-                income: f.income,
-                expense: f.expense
-            }))}
-            transactions={data.recentTransactions}
-          />
-        </div>
-      </div>
-
-      {}
-      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8">
-        {}
-        <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm flex flex-col min-h-[450px]">
-          <div className="pb-4 border-b border-[var(--border-light)] mb-6 flex items-center justify-between">
-            <h2 className="text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-[var(--income-green)]" /> Recent Activity
-            </h2>
-            <Link href="/dashboard/transactions" className="text-[12px] font-bold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors uppercase tracking-widest border border-[var(--border-light)] px-3 py-1 rounded-full">View All</Link>
-          </div>
-          
-          <div className="flex flex-col divide-y divide-[var(--border-light)]">
             {data.recentTransactions.length === 0 ? (
-              <div className="py-20 text-center flex flex-col items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-light)] flex items-center justify-center text-2xl shadow-sm">📝</div>
-                <div>
-                  <p className="text-sm font-bold text-[var(--text-main)] mb-1">No transactions yet</p>
-                  <p className="text-[12px] text-[var(--text-muted)] max-w-[280px]">Add your first transaction to start tracking your finances and see insights here.</p>
-                </div>
-                <Link href="/dashboard/transactions" className="mt-2 inline-flex items-center gap-1.5 px-5 py-2.5 bg-[var(--text-main)] text-[var(--bg-base)] rounded-full text-[11px] font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-lg">
-                  <Plus className="w-3.5 h-3.5" /> Add Transaction
+              <div className="flex min-h-[280px] flex-col items-center justify-center gap-4 text-center">
+                <div className="tm-label">No transactions yet</div>
+                <Link href="/dashboard/transactions" className="tm-button-primary">
+                  Add Transaction
                 </Link>
               </div>
             ) : (
-              data.recentTransactions.map((tx: any) => (
-                <div className="group grid grid-cols-[auto_1fr_auto] sm:grid-cols-[auto_1fr_auto_auto] items-center gap-3 sm:gap-4 py-4 transition-all hover:bg-[var(--bg-surface)] sm:hover:px-4 -mx-0 sm:hover:-mx-4 rounded-xl" key={tx.id}>
-                  <div className="w-10 h-10 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl flex items-center justify-center text-lg shadow-sm group-hover:scale-110 transition-transform">
-                    {tx.categories?.icon || '💸'}
-                  </div>
-                  <div className="flex flex-col gap-0.5 overflow-hidden">
-                    <span className="text-[13px] font-bold truncate text-[var(--text-main)] uppercase tracking-tight">{tx.merchant || tx.description || 'Transaction'}</span>
-                    <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest truncate">{tx.categories?.name || 'Uncategorized'}</span>
-                  </div>
-                  <div className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-tighter text-right hidden sm:block">
-                    {format(new Date(tx.date), 'MMM dd, yyyy')}
-                  </div>
-                  <div className={`text-[13px] font-bold tabular-nums text-right min-w-[70px] sm:min-w-[90px] ${tx.type === 'income' ? 'text-[var(--income-green)]' : 'text-[var(--text-main)]'}`}>
-                    {tx.type === 'income' ? '+ ' : '- '}{safeFormatCurrency(Number(tx.amount))}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        {}
-        <div className="flex flex-col gap-6">
-          {}
-          <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm">
-            <h2 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] mb-6 flex items-center gap-2">
-              <Calendar className="w-3.5 h-3.5" /> Upcoming Charges
-            </h2>
-            {data.upcomingCharges.length === 0 ? (
-              <div className="text-center py-6 flex flex-col items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-light)] flex items-center justify-center text-xl shadow-sm">🔔</div>
-                <div>
-                  <p className="text-[12px] font-bold text-[var(--text-main)] mb-0.5">No upcoming charges</p>
-                  <p className="text-[11px] text-[var(--text-muted)]">Add subscriptions to track recurring payments</p>
-                </div>
-                <Link href="/dashboard/subscriptions" className="inline-flex items-center gap-1 px-4 py-2 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-full text-[10px] font-bold uppercase tracking-widest text-[var(--text-main)] hover:border-[var(--border-dark)] transition-all">
-                  <Plus className="w-3 h-3" /> Add Subscription
-                </Link>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {data.upcomingCharges.map((sub) => (
-                    <div key={sub.id} className="bg-[var(--bg-surface)] p-4 rounded-2xl border border-[var(--border-light)]/50 flex items-center gap-4 group cursor-pointer hover:shadow-md transition-all">
-                      <span className="text-2xl group-hover:scale-110 transition-transform">{sub.icon || '💳'}</span>
-                      <div className="flex-grow">
-                        <div className="text-xs font-bold text-[var(--text-main)] uppercase tracking-tight">{sub.merchant}</div>
-                        <div className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
-                          {format(new Date(sub.nextChargeDate), 'MMM dd, yyyy')}
+              <div className="divide-y divide-[var(--border-light)]">
+                {data.recentTransactions.slice(0, 7).map((tx) => {
+                  const amount = getTransactionAmount(tx)
+                  const isIncome = tx.type === 'income'
+                  return (
+                    <div key={tx.id} className="grid grid-cols-[72px_1fr_auto] items-center gap-4 py-4 font-mono">
+                      <span className="text-[13px] text-[var(--text-muted)]">
+                        {format(new Date(tx.date), 'dd MMM')}
+                      </span>
+                      <div className="min-w-0">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <span
+                            className="h-2 w-2 rounded-full"
+                            style={{ backgroundColor: getTransactionCategoryColor(tx) }}
+                          />
+                          <span className="truncate text-[14px] font-bold text-[var(--text-main)]">
+                            {getTransactionMerchant(tx)}
+                          </span>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-xs font-bold text-[var(--text-main)] tabular-nums">{safeFormatCurrency(Number(sub.amount))}</div>
-                      </div>
+                      <span className={`text-right text-[13px] tabular-nums ${isIncome ? 'text-[var(--text-main)]' : 'text-[var(--text-muted)]'}`}>
+                        {isIncome ? '+' : '-'}{fullMoney(amount, displayCurrency)}
+                      </span>
                     </div>
-                ))}
+                  )
+                })}
               </div>
             )}
-            <Link href="/dashboard/subscriptions" className="block text-center mt-4 text-[11px] font-bold text-[var(--accent)] uppercase tracking-widest hover:underline">Manage Subscriptions</Link>
+          </ConsolePanel>
+        </div>
+
+        <aside className="space-y-6">
+          <ConsolePanel accent className="p-7">
+            <div className="flex items-center justify-between gap-4">
+              <div className="font-mono text-[13px] font-bold uppercase tracking-[0.16em]">Monthly Spend</div>
+              <AmountPill>{remainingDays}D REMAINING</AmountPill>
+            </div>
+            <div className="mt-8">
+              <RailMeter value={monthlySpent} limit={monthlyLimit} accent />
+            </div>
+            <div className="mt-7 flex items-center justify-between font-mono text-[12px] font-bold">
+              <span>{fullMoney(monthlySpent, displayCurrency)}</span>
+              <span>{fullMoney(monthlyLimit, displayCurrency)} Limit</span>
+            </div>
+          </ConsolePanel>
+
+          <ConsolePanel className="p-7">
+            <div className="flex items-center justify-between gap-4">
+              <ConsoleHeader title="Discretionary" />
+              <span className="rounded-full bg-[var(--accent)] px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-black">
+                {discretionarySpent > discretionaryLimit * 0.8 ? 'At Risk' : 'On Track'}
+              </span>
+            </div>
+            <div className="mt-8">
+              <RailMeter value={discretionarySpent} limit={discretionaryLimit} />
+            </div>
+            <div className="mt-7 flex items-center justify-between font-mono text-[12px] text-[var(--text-muted)]">
+              <span>{fullMoney(discretionarySpent, displayCurrency)}</span>
+              <span>{fullMoney(discretionaryLimit, displayCurrency)} Limit</span>
+            </div>
+          </ConsolePanel>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Link href="/dashboard/transactions" className="tm-button-primary justify-between">
+              Send <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href="/dashboard/auto-parse" className="tm-button-secondary justify-between">
+              Receive <ArrowLeft className="h-4 w-4" />
+            </Link>
           </div>
 
-          {}
-          <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm">
-            <h2 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] mb-6 flex items-center gap-2">
-              <PieChartIcon className="w-3.5 h-3.5" /> Top Spending
-            </h2>
-            {data.topSpending.length === 0 ? (
-              <div className="text-center py-6 flex flex-col items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-light)] flex items-center justify-center text-xl shadow-sm">📊</div>
-                <div>
-                  <p className="text-[12px] font-bold text-[var(--text-main)] mb-0.5">No spending data yet</p>
-                  <p className="text-[11px] text-[var(--text-muted)]">Start adding expenses to see your top categories</p>
-                </div>
+          <ConsolePanel className="p-7 xl:mt-[202px]">
+            <div className="flex items-end justify-between gap-4">
+              <div className="tm-value text-2xl font-bold">
+                {monthGrowth >= 0 ? '+' : ''}{monthGrowth.toFixed(1)}%
               </div>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {data.topSpending.map((item) => (
-                  <div key={item.categoryName} className="flex flex-col gap-1.5">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">{item.icon}</span>
-                        <span className="text-[11px] font-bold uppercase tracking-tight text-[var(--text-main)]">{item.categoryName}</span>
-                      </div>
-                      <span className="text-[11px] font-bold tabular-nums text-[var(--text-main)]">{safeFormatCurrency(Number(item.amount))}</span>
-                    </div>
-                    <div className="h-1.5 bg-[var(--bg-surface)] rounded-full overflow-hidden">
-                      <div 
-                        className="h-full rounded-full transition-all duration-700" 
-                        style={{ width: `${Math.min(item.percentage, 100)}%`, backgroundColor: item.color }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+              <div className="tm-label">Mom Growth</div>
+            </div>
+          </ConsolePanel>
+        </aside>
+      </div>
 
-          {}
-          <FinancialHealthScore
-            details={data.financialHealth}
-          />
+      <div className="mx-auto mt-6 max-w-[1220px] space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="tm-label">Period</div>
+          <div className="flex max-w-full gap-2 overflow-x-auto pb-1">
+            {PERIOD_OPTIONS.map((p) => (
+              <button
+                key={p.val}
+                onClick={() => handleRangeChange(p.val)}
+                className={`tm-route-chip ${range === p.val ? 'tm-route-chip-active' : 'tm-route-chip-idle'}`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <InteractiveChartsManager
+          donutData={data.expenseBreakdown.map((category) => ({
+            name: category.categoryName,
+            value: category.amount,
+            icon: category.icon,
+            color: category.color,
+          }))}
+          donutTotal={metrics.outflow}
+          cashFlowData={data.cashflowSeries.map((point) => ({
+            month: format(new Date(point.date), 'MMM dd'),
+            income: point.income,
+            expense: point.expense,
+          }))}
+          transactions={data.recentTransactions}
+        />
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
+          <ConsolePanel className="p-7">
+            <ConsoleHeader title="Intelligence Summary" className="mb-5" />
+            <p className="max-w-3xl font-mono text-[13px] leading-7 text-[var(--text-muted)]">
+              {metrics.inflow === 0 && metrics.outflow === 0
+                ? 'No activity recorded for this period. Add your first transaction to start generating operating signals.'
+                : `You earned ${fullMoney(metrics.inflow, displayCurrency)} and spent ${fullMoney(metrics.outflow, displayCurrency)}. Net ${metrics.netPosition >= 0 ? 'saved' : 'deficit'} is ${fullMoney(Math.abs(metrics.netPosition), displayCurrency)} with ${metrics.savingsRate.toFixed(1)}% savings efficiency.`}
+            </p>
+            {data.lastInsight?.insights?.[0] ? (
+              <div className="mt-6 border-t border-[var(--border-light)] pt-5">
+                <div className="tm-label mb-2">{data.lastInsight.insights[0].title}</div>
+                <p className="font-mono text-[13px] leading-7 text-[var(--text-main)]">
+                  {data.lastInsight.insights[0].body}
+                </p>
+              </div>
+            ) : null}
+          </ConsolePanel>
+
+          <div className="tm-panel-dark p-1">
+            <FinancialHealthScore details={data.financialHealth} />
+          </div>
         </div>
       </div>
-    </div>
-  )
-}
-
 
-function MetricCard({ label, value, hint, icon, color }: {
-  label: string;
-  value: string;
-  hint: string;
-  icon: React.ReactNode;
-  color?: string;
-}) {
-  return (
-    <div className="p-4 bg-[var(--bg-base)] border border-[var(--border-light)] rounded-xl text-center shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all group cursor-default">
-      <div className="text-[11px] font-bold text-[var(--text-main)] opacity-70 uppercase tracking-widest mb-2 flex items-center justify-center gap-1.5">
-        <span className={`w-6 h-6 rounded-md flex items-center justify-center border border-current opacity-90 group-hover:scale-110 transition-all ${color || 'text-[var(--text-main)]'}`}>{icon}</span>
-        {label}
-      </div>
-      <div className={`text-lg font-bold tabular-nums mb-1 tracking-tighter transition-colors ${color || 'text-[var(--text-main)]'}`}>{value}</div>
-      <div className="text-[11px] font-bold text-[var(--text-main)] uppercase tracking-tighter opacity-50 truncate">{hint}</div>
+      {loading ? (
+        <div className="fixed bottom-5 right-5 z-40 rounded-full bg-[var(--bg-surface)] px-4 py-2 font-mono text-[11px] text-[var(--text-muted)]">
+          <Loader2 className="mr-2 inline h-3 w-3 animate-spin" />
+          Syncing
+        </div>
+      ) : null}
     </div>
   )
 }

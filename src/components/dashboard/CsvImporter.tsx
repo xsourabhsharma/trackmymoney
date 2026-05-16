@@ -6,6 +6,7 @@ import { UploadCloud, FileType, CheckCircle2, AlertCircle, Loader2, Sparkles, X,
 import { useToast } from '@/components/ui/toast-provider'
 import { ImportJob, ImportRow } from '@/lib/types'
 import { getImportJobDetails, updateImportRow, cancelImportJob } from '@/app/dashboard/auto-parse/actions'
+import { IMPORT_CSV_MAX_FILE_SIZE_BYTES, IMPORT_CSV_MAX_FILE_SIZE_LABEL } from '@/lib/import/constants'
 
 interface CategoryItem {
   id: string
@@ -20,6 +21,19 @@ interface AccountItem {
   name: string
   type: string
   color: string | null
+}
+
+interface UploadResponse {
+  jobId?: string
+  rowCount?: number
+  error?: string
+}
+
+interface CommitResponse {
+  importedCount?: number
+  duplicateSkippedCount?: number
+  warnings?: string[]
+  error?: string
 }
 
 export function CsvImporter({ 
@@ -39,38 +53,39 @@ export function CsvImporter({
   const [isAiRunning, setIsAiRunning] = useState(false)
   const [isCommitting, setIsCommitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [selectedAccountId, setSelectedAccountId] = useState('')
   
   const { addToast } = useToast()
 
  
-  useEffect(() => {
-    if (job && job.status !== 'pending' && job.status !== 'failed' && rows.length === 0) {
-      loadJobData(job.id)
-    }
-  }, [job])
-
-  const loadJobData = async (jobId: string) => {
+  const loadJobData = useCallback(async (jobId: string) => {
     try {
       const data = await getImportJobDetails(jobId)
       setJob(data.job)
       setRows(data.rows)
-    } catch (err: any) {
-      setError("Failed to load active import job.")
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "Failed to load active import job."))
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    if (job && job.status !== 'pending' && job.status !== 'failed' && rows.length === 0) {
+      loadJobData(job.id)
+    }
+  }, [job, rows.length, loadJobData])
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     setError(null)
     const selected = acceptedFiles[0]
     if (!selected) return
 
-    if (selected.type !== 'text/csv' && !selected.name.endsWith('.csv')) {
+    if (selected.type !== 'text/csv' && !selected.name.toLowerCase().endsWith('.csv')) {
       setError("Please drop a valid .csv file")
       return
     }
 
-    if (selected.size > 10 * 1024 * 1024) {
-      setError("File too large. Max 10MB.")
+    if (selected.size > IMPORT_CSV_MAX_FILE_SIZE_BYTES) {
+      setError(`File too large. Max ${IMPORT_CSV_MAX_FILE_SIZE_LABEL}.`)
       return
     }
 
@@ -83,23 +98,25 @@ export function CsvImporter({
         method: 'POST',
         body: formData,
       })
-      const data = await res.json()
+      const data = await res.json() as UploadResponse
       
-      if (!res.ok) throw new Error(data.error)
+      if (!res.ok) throw new Error(data.error || "Failed to upload CSV.")
+      if (!data.jobId || typeof data.rowCount !== 'number') throw new Error("Upload response was incomplete.")
       
       addToast(`Successfully parsed ${data.rowCount} rows.`, "success")
       await loadJobData(data.jobId)
-    } catch (err: any) {
-      setError(err.message || "Failed to upload CSV.")
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "Failed to upload CSV."))
     } finally {
       setIsUploading(false)
     }
-  }, [addToast])
+  }, [addToast, loadJobData])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ 
     onDrop,
     accept: { 'text/csv': ['.csv'] },
-    maxFiles: 1
+    maxFiles: 1,
+    maxSize: IMPORT_CSV_MAX_FILE_SIZE_BYTES
   })
 
   const runAiCategorization = async () => {
@@ -123,8 +140,8 @@ export function CsvImporter({
       }
       addToast("AI Categorization complete!", "success")
       await loadJobData(job.id)
-    } catch (err: any) {
-       addToast(err.message, "error")
+    } catch (err: unknown) {
+       addToast(getErrorMessage(err, "Failed to categorize rows."), "error")
     } finally {
       setIsAiRunning(false)
     }
@@ -165,15 +182,18 @@ export function CsvImporter({
       const res = await fetch('/api/ai/auto-parse/commit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ importJobId: job.id, accountId: null }),
+        body: JSON.stringify({ importJobId: job.id, accountId: selectedAccountId || null }),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
+      const data = await res.json() as CommitResponse
+      if (!res.ok) throw new Error(data.error || "Failed to commit import.")
       
-      addToast(`Imported ${data.importedCount} transactions. Skipped ${data.duplicateSkippedCount} duplicates.`, "success")
+      addToast(`Imported ${data.importedCount ?? 0} transactions. Skipped ${data.duplicateSkippedCount ?? 0} duplicates.`, "success")
+      if (data.warnings && data.warnings.length > 0) {
+        addToast(data.warnings.join(' '), "warning", 7000)
+      }
       setJob({ ...job, status: 'completed' })
-    } catch (err: any) {
-      addToast(err.message, "error")
+    } catch (err: unknown) {
+      addToast(getErrorMessage(err, "Failed to commit import."), "error")
     } finally {
       setIsCommitting(false)
     }
@@ -183,6 +203,7 @@ export function CsvImporter({
   const selectedCount = rows.filter(r => r.is_selected_for_import && !r.has_error).length
   const duplicatesCount = rows.filter(r => r.is_duplicate_guess).length
   const errorsCount = rows.filter(r => r.has_error).length
+  const uncategorizedCount = rows.filter(r => r.is_selected_for_import && !r.has_error && !r.parsed_category_id).length
   
   const totalIncome = rows.filter(r => r.is_selected_for_import && !r.has_error && r.parsed_type === 'income').reduce((sum, r) => sum + (r.parsed_amount || 0), 0)
   const totalExpense = rows.filter(r => r.is_selected_for_import && !r.has_error && r.parsed_type === 'expense').reduce((sum, r) => sum + (r.parsed_amount || 0), 0)
@@ -406,15 +427,41 @@ export function CsvImporter({
                   <span className="text-[11px] font-medium text-[var(--text-muted)]">Duplicates Skipped</span>
                   <span className="text-[12px] font-bold text-[var(--warn-yellow)]">{duplicatesCount}</span>
                 </div>
-                {errorsCount > 0 && (
+               {errorsCount > 0 && (
                   <div className="flex justify-between items-center">
                     <span className="text-[11px] font-medium text-[var(--expense-red)]">Errors</span>
                     <span className="text-[12px] font-bold text-[var(--expense-red)]">{errorsCount}</span>
                   </div>
                 )}
+                {uncategorizedCount > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-[11px] font-medium text-[var(--text-muted)]">Uncategorized</span>
+                    <span className="text-[12px] font-bold text-[var(--text-main)]">{uncategorizedCount}</span>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-4 pt-6 border-t border-[var(--border-light)]">
+                 <div className="space-y-2">
+                  <label htmlFor="import-account" className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Account</label>
+                  <select
+                    id="import-account"
+                    value={selectedAccountId}
+                    onChange={(event) => setSelectedAccountId(event.target.value)}
+                    className="w-full px-3 py-2 rounded-lg bg-[var(--bg-base)] border border-[var(--border-light)] text-[12px] font-bold text-[var(--text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                  >
+                    <option value="">Unassigned account</option>
+                    {accounts.map(account => (
+                      <option key={account.id} value={account.id}>{account.name}</option>
+                    ))}
+                  </select>
+                  {!selectedAccountId && (
+                    <p className="text-[11px] font-medium text-[var(--warn-yellow)] leading-relaxed">
+                      Imported rows will not be linked to an account.
+                    </p>
+                  )}
+                </div>
+
                  <div className="flex justify-between items-center">
                   <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Total Income</span>
                   <span className="text-[14px] font-black text-[var(--income-green)]">+${totalIncome.toFixed(2)}</span>
@@ -439,4 +486,8 @@ export function CsvImporter({
       )}
     </div>
   )
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback
 }
