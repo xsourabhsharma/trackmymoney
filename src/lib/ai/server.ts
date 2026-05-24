@@ -6,9 +6,11 @@ import { createOpenAI } from '@ai-sdk/openai'
 import {
   generateObject,
   generateText,
+  stepCountIs,
   streamText,
   type LanguageModel,
   type ModelMessage,
+  type StopCondition,
   type TimeoutConfiguration,
   type ToolSet,
 } from 'ai'
@@ -108,6 +110,37 @@ function requestedModelProvider(model: string): AiProvider | null {
   return null
 }
 
+function hasDirectProviderCredential(provider: AiProvider) {
+  if (provider === 'groq') return Boolean(process.env.GROQ_API_KEY)
+  if (provider === 'google') return Boolean(getGoogleApiKey())
+  if (provider === 'openai') return Boolean(getOpenAiApiKey())
+  return false
+}
+
+function hasAnyDirectProviderCredential() {
+  return (
+    hasDirectProviderCredential('groq') ||
+    hasDirectProviderCredential('google') ||
+    hasDirectProviderCredential('openai')
+  )
+}
+
+function shouldUseGateway(providerPreference: AiProvider | null) {
+  if (!hasGatewayAuth()) {
+    return false
+  }
+
+  if (process.env.AI_GATEWAY_API_KEY) {
+    return true
+  }
+
+  if (providerPreference) {
+    return !hasDirectProviderCredential(providerPreference)
+  }
+
+  return !hasAnyDirectProviderCredential()
+}
+
 function modelForProvider(provider: AiProvider, capability: AiCapability, fallback: string) {
   const model = requestedModel(capability)
   if (!model) {
@@ -115,7 +148,7 @@ function modelForProvider(provider: AiProvider, capability: AiCapability, fallba
   }
 
   if (provider === 'gateway') {
-    return model
+    return requestedModelProvider(model) ? model : fallback
   }
 
   const requestedProvider = requestedModelProvider(model)
@@ -133,15 +166,6 @@ function modelForProvider(provider: AiProvider, capability: AiCapability, fallba
 function textModelChoice(): AiDisabledState {
   const model = requestedModel('text')
   const providerPreference = requestedModelProvider(model)
-
-  if (hasGatewayAuth()) {
-    return {
-      enabled: true,
-      capability: 'text',
-      provider: 'gateway',
-      model: modelForProvider('gateway', 'text', 'openai/gpt-5.4'),
-    }
-  }
 
   if ((providerPreference === 'openai' || process.env.AI_BASE_URL) && getOpenAiApiKey()) {
     return {
@@ -161,7 +185,25 @@ function textModelChoice(): AiDisabledState {
     }
   }
 
-  if ((providerPreference === 'groq' || !providerPreference) && process.env.GROQ_API_KEY) {
+  if (providerPreference === 'groq' && process.env.GROQ_API_KEY) {
+    return {
+      enabled: true,
+      capability: 'text',
+      provider: 'groq',
+      model: modelForProvider('groq', 'text', 'llama-3.1-8b-instant'),
+    }
+  }
+
+  if (shouldUseGateway(providerPreference)) {
+    return {
+      enabled: true,
+      capability: 'text',
+      provider: 'gateway',
+      model: modelForProvider('gateway', 'text', 'openai/gpt-5.4'),
+    }
+  }
+
+  if (!providerPreference && process.env.GROQ_API_KEY) {
     return {
       enabled: true,
       capability: 'text',
@@ -205,15 +247,6 @@ function visionModelChoice(): AiDisabledState {
   const model = requestedModel('vision')
   const providerPreference = requestedModelProvider(model)
 
-  if (hasGatewayAuth()) {
-    return {
-      enabled: true,
-      capability: 'vision',
-      provider: 'gateway',
-      model: modelForProvider('gateway', 'vision', 'google/gemini-2.5-flash'),
-    }
-  }
-
   if ((providerPreference === 'google' || !providerPreference) && getGoogleApiKey()) {
     return {
       enabled: true,
@@ -223,7 +256,25 @@ function visionModelChoice(): AiDisabledState {
     }
   }
 
-  if ((providerPreference === 'groq' || !providerPreference) && process.env.GROQ_API_KEY) {
+  if (providerPreference === 'groq' && process.env.GROQ_API_KEY) {
+    return {
+      enabled: true,
+      capability: 'vision',
+      provider: 'groq',
+      model: modelForProvider('groq', 'vision', 'llama-3.2-11b-vision-preview'),
+    }
+  }
+
+  if (shouldUseGateway(providerPreference)) {
+    return {
+      enabled: true,
+      capability: 'vision',
+      provider: 'gateway',
+      model: modelForProvider('gateway', 'vision', 'google/gemini-2.5-flash'),
+    }
+  }
+
+  if (!providerPreference && process.env.GROQ_API_KEY) {
     return {
       enabled: true,
       capability: 'vision',
@@ -342,13 +393,16 @@ export function logAiServiceError(scope: string, error: unknown) {
 }
 
 export async function generateAiText<TOOLS extends ToolSet = ToolSet>(
-  options: GenerateAiTextOptions & { tools?: TOOLS } = {}
+  options: GenerateAiTextOptions & { tools?: TOOLS; stopWhen?: StopCondition<TOOLS> | Array<StopCondition<TOOLS>> } = {}
 ) {
+  const hasTools = options.tools && Object.keys(options.tools).length > 0
+
   return generateText({
     model: getConfiguredTextModel(options.model),
     system: options.system,
     ...getPromptInput(options),
     tools: options.tools,
+    stopWhen: options.stopWhen ?? (hasTools ? stepCountIs(5) : undefined),
     temperature: options.temperature,
     maxOutputTokens: options.maxOutputTokens,
     abortSignal: options.abortSignal,
@@ -357,13 +411,16 @@ export async function generateAiText<TOOLS extends ToolSet = ToolSet>(
 }
 
 export function streamAiText<TOOLS extends ToolSet = ToolSet>(
-  options: GenerateAiTextOptions & { tools?: TOOLS } = {}
+  options: GenerateAiTextOptions & { tools?: TOOLS; stopWhen?: StopCondition<TOOLS> | Array<StopCondition<TOOLS>> } = {}
 ) {
+  const hasTools = options.tools && Object.keys(options.tools).length > 0
+
   return streamText({
     model: getConfiguredTextModel(options.model),
     system: options.system,
     ...getPromptInput(options),
     tools: options.tools,
+    stopWhen: options.stopWhen ?? (hasTools ? stepCountIs(5) : undefined),
     temperature: options.temperature,
     maxOutputTokens: options.maxOutputTokens,
     abortSignal: options.abortSignal,

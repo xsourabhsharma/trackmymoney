@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useChat } from '@ai-sdk/react'
+import { DefaultChatTransport } from 'ai'
 import { Sparkles, X, Minimize2, Maximize2, Mic, MicOff, Send, Image as ImageIcon, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { useVoiceToText } from '@/hooks/useVoiceToText'
@@ -14,21 +15,13 @@ type ChatImageData = {
   imageUrl?: string
   imageUrls?: string[]
 }
-type ChatPayload = {
-  role: 'user'
-  content: string
-  data?: ChatImageData
-}
-type ChatPayloadOptions = {
-  data?: ChatImageData
-}
-type ChatAppend = (message: ChatPayload, options?: ChatPayloadOptions) => Promise<unknown> | unknown
 type TextPart = {
   type: 'text'
   text: string
 }
 type ToolResult = {
   error?: string
+  ok?: boolean
   success?: boolean
 }
 type ToolPart = {
@@ -36,7 +29,9 @@ type ToolPart = {
   toolCallId?: string
   toolName?: string
   state?: string
+  output?: ToolResult
   result?: ToolResult
+  errorText?: string
 }
 type AdvisorMessage = {
   id: string
@@ -49,8 +44,10 @@ type AdvisorMessage = {
 type ChatHookCompat = {
   messages: AdvisorMessage[]
   isLoading?: boolean
-  append?: ChatAppend
-  sendMessage?: ChatAppend
+  status?: string
+  error?: Error
+  clearError?: () => void
+  sendMessage?: (message: { text: string }, options?: { body?: object }) => Promise<unknown> | unknown
 }
 
 function isTextPart(part: TextPart | ToolPart): part is TextPart {
@@ -77,24 +74,57 @@ function getMessageText(message: AdvisorMessage) {
 function getToolParts(message: AdvisorMessage) {
   if (message.toolInvocations?.length) return message.toolInvocations
   if (Array.isArray(message.parts)) {
-    return message.parts.filter((part): part is ToolPart => part.type === 'tool-invocation')
+    return message.parts.filter((part): part is ToolPart => (
+      part.type === 'tool-invocation' ||
+      part.type === 'dynamic-tool' ||
+      (typeof part.type === 'string' && part.type.startsWith('tool-'))
+    ))
   }
   return []
+}
+
+function getToolName(toolPart: ToolPart) {
+  if (toolPart.toolName) return toolPart.toolName
+  if (typeof toolPart.type === 'string' && toolPart.type.startsWith('tool-')) {
+    return toolPart.type.slice('tool-'.length)
+  }
+  return 'TrackMyMoney tool'
+}
+
+function getToolOutput(toolPart: ToolPart) {
+  return toolPart.result || toolPart.output
+}
+
+function getChatErrorMessage(error: unknown) {
+  const fallback = 'AI could not reply. Please try again.'
+  if (!error) return fallback
+
+  const raw = error instanceof Error ? error.message : String(error)
+  try {
+    const parsed = JSON.parse(raw) as { error?: string; message?: string }
+    return parsed.message || parsed.error || fallback
+  } catch {
+    return raw.trim() || fallback
+  }
 }
 
 export function GlobalAiWidget() {
   const [widgetState, setWidgetState] = useState<WidgetState>('minimized')
   const [files, setFiles] = useState<File[]>([])
   const [myInput, setMyInput] = useState('')
+  const [chatError, setChatError] = useState<string | null>(null)
 
   const chatHook = useChat({
-    api: '/api/chat',
-    maxSteps: 5,
-    onError: (error: unknown) => console.error("Chat error:", error)
+    transport: new DefaultChatTransport({ api: '/api/chat' }),
+    onError: (error: unknown) => {
+      setChatError(getChatErrorMessage(error))
+      console.error("Chat error:", error)
+    },
   } as Parameters<typeof useChat>[0]) as unknown as ChatHookCompat
 
 
-  const { messages, isLoading = false } = chatHook
+  const { messages } = chatHook
+  const isLoading = chatHook.status === 'submitted' || chatHook.status === 'streaming' || chatHook.isLoading === true
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -111,6 +141,12 @@ export function GlobalAiWidget() {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
     }
   }, [messages, widgetState])
+
+  useEffect(() => {
+    if (chatHook.error) {
+      setChatError(getChatErrorMessage(chatHook.error))
+    }
+  }, [chatHook.error])
 
 
   useEffect(() => {
@@ -135,8 +171,10 @@ export function GlobalAiWidget() {
     if (!safeInput.trim() && files.length === 0) return
 
     try {
-      const appendFn = chatHook.append || chatHook.sendMessage;
-      const safeAppend = appendFn ? appendFn.bind(chatHook) : null;
+      setChatError(null)
+      chatHook.clearError?.()
+
+      const sendMessage = chatHook.sendMessage ? chatHook.sendMessage.bind(chatHook) : null;
 
       if (files.length > 0) {
         try {
@@ -150,51 +188,46 @@ export function GlobalAiWidget() {
             }))
           )
 
-          if (safeAppend) {
+          if (sendMessage) {
             try {
-               await safeAppend(
-                 {
-                   role: 'user',
-                   content: myInput || 'Please analyze these images.',
-                   data: { imageUrls: base64Images }
-                 },
-                 {
-                   data: { imageUrls: base64Images }
-                 }
+               await sendMessage(
+                 { text: myInput || 'Please analyze these images.' },
+                 { body: { data: { imageUrls: base64Images }, pathname: window.location.pathname } }
                )
             } catch (networkErr: unknown) {
                console.error("Network append failed on try 1:", networkErr);
-
-               try {
-                 await safeAppend(
-                   { role: 'user', content: myInput || 'Please analyze these images.' },
-                   { data: { imageUrls: base64Images } }
-                 )
-               } catch (finalErr) {
-                 console.error("All image append attempts failed:", finalErr);
-               }
+               setChatError(getChatErrorMessage(networkErr))
             }
+          } else {
+            setChatError('AI chat is still loading. Please try again.')
           }
         } catch (err) {
           console.error("Failed to append image messages:", err)
+          setChatError(getChatErrorMessage(err))
         } finally {
           setMyInput('')
           setFiles([])
         }
       } else {
-        if (safeAppend) {
+        if (sendMessage) {
           try {
-            await safeAppend({ role: 'user', content: myInput })
+            await sendMessage(
+              { text: myInput },
+              { body: { pathname: window.location.pathname } }
+            )
           } catch (e) {
             console.error("Append message failed:", e)
+            setChatError(getChatErrorMessage(e))
           }
         } else {
-          console.error("safeAppend is undefined!", Object.keys(chatHook))
+          setChatError('AI chat is still loading. Please try again.')
+          console.error("sendMessage is undefined!", Object.keys(chatHook))
         }
         setMyInput('')
       }
     } catch (globalErr) {
       console.error("Global chat submission error:", globalErr)
+      setChatError(getChatErrorMessage(globalErr))
     }
   }
 
@@ -310,12 +343,12 @@ export function GlobalAiWidget() {
                             <div key={tool.toolCallId || i} className="mt-1 text-xs bg-[var(--bg-base)] p-3 rounded-xl border border-[var(--border-light)]">
                               <div className="text-[var(--text-muted)] font-mono flex items-center gap-1.5 mb-1">
                                 <Sparkles className="w-3.5 h-3.5 text-[var(--accent)]" />
-                                Working: <span className="text-[var(--text-main)]">{tool.toolName}</span>
+                                Working: <span className="text-[var(--text-main)]">{getToolName(tool)}</span>
                               </div>
                               {}
-                              {(tool.state === 'result' || 'result' in tool) && (
-                                <div className={tool.result?.error || tool.result?.success === false ? "text-red-400 font-medium" : "text-emerald-400 font-medium"}>
-                                  {tool.result?.error || tool.result?.success === false ? 'Action failed' : 'Completed'}
+                              {(tool.state === 'result' || tool.state === 'output-available' || tool.state === 'output-error' || 'result' in tool || 'output' in tool) && (
+                                <div className={tool.errorText || getToolOutput(tool)?.error || getToolOutput(tool)?.ok === false || getToolOutput(tool)?.success === false ? "text-red-400 font-medium" : "text-emerald-400 font-medium"}>
+                                  {tool.errorText || getToolOutput(tool)?.error || getToolOutput(tool)?.ok === false || getToolOutput(tool)?.success === false ? 'Action failed' : 'Completed'}
                                 </div>
                               )}
                             </div>
@@ -325,6 +358,13 @@ export function GlobalAiWidget() {
                     </div>
                   </div>
                 ))
+              )}
+              {chatError && (
+                <div className="flex w-full justify-start">
+                  <div className="max-w-[90%] md:max-w-[85%] rounded-2xl border border-red-500/30 bg-red-500/10 p-3 text-[13px] text-red-300">
+                    {chatError}
+                  </div>
+                </div>
               )}
               {isLoading && (
                 <div className="flex w-full justify-start pl-2 py-2">
