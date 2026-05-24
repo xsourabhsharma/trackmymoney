@@ -1,12 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Menu, ShieldCheck, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { PublicButton } from './PublicButton'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { BrandLogo } from '@/components/BrandLogo'
 
 export type MarketingNavLink = {
   href: string
@@ -96,19 +96,10 @@ export function MarketingNav({
           className="group relative z-[61] flex min-w-0 items-center gap-3 font-bold text-[var(--public-text)]"
           onClick={() => setMobileOpen(false)}
         >
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] border border-[var(--public-border)] bg-white/[0.055] shadow-[0_10px_28px_rgba(0,0,0,0.22)] transition-transform group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100">
-            <Image
-              src="/real-logo.png"
-              alt="TrackMyMoney"
-              width={28}
-              height={28}
-              className="h-7 w-7 dark:invert"
-              priority
-            />
-          </span>
-          <span className="truncate text-[17px] tracking-normal">
-            Track<span className="text-[var(--public-muted)]">My</span>Money
-          </span>
+          <BrandLogo
+            markClassName="h-11 w-11 transition-transform group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            textClassName="text-[17px] text-[var(--public-text)]"
+          />
         </Link>
 
         {showLinks && links.length > 0 ? (

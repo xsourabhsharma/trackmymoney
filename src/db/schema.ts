@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, decimal, boolean, jsonb, pgEnum, integer, index } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, decimal, boolean, jsonb, pgEnum, integer, index, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const transactionSourceEnum = pgEnum("transaction_source", ["manual", "sms", "email", "import"]);
 export const transactionTypeEnum = pgEnum("transaction_type", ["income", "expense", "transfer"]);
@@ -213,5 +213,53 @@ export const importRows = pgTable("import_rows", {
   jobIdx: index("idx_import_rows_job").on(t.importJobId),
   statusIdx: index("idx_import_rows_status").on(t.importJobId, t.isSelectedForImport, t.hasError),
   duplicateIdx: index("idx_import_rows_duplicate").on(t.importJobId, t.isDuplicateGuess),
+}));
+
+export const externalAccessTokens = pgTable("external_access_tokens", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
+  name: text("name").notNull(),
+  tokenHash: text("token_hash").notNull(),
+  scopes: text("scopes").array().notNull().default([]),
+  lastUsedAt: timestamp("last_used_at"),
+  expiresAt: timestamp("expires_at"),
+  revokedAt: timestamp("revoked_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (t) => ({
+  tokenHashIdx: uniqueIndex("idx_external_access_tokens_hash").on(t.tokenHash),
+  userIdx: index("idx_external_access_tokens_user").on(t.userId),
+}));
+
+export const toolConfirmations = pgTable("tool_confirmations", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
+  actor: text("actor").notNull(),
+  toolName: text("tool_name").notNull(),
+  payload: jsonb("payload").notNull(),
+  payloadHash: text("payload_hash").notNull(),
+  summary: text("summary").notNull(),
+  status: text("status").default("pending").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  confirmedAt: timestamp("confirmed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (t) => ({
+  userStatusIdx: index("idx_tool_confirmations_user_status").on(t.userId, t.status),
+  userToolIdx: index("idx_tool_confirmations_user_tool").on(t.userId, t.toolName),
+}));
+
+export const toolAuditEvents = pgTable("tool_audit_events", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
+  actor: text("actor").notNull(),
+  toolName: text("tool_name").notNull(),
+  action: text("action").notNull(),
+  resourceType: text("resource_type"),
+  resourceId: uuid("resource_id"),
+  status: text("status").notNull(),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (t) => ({
+  userCreatedIdx: index("idx_tool_audit_events_user_created").on(t.userId, t.createdAt),
+  userToolIdx: index("idx_tool_audit_events_user_tool").on(t.userId, t.toolName),
 }));
 

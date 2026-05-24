@@ -35,7 +35,7 @@ export async function addTransaction(formData: FormData) {
       id: user.id,
       email: user.email || 'unknown@example.com',
       full_name: user.user_metadata?.full_name || 'User',
-      currency: 'USD'
+      currency: String(formData.get('currency') || 'INR').toUpperCase() === 'USD' ? 'USD' : 'INR'
     })
   }
 

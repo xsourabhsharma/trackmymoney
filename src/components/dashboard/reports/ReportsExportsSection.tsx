@@ -1,160 +1,101 @@
 'use client'
 
 import { useState } from 'react'
-import { Download, Loader2, ChevronDown } from 'lucide-react'
-import { ReportsFilter } from '@/app/dashboard/reports/data'
-import { jsPDF } from 'jspdf'
-import 'jspdf-autotable'
-import Papa from 'papaparse'
+import { CheckCircle2, ChevronDown, Download, FileSpreadsheet, FileText, Loader2 } from 'lucide-react'
+import type { ReportsFilter } from '@/app/dashboard/reports/data'
 
 interface Props {
   filter: ReportsFilter
 }
 
 type ExportFormat = 'csv' | 'pdf'
-type AutoTableDoc = jsPDF & {
-  autoTable: (options: {
-    startY: number
-    head: string[][]
-    body: string[][]
-    theme: 'striped'
-    headStyles: { fillColor: number[] }
-    styles: { fontSize: number; cellPadding: number }
-  }) => void
-}
-
-interface ExportCard {
-  id: string
-  name: string
-  desc: string
-  icon: string
-}
-
-const EXPORT_CARDS: ExportCard[] = [
-  { id: 'monthly', name: 'Monthly Summary Report', desc: 'Income, expenses, net, and category totals for the current period.', icon: '📋' },
-]
 
 export function ReportsExportsSection({ filter }: Props) {
-  const [formats, setFormats] = useState<Record<string, ExportFormat>>({
-    monthly: 'csv', tax: 'csv'
-  })
-  const [loading, setLoading] = useState<Record<string, boolean>>({})
-  const [done, setDone] = useState<Record<string, boolean>>({})
+  const [format, setFormat] = useState<ExportFormat>('pdf')
+  const [loading, setLoading] = useState(false)
+  const [done, setDone] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  function setFormat(id: string, fmt: ExportFormat) {
-    setFormats(prev => ({ ...prev, [id]: fmt }))
-  }
-
-  async function handleGenerate(card: ExportCard) {
-    const fmt = formats[card.id]
-    setLoading(prev => ({ ...prev, [card.id]: true }))
+  async function handleGenerate() {
+    setLoading(true)
+    setError(null)
 
     try {
-     
-      const res = await fetch(`/api/reports/export?type=${card.id}&format=csv&period=${filter.period}&scope=${filter.scope}`)
-      if (!res.ok) throw new Error('Failed to fetch report data')
-      const csvText = await res.text()
+      const params = new URLSearchParams({
+        format,
+        period: filter.period,
+        scope: filter.scope,
+        type: filter.view === 'tax' ? 'tax' : 'transactions',
+      })
+      if (filter.from) params.set('from', filter.from)
+      if (filter.to) params.set('to', filter.to)
 
-      const now = new Date()
-      const filenameBase = `${card.id}-report-${now.toISOString().split('T')[0]}`
+      const response = await fetch(`/api/reports/export?${params.toString()}`)
+      if (!response.ok) throw new Error('Report export failed.')
 
-      if (fmt === 'csv') {
-        const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `${filenameBase}.csv`
-        a.click()
-        URL.revokeObjectURL(url)
-      } else if (fmt === 'pdf') {
-        const parsed = Papa.parse(csvText, { skipEmptyLines: true })
-        const data = parsed.data as string[][]
-        
-        if (data.length < 2) {
-          alert('Not enough data to generate PDF.')
-          return
-        }
+      const blob = await response.blob()
+      const fallbackName = `trackmymoney-report.${format}`
+      const disposition = response.headers.get('Content-Disposition') || ''
+      const filename = disposition.match(/filename="([^"]+)"/)?.[1] || fallbackName
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = filename
+      anchor.click()
+      URL.revokeObjectURL(url)
 
-        const doc = new jsPDF() as AutoTableDoc
-        const headers = data[0]
-        const body = data.slice(1)
-
-        doc.setFontSize(18)
-        doc.text(card.name, 14, 22)
-        doc.setFontSize(11)
-        doc.setTextColor(100)
-        doc.text(`Generated on ${now.toLocaleDateString()}`, 14, 30)
-
-       
-        doc.autoTable({
-          startY: 36,
-          head: [headers],
-          body: body,
-          theme: 'striped',
-          headStyles: { fillColor: [28, 27, 25] },
-          styles: { fontSize: 9, cellPadding: 4 },
-        })
-
-        doc.save(`${filenameBase}.pdf`)
-      }
-
-      setDone(prev => ({ ...prev, [card.id]: true }))
-      setTimeout(() => setDone(prev => ({ ...prev, [card.id]: false })), 3000)
-    } catch (err) {
-      console.error('Export error:', err)
+      setDone(true)
+      setTimeout(() => setDone(false), 3000)
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Report export failed.')
     } finally {
-      setLoading(prev => ({ ...prev, [card.id]: false }))
+      setLoading(false)
     }
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {EXPORT_CARDS.map(card => (
-        <div
-          key={card.id}
-          className="p-5 bg-[var(--bg-surface)] border border-[var(--border-light)]/50 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-5 group hover:border-[var(--border-dark)] transition-all"
-        >
-          <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[var(--bg-base)] border border-[var(--border-light)] flex items-center justify-center text-lg shadow-sm">
-              {card.icon}
-            </div>
-            <div className="min-w-0">
-              <h4 className="text-[12px] font-bold text-[var(--text-main)] uppercase tracking-tight truncate">{card.name}</h4>
-              <p className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider leading-relaxed">{card.desc}</p>
-            </div>
-          </div>
-
-          <div className="flex gap-2 flex-shrink-0">
-            <div className="relative">
-              <select
-                value={formats[card.id]}
-                onChange={e => setFormat(card.id, e.target.value as ExportFormat)}
-                className="pl-3 pr-7 py-2 bg-[var(--bg-base)] border border-[var(--border-light)] rounded-lg text-[12px] font-bold uppercase appearance-none outline-none focus:border-[var(--border-dark)] cursor-pointer transition-all"
-              >
-                <option value="csv">CSV</option>
-                <option value="pdf">PDF</option>
-              </select>
-              <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-[var(--text-muted)] pointer-events-none" />
-            </div>
-            <button
-              onClick={() => handleGenerate(card)}
-              disabled={loading[card.id]}
-              className={`flex items-center gap-1.5 h-9 px-4 rounded-lg text-[12px] font-bold uppercase tracking-widest shadow-sm transition-all ${
-                done[card.id]
-                  ? 'bg-[var(--income-green)] text-white'
-                  : 'bg-[var(--text-main)] text-[var(--bg-base)] hover:scale-[1.01] active:scale-[0.99]'
-              } disabled:opacity-60`}
-            >
-              {loading[card.id] ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <Download className="w-3.5 h-3.5" />
-              )}
-              {done[card.id] ? 'Done!' : 'Generate'}
-            </button>
-          </div>
+    <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
+      <div className="flex items-start gap-4 rounded-2xl border border-[var(--border-light)] bg-[var(--bg-surface)] p-5">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] border border-[var(--border-light)] bg-[var(--bg-base)] text-[var(--accent)]">
+          {format === 'pdf' ? <FileText className="h-5 w-5" /> : <FileSpreadsheet className="h-5 w-5" />}
         </div>
-      ))}
+        <div className="min-w-0">
+          <h4 className="text-sm font-bold uppercase tracking-[0.16em] text-[var(--text-main)]">
+            Transaction Report
+          </h4>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-muted)]">
+            Export the selected report range with real transaction rows, category totals, income, expenses, and net cash flow.
+          </p>
+          {error ? <p className="mt-3 text-sm font-semibold text-[var(--expense-red)]">{error}</p> : null}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
+        <div className="relative">
+          <select
+            value={format}
+            onChange={(event) => setFormat(event.target.value as ExportFormat)}
+            className="h-11 w-full appearance-none rounded-xl border border-[var(--border-light)] bg-[var(--bg-base)] pl-4 pr-10 text-[12px] font-bold uppercase tracking-[0.16em] text-[var(--text-main)] outline-none focus:border-[var(--border-dark)] sm:w-32"
+          >
+            <option value="pdf">PDF</option>
+            <option value="csv">CSV</option>
+          </select>
+          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
+        </div>
+        <button
+          type="button"
+          onClick={handleGenerate}
+          disabled={loading}
+          className={`inline-flex h-11 items-center justify-center gap-2 rounded-xl px-5 text-[12px] font-bold uppercase tracking-[0.16em] transition-all ${
+            done
+              ? 'bg-[var(--income-green)] text-black'
+              : 'bg-[var(--text-main)] text-[var(--bg-base)] hover:opacity-90'
+          } disabled:opacity-60`}
+        >
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : done ? <CheckCircle2 className="h-4 w-4" /> : <Download className="h-4 w-4" />}
+          {done ? 'Downloaded' : 'Download'}
+        </button>
+      </div>
     </div>
   )
 }

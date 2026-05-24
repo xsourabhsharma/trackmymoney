@@ -64,7 +64,7 @@ export function InteractiveChartsManager({ donutData, donutTotal, cashFlowData, 
               <PieChartIcon className="w-3.5 h-3.5 text-[var(--accent)]" /> Expense Breakdown
             </h3>
             <Link href="/dashboard/reports" className="text-[11px] font-bold text-[var(--accent)] uppercase tracking-widest hover:underline">
-              Full Report →
+              Full Report -&gt;
             </Link>
           </div>
           <ExpenseDonutChart 

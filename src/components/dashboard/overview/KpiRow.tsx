@@ -43,7 +43,7 @@ export function KpiRow({ metrics }: KpiRowProps) {
     },
     {
       label: '% Savings Rate',
-      value: metrics.savingsRate !== null ? `${metrics.savingsRate.toFixed(1)}%` : '—',
+      value: metrics.savingsRate !== null ? `${metrics.savingsRate.toFixed(1)}%` : '-',
       icon: Percent,
       colorClass: 'text-[var(--text-main)]',
       subtext: 'EFFICIENCY',

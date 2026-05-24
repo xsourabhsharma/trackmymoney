@@ -50,15 +50,15 @@ async function seed() {
 
  
   console.log('Inserting categories...');
-  const catHousing = { id: uuidv4(), userId, name: 'Housing', type: 'expense' as const, isDefault: true, icon: '🏠', color: '#3b82f6' };
-  const catGroceries = { id: uuidv4(), userId, name: 'Groceries', type: 'expense' as const, isDefault: true, icon: '🛒', color: '#10b981' };
-  const catDining = { id: uuidv4(), userId, name: 'Dining Out', type: 'expense' as const, isDefault: true, icon: '🍔', color: '#f59e0b' };
-  const catTransport = { id: uuidv4(), userId, name: 'Transportation', type: 'expense' as const, isDefault: true, icon: '🚗', color: '#6366f1' };
-  const catShopping = { id: uuidv4(), userId, name: 'Shopping', type: 'expense' as const, isDefault: true, icon: '🛍️', color: '#ec4899' };
-  const catUtilities = { id: uuidv4(), userId, name: 'Utilities', type: 'expense' as const, isDefault: true, icon: '⚡', color: '#eab308' };
-  const catSubs = { id: uuidv4(), userId, name: 'Subscriptions', type: 'expense' as const, isDefault: true, icon: '📱', color: '#d946ef' };
-  const catSalary = { id: uuidv4(), userId, name: 'Salary', type: 'income' as const, isDefault: true, icon: '💵', color: '#10b981' };
-  const catBonus = { id: uuidv4(), userId, name: 'Bonus', type: 'income' as const, isDefault: true, icon: '🎉', color: '#f59e0b' };
+  const catHousing = { id: uuidv4(), userId, name: 'Housing', type: 'expense' as const, isDefault: true, icon: 'home', color: '#3b82f6' };
+  const catGroceries = { id: uuidv4(), userId, name: 'Groceries', type: 'expense' as const, isDefault: true, icon: 'groceries', color: '#10b981' };
+  const catDining = { id: uuidv4(), userId, name: 'Dining Out', type: 'expense' as const, isDefault: true, icon: 'dining', color: '#f59e0b' };
+  const catTransport = { id: uuidv4(), userId, name: 'Transportation', type: 'expense' as const, isDefault: true, icon: 'transport', color: '#6366f1' };
+  const catShopping = { id: uuidv4(), userId, name: 'Shopping', type: 'expense' as const, isDefault: true, icon: 'shopping', color: '#ec4899' };
+  const catUtilities = { id: uuidv4(), userId, name: 'Utilities', type: 'expense' as const, isDefault: true, icon: 'utilities', color: '#eab308' };
+  const catSubs = { id: uuidv4(), userId, name: 'Subscriptions', type: 'expense' as const, isDefault: true, icon: 'subscriptions', color: '#d946ef' };
+  const catSalary = { id: uuidv4(), userId, name: 'Salary', type: 'income' as const, isDefault: true, icon: 'salary', color: '#10b981' };
+  const catBonus = { id: uuidv4(), userId, name: 'Bonus', type: 'income' as const, isDefault: true, icon: 'bonus', color: '#f59e0b' };
 
   const categoriesData = [catHousing, catGroceries, catDining, catTransport, catShopping, catUtilities, catSubs, catSalary, catBonus];
   await db.insert(schema.categories).values(categoriesData);

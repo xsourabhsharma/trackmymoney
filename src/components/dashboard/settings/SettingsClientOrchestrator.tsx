@@ -8,14 +8,17 @@ import { SecuritySettingsSection } from './SecuritySettingsSection'
 import { AppearanceSettingsSection } from './AppearanceSettingsSection'
 import { IntegrationsSettingsSection } from './IntegrationsSettingsSection'
 import { DataPrivacySettingsSection } from './DataPrivacySettingsSection'
+import { McpAccessSettingsSection } from './McpAccessSettingsSection'
+import type { ExternalAccessTokenSummary } from '@/app/dashboard/settings/data'
 
 interface Props {
   initialSettings: UserSettings
   integrations: Integration[]
+  externalAccessTokens: ExternalAccessTokenSummary[]
   email: string
 }
 
-export function SettingsClientOrchestrator({ initialSettings, integrations, email }: Props) {
+export function SettingsClientOrchestrator({ initialSettings, integrations, externalAccessTokens, email }: Props) {
   const [settings, setSettings] = useState<UserSettings>(initialSettings)
 
  
@@ -50,6 +53,7 @@ export function SettingsClientOrchestrator({ initialSettings, integrations, emai
       {}
       <div className="flex flex-col gap-8 flex-1 min-w-0">
         <IntegrationsSettingsSection integrations={integrations} />
+        <McpAccessSettingsSection tokens={externalAccessTokens} />
         <DataPrivacySettingsSection settings={settings} onSave={handleSaveSetting} />
       </div>
     </div>

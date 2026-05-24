@@ -1,5 +1,4 @@
 import {
-  ArrowRight,
   BellRing,
   Bot,
   CalendarClock,
@@ -186,7 +185,7 @@ export default function LandingPage() {
         <SectionIntro
           eyebrow="Product preview"
           title="A single operating view for day-to-day money decisions."
-          body="The homepage preview is code-native UI, not a static screenshot: clear balances, recent transactions, budget pressure, and AI context in one scannable layout."
+          body="The preview below shows the product workflow with example data: clear balances, recent transactions, budget pressure, and transaction-aware AI context in one scannable layout."
         />
         <Reveal className="mt-10">
           <PublicPanel padding="none" className="overflow-hidden">
@@ -197,11 +196,11 @@ export default function LandingPage() {
                     <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-[var(--public-muted)]">
                       Personal ledger
                     </p>
-                    <h3 className="mt-3 text-2xl font-medium text-[var(--public-text)]">May money command center</h3>
+                    <h3 className="mt-3 text-2xl font-medium text-[var(--public-text)]">Example money command center</h3>
                   </div>
-                  <PublicButton href="/signup" variant="outline" size="sm" icon={<ArrowRight className="h-4 w-4" />}>
-                    Try it
-                  </PublicButton>
+                  <span className="rounded-full border border-[var(--public-border)] bg-white/[0.04] px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--public-muted)]">
+                    Example data
+                  </span>
                 </div>
 
                 <div className="mt-7 grid gap-4 md:grid-cols-3">

@@ -203,18 +203,18 @@ export async function loadOverviewData(period: OverviewPeriod): Promise<Overview
   const cashflowSeries = computeCashflowSeries(transactions);
   const topSpending = computeTopSpending(expenseBreakdown);
   const recentTransactions = transactions.slice(0, 10);
-  const monthlyLimit = budgets.reduce((sum, b) => sum + Number(b.limit_amount || 0), 0) || Math.max(outflow * 1.4, 5000);
+  const monthlyLimit = budgets.reduce((sum, b) => sum + Number(b.limit_amount || 0), 0);
   const monthlySpent = budgets.reduce((sum, b) => sum + Number(b.spent || 0), 0) || outflow;
   const discretionaryBudget = budgets.find((b) => {
     const cat = getRelation(b.categories);
     return /dining|food|entertainment|shopping/i.test(cat?.name || '');
   });
-  const discretionaryLimit = Number(discretionaryBudget?.limit_amount || 1000);
+  const discretionaryLimit = Number(discretionaryBudget?.limit_amount || 0);
   const discretionarySpent = discretionaryBudget
     ? Number(discretionaryBudget.spent || 0)
     : expenseBreakdown
         .filter((item) => /dining|food|entertainment|shopping/i.test(item.categoryName))
-        .reduce((sum, item) => sum + item.amount, 0) || Math.min(outflow, 850);
+        .reduce((sum, item) => sum + item.amount, 0);
 
 
   const upcomingCharges = subscriptions
@@ -274,6 +274,8 @@ export async function loadOverviewData(period: OverviewPeriod): Promise<Overview
     },
     accounts: accountBreakdown,
     budgetSnapshot: {
+      hasDiscretionaryBudget: Boolean(discretionaryBudget),
+      hasMonthlyBudget: monthlyLimit > 0,
       monthlySpent,
       monthlyLimit,
       discretionarySpent,

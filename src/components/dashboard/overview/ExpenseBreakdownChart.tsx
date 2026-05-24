@@ -3,6 +3,7 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
 import { EmptyState } from './EmptyState'
 import { PieChart as PieChartIcon } from 'lucide-react'
+import { useCurrency } from '@/hooks/useCurrency'
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#6366f1']
 
@@ -16,6 +17,8 @@ interface ExpenseBreakdownChartProps {
 }
 
 export function ExpenseBreakdownChart({ data }: ExpenseBreakdownChartProps) {
+  const { fmt } = useCurrency()
+
   if (!data || data.length === 0) {
     return (
       <EmptyState
@@ -56,7 +59,7 @@ export function ExpenseBreakdownChart({ data }: ExpenseBreakdownChartProps) {
           </Pie>
           <Tooltip
             formatter={(value: unknown) => [
-              `₹${Number(value).toLocaleString()}`,
+              fmt(Number(value || 0)),
               'Amount'
             ]}
             contentStyle={{

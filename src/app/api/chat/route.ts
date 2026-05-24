@@ -11,6 +11,7 @@ import {
   streamAiText,
 } from '@/lib/ai/server'
 import { requireAiConsent } from '@/lib/ai/privacy'
+import { createTrackMyMoneyAiTools } from '@/lib/finance-tools/ai-tools'
 
 export const maxDuration = 30
 
@@ -79,28 +80,39 @@ export async function POST(req: Request) {
   await appendImageExtraction(coreMessages, data?.imageUrls)
 
   const userDataContext = await buildRedactedFinancialContext(supabase, user.id, pathname)
+  const financeTools = createTrackMyMoneyAiTools({
+    supabase,
+    userId: user.id,
+    actor: 'widget',
+  })
 
   try {
     const result = streamAiText({
-      system: `You are the Intelligence Engine for the Track My Money app. Your purpose is to be a reliable financial advisor focused on analysis, insights, and guidance.
+      system: `You are the TrackMyMoney AI finance assistant. You help the signed-in user read and manage their own TrackMyMoney data: transactions, budgets, subscriptions, savings goals, debts, accounts, categories, and summaries.
 
 PERSONALITY AND TONE:
 - Be friendly, concise, and practical.
 - Use short bullets by default.
 - Do not produce long summaries unless the user explicitly asks.
-- Do not hallucinate records or exact merchants. The financial context is intentionally aggregated and redacted.
+- Do not hallucinate records, amounts, merchants, categories, subscriptions, budgets, goals, debts, or dates that are not in tool results or the provided context.
 
 CREATOR IDENTITY:
 If asked who made you, created you, or developed you, say: "I was made by the Track My Money team."
 
-READ-ONLY MODE:
-You can analyze, summarize, and provide insights, but you cannot add, create, modify, or delete records. If asked to write data, direct the user to the relevant dashboard page.
+STRICT ACTION RULES:
+- Use TrackMyMoney tools for live user data instead of guessing.
+- Create, update, and delete tools are confirmation-gated. First call the relevant tool without confirm to produce a preview and confirmationId. Summarize the preview and ask the user for explicit approval.
+- Only after the user clearly approves, call the same tool again with confirm=true and the exact confirmationId.
+- Never confirm a write action yourself.
+- If a tool returns ok=false, explain the issue and the next useful fix.
+- Do not provide tax, legal, investment, or credential advice. Keep responses focused on TrackMyMoney records and practical app actions.
 
 FINANCIAL CONTEXT PRIVACY:
-The app only provides redacted aggregates and small derived summaries. It does not provide account names, merchant names, raw transaction history, or secret values.
+The app provides financial records and summaries only for the signed-in user. It does not provide account secrets or credentials.
 
 ${userDataContext}`,
       messages: coreMessages,
+      tools: financeTools,
     })
 
     return result.toUIMessageStreamResponse()
@@ -201,38 +213,21 @@ async function buildRedactedFinancialContext(
   const now = new Date()
   const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
   const startOfWindow = new Date(now)
-  startOfWindow.setDate(startOfWindow.getDate() - 90)
+  startOfWindow.setDate(startOfWindow.getDate() - 180)
 
   try {
-    const [
-      accountsResult,
-      budgetsResult,
-      goalsResult,
-      subscriptionsResult,
-      debtsResult,
-      transactionsResult,
-    ] = await Promise.all([
-      supabase.from('accounts').select('type, balance').eq('user_id', userId),
-      supabase.from('budgets').select('period_type, limit_amount, status').eq('user_id', userId),
-      supabase.from('goals').select('target_amount, current_amount, target_date, status').eq('user_id', userId),
-      supabase.from('subscriptions').select('amount, interval, status, next_charge_date').eq('user_id', userId),
-      supabase.from('debts').select('total_amount, remaining_amount, interest_rate').eq('user_id', userId),
-      supabase
-        .from('transactions')
-        .select('amount, type, date')
-        .eq('user_id', userId)
-        .gte('date', startOfWindow.toISOString())
-        .order('date', { ascending: false })
-        .limit(300),
-    ])
+    const transactionsResult = await supabase
+      .from('transactions')
+      .select('amount, type, date, merchant, categories(name)')
+      .eq('user_id', userId)
+      .gte('date', startOfWindow.toISOString())
+      .order('date', { ascending: false })
+      .limit(500)
 
-    const accountRows = asRecords(accountsResult.data)
-    const budgetRows = asRecords(budgetsResult.data)
-    const goalRows = asRecords(goalsResult.data)
-    const subscriptionRows = asRecords(subscriptionsResult.data)
-    const debtRows = asRecords(debtsResult.data)
     const transactionRows = asRecords(transactionsResult.data)
     const monthlyTransactionSummary = summarizeTransactionsByMonth(transactionRows)
+    const topCategories = summarizeTransactionsByCategory(transactionRows)
+    const topMerchants = summarizeTransactionsByMerchant(transactionRows)
     const currentMonthSummary = monthlyTransactionSummary[currentMonth] ?? {
       income: 0,
       expenses: 0,
@@ -240,34 +235,15 @@ async function buildRedactedFinancialContext(
       count: 0,
     }
 
-    return `### REDACTED USER FINANCIAL CONTEXT
-Only aggregated, derived data is included.
+    return `### TRANSACTION CONTEXT
+Only recorded transaction summaries are included.
 ${JSON.stringify({
   currentPage: pathname || '/dashboard',
   currentMonth: currentMonthSummary,
-  last90DaysByMonth: monthlyTransactionSummary,
-  accounts: summarizeAmountByField(accountRows, 'type', 'balance'),
-  budgets: {
-    count: budgetRows.length,
-    activeCount: countByValue(budgetRows, 'status', 'active'),
-    totalLimit: roundCurrency(sumField(budgetRows, 'limit_amount')),
-  },
-  goals: {
-    count: goalRows.length,
-    activeCount: countByValue(goalRows, 'status', 'active'),
-    totalTarget: roundCurrency(sumField(goalRows, 'target_amount')),
-    totalCurrent: roundCurrency(sumField(goalRows, 'current_amount')),
-  },
-  subscriptions: {
-    count: subscriptionRows.length,
-    activeCount: countByValue(subscriptionRows, 'status', 'active'),
-    monthlyEstimate: roundCurrency(sumSubscriptionMonthlyEstimate(subscriptionRows)),
-  },
-  debts: {
-    count: debtRows.length,
-    totalOriginal: roundCurrency(sumField(debtRows, 'total_amount')),
-    totalRemaining: roundCurrency(sumField(debtRows, 'remaining_amount')),
-  },
+  last180DaysByMonth: monthlyTransactionSummary,
+  transactionCountInContext: transactionRows.length,
+  topCategories,
+  topMerchants,
 })}`
   } catch (error) {
     logAiServiceError('chat financial context load failed', error)
@@ -314,48 +290,50 @@ function summarizeTransactionsByMonth(rows: Record<string, unknown>[]) {
   return summary
 }
 
-function summarizeAmountByField(
-  rows: Record<string, unknown>[],
-  groupField: string,
-  amountField: string
-) {
-  const summary: Record<string, { count: number; total: number }> = {}
+function summarizeTransactionsByCategory(rows: Record<string, unknown>[]) {
+  const summary: Record<string, { expenses: number; income: number; count: number }> = {}
 
   for (const row of rows) {
-    const key = typeof row[groupField] === 'string' ? row[groupField] : 'unknown'
-    summary[key] ??= { count: 0, total: 0 }
+    const key = getJoinedCategoryName(row.categories) || 'Uncategorized'
+    const type = typeof row.type === 'string' ? row.type : 'unknown'
+    const amount = numberFrom(row.amount)
+
+    summary[key] ??= { count: 0, expenses: 0, income: 0 }
     summary[key].count += 1
-    summary[key].total = roundCurrency(summary[key].total + numberFrom(row[amountField]))
+    if (type === 'income') summary[key].income = roundCurrency(summary[key].income + amount)
+    if (type === 'expense') summary[key].expenses = roundCurrency(summary[key].expenses + amount)
   }
 
-  return summary
+  return Object.entries(summary)
+    .sort((a, b) => (b[1].expenses + b[1].income) - (a[1].expenses + a[1].income))
+    .slice(0, 12)
+    .map(([category, values]) => ({ category, ...values }))
 }
 
-function sumSubscriptionMonthlyEstimate(rows: Record<string, unknown>[]) {
-  return rows.reduce((total, row) => {
+function summarizeTransactionsByMerchant(rows: Record<string, unknown>[]) {
+  const summary: Record<string, { expenses: number; income: number; count: number }> = {}
+
+  for (const row of rows) {
+    const merchant = typeof row.merchant === 'string' && row.merchant.trim() ? row.merchant.trim() : 'Unspecified'
+    const type = typeof row.type === 'string' ? row.type : 'unknown'
     const amount = numberFrom(row.amount)
-    const interval = typeof row.interval === 'string' ? row.interval.toLowerCase() : 'monthly'
 
-    if (interval.includes('year')) {
-      return total + amount / 12
-    }
-    if (interval.includes('week')) {
-      return total + amount * 4.345
-    }
-    if (interval.includes('quarter')) {
-      return total + amount / 3
-    }
+    summary[merchant] ??= { count: 0, expenses: 0, income: 0 }
+    summary[merchant].count += 1
+    if (type === 'income') summary[merchant].income = roundCurrency(summary[merchant].income + amount)
+    if (type === 'expense') summary[merchant].expenses = roundCurrency(summary[merchant].expenses + amount)
+  }
 
-    return total + amount
-  }, 0)
+  return Object.entries(summary)
+    .sort((a, b) => (b[1].expenses + b[1].income) - (a[1].expenses + a[1].income))
+    .slice(0, 12)
+    .map(([merchant, values]) => ({ merchant, ...values }))
 }
 
-function sumField(rows: Record<string, unknown>[], field: string) {
-  return rows.reduce((total, row) => total + numberFrom(row[field]), 0)
-}
-
-function countByValue(rows: Record<string, unknown>[], field: string, value: string) {
-  return rows.filter((row) => row[field] === value).length
+function getJoinedCategoryName(value: unknown) {
+  const category = Array.isArray(value) ? value[0] : value
+  if (!isRecord(category)) return null
+  return typeof category.name === 'string' ? category.name : null
 }
 
 function asRecords(value: unknown): Record<string, unknown>[] {

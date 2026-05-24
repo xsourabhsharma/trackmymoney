@@ -104,6 +104,8 @@ export interface OverviewAccountBalance {
 }
 
 export interface OverviewBudgetSnapshot {
+  hasDiscretionaryBudget: boolean
+  hasMonthlyBudget: boolean
   monthlySpent: number
   monthlyLimit: number
   discretionarySpent: number

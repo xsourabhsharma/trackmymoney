@@ -73,8 +73,8 @@ export function AddGoalButton() {
               <Input id="deadline" name="deadline" type="date" />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="icon">Emoji Icon</Label>
-              <Input id="icon" name="icon" placeholder="🏖️" defaultValue="🎯" maxLength={2} />
+              <Label htmlFor="icon">Icon Key</Label>
+              <Input id="icon" name="icon" placeholder="target" defaultValue="target" />
             </div>
           </div>
           <DialogFooter className="mt-4">

@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { Progress } from "@/components/ui/progress"
+import { CategoryIcon } from '@/components/dashboard/CategoryIcon'
 
 type BudgetSummaryRow = {
   id: string
@@ -68,7 +69,8 @@ export async function BudgetSummaryWidget() {
             <div key={b.id}>
               <div className="flex justify-between text-sm mb-1">
                 <span className="font-medium flex items-center gap-2">
-                  <span>{b.categories?.icon || '📦'}</span> {b.categories?.name || 'Unknown'}
+                  <CategoryIcon className="h-6 w-6 rounded-md" icon={b.categories?.icon} name={b.categories?.name} />
+                  {b.categories?.name || 'Unknown'}
                 </span>
                 <span className={isOver ? 'text-red-500 font-semibold' : 'text-gray-500'}>
                   ${spent.toFixed(0)} / ${limit.toFixed(0)}

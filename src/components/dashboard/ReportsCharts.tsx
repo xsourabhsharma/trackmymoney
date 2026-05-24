@@ -6,6 +6,7 @@ import {
 } from 'recharts'
 import { format, parseISO, getDay } from 'date-fns'
 import type { TransactionRow } from '@/app/dashboard/transactions/data'
+import { BarChart3 } from 'lucide-react'
 
 type ReportChartTransaction = TransactionRow & {
   source?: string | null
@@ -81,7 +82,7 @@ export function ReportsCharts({ transactions }: { transactions: ReportChartTrans
     return (
       <div className="flex items-center justify-center p-12 bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px]">
         <div className="text-center">
-            <p className="text-3xl opacity-40">📊</p>
+            <BarChart3 className="mx-auto h-8 w-8 text-[var(--text-muted)] opacity-60" />
             <h3 className="mt-4 text-sm font-bold uppercase tracking-widest text-[var(--text-main)]">No Data Available</h3>
             <p className="mt-2 text-xs text-[var(--text-muted)]">There are no transactions in the selected period.</p>
         </div>

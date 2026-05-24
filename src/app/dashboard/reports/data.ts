@@ -1,16 +1,23 @@
 import { createClient } from '@/utils/supabase/server'
 import {
-  startOfMonth, endOfMonth, startOfYear,
-  subMonths, format,
+  endOfDay,
+  format,
+  isValid,
+  parseISO,
+  startOfMonth,
+  startOfYear,
+  subDays,
 } from 'date-fns'
 
-export type ReportsPeriod = 'this_month' | 'last_month' | 'last_three_months' | 'year_to_date'
+export type ReportsPeriod = 'last_7_days' | 'this_month' | 'this_year' | 'custom'
 export type ReportsScope = 'all' | 'bank' | 'card'
 export type ReportsView = 'summary' | 'detailed' | 'tax'
 
 export interface ReportsFilter {
+  from?: string
   period: ReportsPeriod
   scope: ReportsScope
+  to?: string
   view: ReportsView
 }
 
@@ -98,7 +105,7 @@ interface PreviousTransactionRow {
   type: 'income' | 'expense' | 'transfer'
 }
 
-const REPORT_PERIODS: readonly ReportsPeriod[] = ['this_month', 'last_month', 'last_three_months', 'year_to_date']
+const REPORT_PERIODS: readonly ReportsPeriod[] = ['last_7_days', 'this_month', 'this_year', 'custom']
 const REPORT_SCOPES: readonly ReportsScope[] = ['all', 'bank', 'card']
 const REPORT_VIEWS: readonly ReportsView[] = ['summary', 'detailed', 'tax']
 
@@ -122,10 +129,18 @@ export function normalizeReportsView(value: unknown): ReportsView {
 
 function normalizeReportsFilter(filter: ReportsFilter): ReportsFilter {
   return {
+    from: normalizeDateString(filter.from),
     period: normalizeReportsPeriod(filter.period),
     scope: normalizeReportsScope(filter.scope),
+    to: normalizeDateString(filter.to),
     view: normalizeReportsView(filter.view),
   }
+}
+
+export function normalizeDateString(value: unknown): string | undefined {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined
+  const parsed = parseISO(value)
+  return isValid(parsed) ? value : undefined
 }
 
 function unwrapJoin<T>(value: T | T[] | null | undefined): T | null {
@@ -135,33 +150,35 @@ function unwrapJoin<T>(value: T | T[] | null | undefined): T | null {
 
 export function getDateRangeForReports(
   period: ReportsPeriod,
-  now: Date = new Date()
+  now: Date = new Date(),
+  custom?: { from?: string; to?: string }
 ): { startDate: string; endDate: string } {
   switch (period) {
+    case 'last_7_days':
+      return {
+        startDate: format(subDays(now, 6), 'yyyy-MM-dd'),
+        endDate: format(now, 'yyyy-MM-dd'),
+      }
     case 'this_month':
       return {
         startDate: format(startOfMonth(now), 'yyyy-MM-dd'),
         endDate: format(now, 'yyyy-MM-dd'),
       }
-    case 'last_month': {
-      const lastMonth = subMonths(now, 1)
-      return {
-        startDate: format(startOfMonth(lastMonth), 'yyyy-MM-dd'),
-        endDate: format(endOfMonth(lastMonth), 'yyyy-MM-dd'),
-      }
-    }
-    case 'last_three_months': {
-      const threeBack = subMonths(now, 3)
-      return {
-        startDate: format(startOfMonth(threeBack), 'yyyy-MM-dd'),
-        endDate: format(endOfMonth(subMonths(now, 1)), 'yyyy-MM-dd'),
-      }
-    }
-    case 'year_to_date':
+    case 'this_year':
       return {
         startDate: format(startOfYear(now), 'yyyy-MM-dd'),
         endDate: format(now, 'yyyy-MM-dd'),
       }
+    case 'custom': {
+      const fallback = {
+        startDate: format(startOfMonth(now), 'yyyy-MM-dd'),
+        endDate: format(now, 'yyyy-MM-dd'),
+      }
+      const from = normalizeDateString(custom?.from)
+      const to = normalizeDateString(custom?.to)
+      if (!from || !to) return fallback
+      return from <= to ? { startDate: from, endDate: to } : { startDate: to, endDate: from }
+    }
   }
 }
 
@@ -192,7 +209,10 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
 
   const safeFilter = normalizeReportsFilter(filter)
   const now = new Date()
-  const { startDate, endDate } = getDateRangeForReports(safeFilter.period, now)
+  const { startDate, endDate } = getDateRangeForReports(safeFilter.period, now, {
+    from: safeFilter.from,
+    to: safeFilter.to,
+  })
   const prevRange = getPreviousPeriodRange(startDate, endDate)
   const warnings: string[] = []
 
@@ -227,7 +247,7 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
     .select('amount, type, date, merchant, category_id, categories ( id, name, icon, color )')
     .eq('user_id', user.id)
     .gte('date', startDate)
-    .lte('date', endDate)
+    .lte('date', endOfDay(parseISO(endDate)).toISOString())
     .order('date', { ascending: true })
 
   if (accountIds) txQuery = txQuery.in('account_id', accountIds)
@@ -244,7 +264,7 @@ export async function loadReportsPageData(filter: ReportsFilter): Promise<Report
     .select('amount, type')
     .eq('user_id', user.id)
     .gte('date', prevRange.startDate)
-    .lte('date', prevRange.endDate)
+    .lte('date', endOfDay(parseISO(prevRange.endDate)).toISOString())
 
   if (accountIds) prevTxQuery = prevTxQuery.in('account_id', accountIds)
 

@@ -1,5 +1,7 @@
 'use client'
 import { Progress } from "@/components/ui/progress"
+import { CategoryIcon } from '@/components/dashboard/CategoryIcon'
+import { useCurrency } from '@/hooks/useCurrency'
 
 interface TopCategoryTransaction {
   type: string
@@ -11,6 +13,7 @@ interface TopCategoryTransaction {
 }
 
 export function TopCategoriesWidget({ expenses }: { expenses: TopCategoryTransaction[] }) {
+  const { fmt } = useCurrency()
   const categoryMap: Record<string, { name: string, icon: string, amount: number }> = {}
   let total = 0
   
@@ -20,7 +23,7 @@ export function TopCategoriesWidget({ expenses }: { expenses: TopCategoryTransac
       total += amt
       const catId = e.categories?.name || 'Other'
       if (!categoryMap[catId]) {
-        categoryMap[catId] = { name: catId, icon: e.categories?.icon || '📦', amount: 0 }
+        categoryMap[catId] = { name: catId, icon: e.categories?.icon || 'other', amount: 0 }
       }
       categoryMap[catId].amount += amt
     }
@@ -39,9 +42,10 @@ export function TopCategoriesWidget({ expenses }: { expenses: TopCategoryTransac
             <div key={cat.name}>
               <div className="flex justify-between text-sm mb-1">
                 <span className="font-medium flex items-center gap-2">
-                  <span>{cat.icon}</span> {cat.name}
+                  <CategoryIcon className="h-6 w-6 rounded-md" icon={cat.icon} name={cat.name} />
+                  {cat.name}
                 </span>
-                <span className="font-semibold">${cat.amount.toFixed(2)}</span>
+                <span className="font-semibold">{fmt(cat.amount)}</span>
               </div>
               <Progress value={(cat.amount / total) * 100} className="h-2 bg-gray-100 dark:bg-zinc-800" indicatorColor="bg-blue-500" />
             </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import type { SavingsGoalRow, GoalStatus } from '@/app/dashboard/goals/data'
-import { Plus, Clock } from 'lucide-react'
+import { Banknote, BriefcaseBusiness, Car, Clock, GraduationCap, Home, Laptop, Lightbulb, Plane, Plus, Shield, Target } from 'lucide-react'
 import { format } from 'date-fns'
 import { ConfettiCelebration } from '@/components/dashboard/goals/ConfettiCelebration'
 import { useCurrency } from '@/hooks/useCurrency'
@@ -18,6 +18,18 @@ const STATUS_COLORS: Record<GoalStatus, string> = {
   active: 'bg-blue-50 text-blue-600 border-blue-100',
   completed: 'bg-green-50 text-green-600 border-green-100',
   paused: 'bg-orange-50 text-orange-600 border-orange-100',
+}
+
+const GOAL_ICON_BY_KEY = {
+  business: BriefcaseBusiness,
+  car: Car,
+  cash: Banknote,
+  device: Laptop,
+  education: GraduationCap,
+  home: Home,
+  protected: Shield,
+  target: Target,
+  travel: Plane,
 }
 
 function GoalCard({ goal, onEdit }: { goal: SavingsGoalRow; onEdit: () => void }) {
@@ -55,8 +67,11 @@ function GoalCard({ goal, onEdit }: { goal: SavingsGoalRow; onEdit: () => void }
         {}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition-transform">
-              {goal.icon || '🎯'}
+            <div className="w-11 h-11 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl flex items-center justify-center text-[var(--accent)] shadow-sm group-hover:scale-110 transition-transform">
+              {(() => {
+                const Icon = GOAL_ICON_BY_KEY[(goal.icon || 'target') as keyof typeof GOAL_ICON_BY_KEY] || Target
+                return <Icon className="h-5 w-5" />
+              })()}
             </div>
             <div>
               <span className="text-[13px] font-bold text-[var(--text-main)] uppercase tracking-tight block">
@@ -64,7 +79,7 @@ function GoalCard({ goal, onEdit }: { goal: SavingsGoalRow; onEdit: () => void }
               </span>
               <span className={`text-[11px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${STATUS_COLORS[goal.status]}`}>
                 {goal.status}
-                {goal.priority === 1 && <span className="ml-1">⚡</span>}
+                {goal.priority === 1 && <span className="ml-1 text-[var(--accent)]">Priority</span>}
               </span>
             </div>
           </div>
@@ -102,7 +117,7 @@ function GoalCard({ goal, onEdit }: { goal: SavingsGoalRow; onEdit: () => void }
         {}
         {!isCompleted && (
           <div className="text-[12px] text-[var(--text-muted)] font-bold">
-            💡 {fmt(goal.targetAmount - goal.currentAmount, goal.currency)} to go
+            <Lightbulb className="mr-1 inline h-3.5 w-3.5 text-[var(--accent)]" /> {fmt(goal.targetAmount - goal.currentAmount, goal.currency)} to go
           </div>
         )}
       </div>
@@ -136,7 +151,7 @@ export function SavingsGoalsSection({ goals, activeTab, onTabChange, onAddGoal, 
       {goals.length === 0 ? (
         <div className="py-16 text-center flex flex-col items-center gap-5 border-2 border-dashed border-[var(--border-light)] rounded-[24px] bg-[var(--bg-surface)]/30">
           <div className="w-16 h-16 rounded-full bg-[var(--bg-base)] border border-[var(--border-light)] flex items-center justify-center text-3xl shadow-sm">
-            🎯
+            <Target className="h-7 w-7 text-[var(--accent)]" />
           </div>
           <div>
             <p className="text-[13px] font-bold text-[var(--text-main)] tracking-tight mb-1">
@@ -144,8 +159,8 @@ export function SavingsGoalsSection({ goals, activeTab, onTabChange, onAddGoal, 
             </p>
             <p className="text-[11px] text-[var(--text-muted)] max-w-xs mx-auto leading-relaxed">
               {activeTab === 'completed'
-                ? 'Keep working on your active goals — completions will show up here.'
-                : 'Start tracking money toward something meaningful. Emergency fund, vacation, home — anything works.'}
+                ? 'Keep working on your active goals - completions will show up here.'
+                : 'Start tracking money toward something meaningful. Emergency fund, vacation, home - anything works.'}
             </p>
           </div>
           {activeTab !== 'completed' && (

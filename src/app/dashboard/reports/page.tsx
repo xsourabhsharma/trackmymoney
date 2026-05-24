@@ -31,10 +31,14 @@ export default async function ReportsPage({
   const period = normalizeReportsPeriod(firstSearchParam(resolvedSearchParams?.period))
   const scope = normalizeReportsScope(firstSearchParam(resolvedSearchParams?.scope))
   const view = normalizeReportsView(firstSearchParam(resolvedSearchParams?.view))
+  const from = firstSearchParam(resolvedSearchParams?.from)
+  const to = firstSearchParam(resolvedSearchParams?.to)
 
   const pageData = await loadReportsPageData({
+    from,
     period,
     scope,
+    to,
     view,
   })
 

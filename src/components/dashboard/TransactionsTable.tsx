@@ -12,6 +12,7 @@ import {
   ChevronRight,
   Eye,
   Download,
+  FolderOpen,
 } from 'lucide-react'
 import {
   Table,
@@ -24,6 +25,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { EditTransactionButton } from '@/components/dashboard/EditTransactionButton'
 import { DeleteTransactionButton } from '@/components/dashboard/DeleteTransactionButton'
+import { CategoryIcon } from '@/components/dashboard/CategoryIcon'
 import { bulkDeleteTransactions } from '@/app/dashboard/transactions/bulk-actions'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import type { TransactionRow } from '@/app/dashboard/transactions/data'
@@ -248,7 +250,9 @@ export function TransactionsTable({
                 <TableRow>
                   <TableCell colSpan={8} className="h-40 text-center">
                     <div className="flex flex-col items-center gap-4 py-8">
-                      <div className="text-3xl opacity-30">📭</div>
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--border-light)] bg-[var(--bg-surface)] text-[var(--accent)]">
+                        <FolderOpen className="h-5 w-5" />
+                      </div>
                       <span className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">No transactions match your filters</span>
                       <div className="flex items-center gap-3 mt-2">
                         <button
@@ -277,9 +281,7 @@ export function TransactionsTable({
                     </TableCell>
                     <TableCell className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-light)] flex items-center justify-center text-sm shadow-sm group-hover:scale-110 transition-transform">
-                          {tx.categories?.icon || '💸'}
-                        </div>
+                        <CategoryIcon className="h-8 w-8 rounded-lg group-hover:scale-110 transition-transform" icon={tx.categories?.icon} name={tx.categories?.name} />
                         <div className="flex flex-col overflow-hidden max-w-[180px]">
                           <span className="text-[12px] font-bold truncate text-[var(--text-main)] uppercase tracking-tight">{tx.merchant}</span>
                           {tx.description && (
@@ -301,7 +303,7 @@ export function TransactionsTable({
                       </span>
                     </TableCell>
                     <TableCell className="p-4 text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
-                      {tx.accountName || '—'}
+                      {tx.accountName || '-'}
                     </TableCell>
                     <TableCell className={`p-4 text-right text-[13px] font-bold tabular-nums tracking-tighter ${
                       tx.type === 'income' ? 'text-[var(--income-green)]' : 'text-[var(--text-main)]'
@@ -330,7 +332,7 @@ export function TransactionsTable({
       {}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 mt-2">
         <div className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">
-          Showing {((currentPage - 1) * pageSize) + 1}–{Math.min(currentPage * pageSize, totalCount)} of {totalCount} nodes
+          Showing {((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, totalCount)} of {totalCount} transactions
         </div>
 
         <div className="flex items-center gap-1.5">

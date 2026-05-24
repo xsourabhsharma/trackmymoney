@@ -97,12 +97,12 @@ export async function POST(req: NextRequest) {
 
   try {
     if (!getAiTextState().enabled) {
-      const fallbackInsights = generateMockInsights(summary)
+      const fallbackInsights = generateLocalTransactionInsights(summary)
       await storeInsights(supabase, user.id, stats.period || 'this-month', fallbackInsights, summary)
       return NextResponse.json({ insights: fallbackInsights, source: 'local' })
     }
 
-    const prompt = `You are a personal finance advisor. Analyze these redacted financial metrics and generate 3-5 concise, actionable insights.
+    const prompt = `You are a transaction analyst for TrackMyMoney. Analyze these redacted transaction metrics and generate 3-5 concise, actionable insights.
 
 Financial Summary:
 - Period: ${summary.period}
@@ -112,13 +112,12 @@ Financial Summary:
 - Savings Rate: ${summary.savingsRate.toFixed(1)}%
 - Account Balance: ${summary.accountBalance.toLocaleString()}
 - Top spending categories: ${summary.topCategories.map((category) => `${category.name}: ${category.amount}`).join(', ') || 'None'}
-- Upcoming charges: ${summary.upcomingChargesCount}
-- Financial Health Score: ${summary.healthScore}/100
 
 Rules:
 - Be specific and reference only the numbers above.
-- Identify spending patterns, savings opportunities, and risks.
+- Identify transaction patterns, category concentration, income/expense changes, and data gaps.
 - Each insight should have a clear action the user can take.
+- Do not discuss budgets, goals, subscriptions, debt, investments, or general financial planning.
 - Keep titles under 6 words in Standard Title Case.
 - Keep body under 30 words in normal sentence case.
 - Keep actionHint friendly, clear, and normal sentence case.
@@ -147,7 +146,7 @@ Respond with ONLY a valid JSON array of objects with these exact keys:
   } catch (error) {
     logAiServiceError('insights route failed', error)
     if (isAiDisabledError(error)) {
-      const fallbackInsights = generateMockInsights(summary)
+      const fallbackInsights = generateLocalTransactionInsights(summary)
       await storeInsights(supabase, user.id, stats.period || 'this-month', fallbackInsights, summary)
       return NextResponse.json({ insights: fallbackInsights, source: 'local' })
     }
@@ -205,24 +204,24 @@ async function storeInsights(
   }
 }
 
-function generateMockInsights(summary: InsightsSummary): InsightRecord[] {
+function generateLocalTransactionInsights(summary: InsightsSummary): InsightRecord[] {
   const insights: InsightRecord[] = []
 
   if (summary.savingsRate > 20) {
     insights.push({
       id: '1',
       title: 'Strong Savings Rate',
-      body: `You're saving ${summary.savingsRate.toFixed(1)}% of your income. You're above the recommended 20% threshold.`,
+      body: `Recorded income is higher than expenses by ${summary.savingsRate.toFixed(1)}% this period.`,
       severity: 'info',
-      actionHint: 'Consider investing the surplus in an index fund.',
+      actionHint: 'Review recent income and expense transactions to confirm the pattern.',
     })
   } else if (summary.savingsRate > 0) {
     insights.push({
       id: '1',
-      title: 'Savings Below Target',
-      body: `Your ${summary.savingsRate.toFixed(1)}% savings rate is below the recommended 20%. Look for areas to cut back.`,
+      title: 'Narrow Transaction Margin',
+      body: `Recorded income is only ${summary.savingsRate.toFixed(1)}% above expenses this period.`,
       severity: 'warning',
-      actionHint: 'Review your top spending categories for quick wins.',
+      actionHint: 'Review your largest recorded expense categories for this period.',
     })
   } else {
     insights.push({
@@ -248,20 +247,20 @@ function generateMockInsights(summary: InsightsSummary): InsightRecord[] {
   if (summary.upcomingChargesCount > 0) {
     insights.push({
       id: '3',
-      title: 'Upcoming Charges',
-      body: `You have ${summary.upcomingChargesCount} subscription${summary.upcomingChargesCount > 1 ? 's' : ''} coming up. Review any you no longer need.`,
+      title: 'Recent Transaction Volume',
+      body: `This insight used ${summary.transactionCount} recent transaction${summary.transactionCount === 1 ? '' : 's'} in the selected period.`,
       severity: 'info',
-      actionHint: 'Visit Subscriptions to review active services.',
+      actionHint: 'Add missing transactions so reports and advisor answers stay accurate.',
     })
   }
 
   if (insights.length < 3) {
     insights.push({
       id: String(insights.length + 1),
-      title: 'Build Your Profile',
-      body: 'Add more transactions and set up budgets to get personalized insights tailored to your spending patterns.',
+      title: 'Add More Transactions',
+      body: 'More recorded transactions will make category and merchant insights more useful.',
       severity: 'info',
-      actionHint: 'Create your first budget in the Budgets tab.',
+      actionHint: 'Use Transactions or AI Auto-Parse to record activity.',
     })
   }
 

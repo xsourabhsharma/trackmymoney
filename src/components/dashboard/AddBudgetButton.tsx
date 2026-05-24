@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import type { FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus } from 'lucide-react'
 import { addBudget } from '@/app/dashboard/budgets/actions'
@@ -19,6 +20,8 @@ import { Label } from "@/components/ui/label"
 
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from '@/components/ui/toast-provider'
+import { CategoryIcon } from '@/components/dashboard/CategoryIcon'
+import { useCurrencyStore } from '@/store/useCurrencyStore'
 
 interface BudgetCategory {
   id: string
@@ -34,6 +37,7 @@ export function AddBudgetButton({ categories }: { categories: BudgetCategory[] }
   const [rollover, setRollover] = useState<boolean>(false)
   const router = useRouter()
   const { addToast } = useToast()
+  const currency = useCurrencyStore((state) => state.currency)
 
   const expenseCategories = categories.filter(c => c.type === 'expense')
 
@@ -61,6 +65,11 @@ export function AddBudgetButton({ categories }: { categories: BudgetCategory[] }
     }
   }
 
+  async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    await handleSubmit(new FormData(event.currentTarget))
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
@@ -78,7 +87,7 @@ export function AddBudgetButton({ categories }: { categories: BudgetCategory[] }
             Create a spending limit for a specific category.
           </DialogDescription>
         </DialogHeader>
-        <form action={handleSubmit} className="grid gap-4 py-4">
+        <form onSubmit={handleFormSubmit} className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="category">Category</Label>
             <select
@@ -88,13 +97,26 @@ export function AddBudgetButton({ categories }: { categories: BudgetCategory[] }
             >
               <option value="">Select category</option>
               {expenseCategories.map(c => (
-                <option key={c.id} value={c.id}>{c.icon ? `${c.icon} ` : ''}{c.name}</option>
+                <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
+            {selectedCategory ? (
+              <div className="mt-2 flex items-center gap-2 text-sm text-[var(--text-muted)]">
+                {(() => {
+                  const selected = expenseCategories.find(category => category.id === selectedCategory)
+                  return selected ? (
+                    <>
+                      <CategoryIcon className="h-8 w-8 rounded-[10px]" icon={selected.icon} name={selected.name} />
+                      <span>{selected.name}</span>
+                    </>
+                  ) : null
+                })()}
+              </div>
+            ) : null}
           </div>
           
           <div className="grid gap-2">
-            <Label htmlFor="amount">Monthly Limit ($)</Label>
+            <Label htmlFor="amount">Monthly Limit ({currency})</Label>
             <Input
               id="amount"
               name="amount"

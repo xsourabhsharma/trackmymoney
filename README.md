@@ -66,6 +66,21 @@ graph TD
 
 ---
 
+## AI, MCP, And CLI Access
+
+TrackMyMoney exposes a user-scoped MCP and CLI layer for AI assistants and local automation.
+
+1. Open **Dashboard -> Settings -> AI, MCP & CLI Access**.
+2. Generate a scoped external access token. The token is shown once and stored only as a hash.
+3. Use one of the generated snippets:
+   - Remote MCP: connect clients that support Streamable HTTP to `/api/mcp` with `Authorization: Bearer <token>`.
+   - Stdio bridge: use `npx -y mcp-remote https://your-domain.com/api/mcp` with the same bearer header.
+   - CLI: run `trackmymoney --base-url https://your-domain.com --token <token> transaction add ...`.
+
+All create, update, and delete tools are confirmation-gated. The first call returns a preview and `confirmationId`; execution only happens after a second call with `confirm=true` and the matching ID. The website AI widget uses the same tool layer.
+
+---
+
 ## 🛡️ Data Domain Model
 
 The schema is engineered for complex financial relationships, not just basic CRUD:

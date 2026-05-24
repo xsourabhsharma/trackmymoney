@@ -1,8 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ArrowLeft, ArrowRight, Clock3, DollarSign, Loader2 } from 'lucide-react'
+import { ArrowRight, BarChart3, Clock3, Loader2, Plus, ReceiptText } from 'lucide-react'
 import { format } from 'date-fns'
 import Link from 'next/link'
 
@@ -10,7 +11,9 @@ import type { OverviewData, OverviewPeriod } from '@/lib/types'
 import { InteractiveChartsManager } from '@/components/dashboard/InteractiveChartsManager'
 import { FinancialHealthScore } from '@/components/dashboard/FinancialHealthScore'
 import { ConsoleHeader, ConsoleMetric, ConsolePanel, RailMeter, AmountPill } from '@/components/dashboard/FinanceConsole'
-import { useCurrencyStore } from '@/store/useCurrencyStore'
+import { CategoryIcon } from '@/components/dashboard/CategoryIcon'
+import { convertCurrency, formatCurrency } from '@/lib/currency'
+import { useCurrency } from '@/hooks/useCurrency'
 
 interface Props {
   initialData: OverviewData
@@ -27,17 +30,18 @@ const PERIOD_OPTIONS: { label: string; val: OverviewPeriod }[] = [
   { label: 'All', val: 'all-time' },
 ]
 
-function fullMoney(value: number, currency: 'USD' | 'INR') {
+function fullMoney(value: number, currency: 'USD' | 'INR', baseCurrency: string, usdToInrRate: number) {
+  const convertedValue = convertCurrency(value, currency, baseCurrency, usdToInrRate)
   return new Intl.NumberFormat(currency === 'INR' ? 'en-IN' : 'en-US', {
     style: 'currency',
     currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(value)
+  }).format(convertedValue)
 }
 
-function splitMoney(value: number, currency: 'USD' | 'INR') {
-  const full = fullMoney(value, currency)
+function splitMoney(value: number, currency: 'USD' | 'INR', baseCurrency: string, usdToInrRate: number) {
+  const full = fullMoney(value, currency, baseCurrency, usdToInrRate)
   const match = full.match(/^(.+?)(\d{2})$/)
   if (!match) return { main: full, cents: '' }
   return { main: match[1].replace(/\.$/, ''), cents: match[2] }
@@ -61,7 +65,7 @@ export default function DashboardClient({ initialData }: Props) {
   const [data, setData] = useState<OverviewData>(initialData)
   const [loading, setLoading] = useState(false)
   const range = (searchParams.get('range') as OverviewPeriod) || 'this-month'
-  const { currency } = useCurrencyStore()
+  const { currency, fmt, rateStatus, usdToInrRate } = useCurrency()
   const displayCurrency = currency === 'INR' ? 'INR' : 'USD'
 
   const fetchData = useCallback(async (newRange: OverviewPeriod) => {
@@ -92,16 +96,16 @@ export default function DashboardClient({ initialData }: Props) {
 
   const { metrics, budgetSnapshot } = data
   const accountTotal = metrics.accountBalance || metrics.netPosition
-  const net = splitMoney(accountTotal, displayCurrency)
+  const net = splitMoney(accountTotal, displayCurrency, 'USD', usdToInrRate)
   const checking = data.accounts?.find((account) => /check|bank/i.test(account.name)) ?? data.accounts?.[0]
   const savings = data.accounts?.find((account) => /saving/i.test(account.name)) ?? data.accounts?.[1]
   const currentDate = useMemo(() => format(new Date(), 'EEEE, dd, MMM'), [])
-  const monthlyLimit = budgetSnapshot?.monthlyLimit || Math.max(metrics.outflow * 1.4, 5000)
-  const monthlySpent = budgetSnapshot?.monthlySpent || metrics.outflow
-  const discretionaryLimit = budgetSnapshot?.discretionaryLimit || 1000
-  const discretionarySpent = budgetSnapshot?.discretionarySpent || Math.min(metrics.outflow, 850)
+  const monthlyLimit = budgetSnapshot.monthlyLimit
+  const monthlySpent = budgetSnapshot.monthlySpent
+  const discretionaryLimit = budgetSnapshot.discretionaryLimit
+  const discretionarySpent = budgetSnapshot.discretionarySpent
   const remainingDays = Math.max(0, Math.ceil((new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).getTime() - Date.now()) / 86400000))
-  const monthGrowth = metrics.inflow > 0 ? (metrics.netPosition / metrics.inflow) * 100 : metrics.savingsRate
+  const hasTransactions = data.recentTransactions.length > 0 || metrics.inflow > 0 || metrics.outflow > 0
 
   return (
     <div className={`tm-console -mx-4 -mt-2 min-h-[calc(100dvh-7rem)] px-4 pb-8 transition-opacity duration-300 md:-mx-6 md:px-6 lg:-mx-10 lg:px-10 ${loading ? 'opacity-70' : 'opacity-100'}`}>
@@ -118,7 +122,10 @@ export default function DashboardClient({ initialData }: Props) {
               {currentDate}
             </div>
             <div className="flex items-center gap-2 text-[var(--text-muted)]">
-              <DollarSign className="h-4 w-4" />
+              <span className="rounded-full border border-[var(--border-light)] bg-[var(--bg-surface)] px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.16em]">
+                {displayCurrency}
+                {rateStatus === 'fallback' || rateStatus === 'error' ? ' fallback rate' : ''}
+              </span>
               <Clock3 className="h-4 w-4" />
             </div>
           </div>
@@ -139,11 +146,11 @@ export default function DashboardClient({ initialData }: Props) {
             <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
               <ConsoleMetric
                 label={checking?.name || 'Checking'}
-                value={fullMoney(checking?.balance ?? metrics.inflow, displayCurrency)}
+                value={checking ? fullMoney(checking.balance, displayCurrency, 'USD', usdToInrRate) : 'No account yet'}
               />
               <ConsoleMetric
                 label={savings?.name || 'Savings'}
-                value={fullMoney(savings?.balance ?? Math.max(accountTotal - metrics.inflow, 0), displayCurrency)}
+                value={savings ? fullMoney(savings.balance, displayCurrency, 'USD', usdToInrRate) : 'Add account'}
               />
             </div>
           </ConsolePanel>
@@ -178,17 +185,19 @@ export default function DashboardClient({ initialData }: Props) {
                       </span>
                       <div className="min-w-0">
                         <div className="flex min-w-0 items-center gap-3">
-                          <span
-                            className="h-2 w-2 rounded-full"
-                            style={{ backgroundColor: getTransactionCategoryColor(tx) }}
+                          <CategoryIcon
+                            className="h-8 w-8 rounded-[10px]"
+                            color={getTransactionCategoryColor(tx)}
+                            icon={tx.categories?.icon}
+                            name={tx.categories?.name}
                           />
                           <span className="truncate text-[14px] font-bold text-[var(--text-main)]">
                             {getTransactionMerchant(tx)}
                           </span>
                         </div>
                       </div>
-                      <span className={`text-right text-[13px] tabular-nums ${isIncome ? 'text-[var(--text-main)]' : 'text-[var(--text-muted)]'}`}>
-                        {isIncome ? '+' : '-'}{fullMoney(amount, displayCurrency)}
+                      <span className={`text-right text-[13px] tabular-nums ${isIncome ? 'text-[var(--income-green)]' : 'text-[var(--text-main)]'}`}>
+                        {isIncome ? '+' : '-'}{fullMoney(amount, displayCurrency, tx.currency || 'USD', usdToInrRate)}
                       </span>
                     </div>
                   )
@@ -205,45 +214,59 @@ export default function DashboardClient({ initialData }: Props) {
               <AmountPill>{remainingDays}D REMAINING</AmountPill>
             </div>
             <div className="mt-8">
-              <RailMeter value={monthlySpent} limit={monthlyLimit} accent />
+              {budgetSnapshot.hasMonthlyBudget ? (
+                <RailMeter value={monthlySpent} limit={monthlyLimit} accent />
+              ) : (
+                <EmptyMiniState icon={<BarChart3 className="h-5 w-5" />} title="No monthly budget" body="Create a budget to compare spend against a real limit." href="/dashboard/budgets" />
+              )}
             </div>
-            <div className="mt-7 flex items-center justify-between font-mono text-[12px] font-bold">
-              <span>{fullMoney(monthlySpent, displayCurrency)}</span>
-              <span>{fullMoney(monthlyLimit, displayCurrency)} Limit</span>
-            </div>
+            {budgetSnapshot.hasMonthlyBudget ? (
+              <div className="mt-7 flex items-center justify-between font-mono text-[12px] font-bold">
+                <span>{fullMoney(monthlySpent, displayCurrency, 'USD', usdToInrRate)}</span>
+                <span>{fullMoney(monthlyLimit, displayCurrency, 'USD', usdToInrRate)} Limit</span>
+              </div>
+            ) : null}
           </ConsolePanel>
 
           <ConsolePanel className="p-7">
             <div className="flex items-center justify-between gap-4">
               <ConsoleHeader title="Discretionary" />
-              <span className="rounded-full bg-[var(--accent)] px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-black">
-                {discretionarySpent > discretionaryLimit * 0.8 ? 'At Risk' : 'On Track'}
-              </span>
+              {budgetSnapshot.hasDiscretionaryBudget ? (
+                <span className="rounded-full bg-[var(--accent)] px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-black">
+                  {discretionaryLimit > 0 && discretionarySpent > discretionaryLimit * 0.8 ? 'At Risk' : 'On Track'}
+                </span>
+              ) : null}
             </div>
             <div className="mt-8">
-              <RailMeter value={discretionarySpent} limit={discretionaryLimit} />
+              {budgetSnapshot.hasDiscretionaryBudget ? (
+                <RailMeter value={discretionarySpent} limit={discretionaryLimit} />
+              ) : (
+                <EmptyMiniState icon={<ReceiptText className="h-5 w-5" />} title="No discretionary budget" body="Spending will appear after you add food, shopping, or entertainment transactions." href="/dashboard/transactions" />
+              )}
             </div>
-            <div className="mt-7 flex items-center justify-between font-mono text-[12px] text-[var(--text-muted)]">
-              <span>{fullMoney(discretionarySpent, displayCurrency)}</span>
-              <span>{fullMoney(discretionaryLimit, displayCurrency)} Limit</span>
-            </div>
+            {budgetSnapshot.hasDiscretionaryBudget ? (
+              <div className="mt-7 flex items-center justify-between font-mono text-[12px] text-[var(--text-muted)]">
+                <span>{fullMoney(discretionarySpent, displayCurrency, 'USD', usdToInrRate)}</span>
+                <span>{fullMoney(discretionaryLimit, displayCurrency, 'USD', usdToInrRate)} Limit</span>
+              </div>
+            ) : null}
           </ConsolePanel>
 
           <div className="grid grid-cols-2 gap-3">
             <Link href="/dashboard/transactions" className="tm-button-primary justify-between">
-              Send <ArrowRight className="h-4 w-4" />
+              Add <Plus className="h-4 w-4" />
             </Link>
             <Link href="/dashboard/auto-parse" className="tm-button-secondary justify-between">
-              Receive <ArrowLeft className="h-4 w-4" />
+              Import <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
           <ConsolePanel className="p-7 xl:mt-[202px]">
             <div className="flex items-end justify-between gap-4">
               <div className="tm-value text-2xl font-bold">
-                {monthGrowth >= 0 ? '+' : ''}{monthGrowth.toFixed(1)}%
+                {hasTransactions ? `${metrics.savingsRate.toFixed(1)}%` : 'No data'}
               </div>
-              <div className="tm-label">Mom Growth</div>
+              <div className="tm-label">Savings Rate</div>
             </div>
           </ConsolePanel>
         </aside>
@@ -287,7 +310,7 @@ export default function DashboardClient({ initialData }: Props) {
             <p className="max-w-3xl font-mono text-[13px] leading-7 text-[var(--text-muted)]">
               {metrics.inflow === 0 && metrics.outflow === 0
                 ? 'No activity recorded for this period. Add your first transaction to start generating operating signals.'
-                : `You earned ${fullMoney(metrics.inflow, displayCurrency)} and spent ${fullMoney(metrics.outflow, displayCurrency)}. Net ${metrics.netPosition >= 0 ? 'saved' : 'deficit'} is ${fullMoney(Math.abs(metrics.netPosition), displayCurrency)} with ${metrics.savingsRate.toFixed(1)}% savings efficiency.`}
+                : `You earned ${fmt(metrics.inflow)} and spent ${fmt(metrics.outflow)}. Net ${metrics.netPosition >= 0 ? 'saved' : 'deficit'} is ${formatCurrency(Math.abs(metrics.netPosition), displayCurrency, 'USD', usdToInrRate)} with ${metrics.savingsRate.toFixed(1)}% savings efficiency.`}
             </p>
             {data.lastInsight?.insights?.[0] ? (
               <div className="mt-6 border-t border-[var(--border-light)] pt-5">
@@ -311,6 +334,33 @@ export default function DashboardClient({ initialData }: Props) {
           Syncing
         </div>
       ) : null}
+    </div>
+  )
+}
+
+function EmptyMiniState({
+  body,
+  href,
+  icon,
+  title,
+}: {
+  body: string
+  href: string
+  icon: ReactNode
+  title: string
+}) {
+  return (
+    <div className="rounded-[20px] border border-dashed border-[var(--border-light)] bg-[var(--bg-surface)] p-4 text-[var(--text-muted)]">
+      <div className="mb-3 flex items-center gap-2 text-[var(--text-main)]">
+        <span className="flex h-9 w-9 items-center justify-center rounded-[12px] border border-[var(--border-light)] bg-[var(--bg-base)] text-[var(--accent)]">
+          {icon}
+        </span>
+        <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em]">{title}</span>
+      </div>
+      <p className="text-sm leading-6">{body}</p>
+      <Link href={href} className="mt-4 inline-flex text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--text-main)] hover:text-[var(--accent)]">
+        Open section
+      </Link>
     </div>
   )
 }

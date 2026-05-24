@@ -55,8 +55,8 @@ export async function POST() {
 
     if (!transactions || transactions.length === 0) {
       const result = streamAiText({
-        system: 'You are a friendly AI financial advisor.',
-        prompt: 'The user has no financial data yet. Give them a friendly 2 sentence welcome message encouraging them to add their first transaction.',
+        system: 'You are a transaction-only assistant for TrackMyMoney.',
+        prompt: 'The user has no recorded transactions yet. Give a concise 2 sentence message encouraging them to add their first transaction before asking for analysis.',
       })
       return result.toTextStreamResponse()
     }
@@ -96,11 +96,12 @@ export async function POST() {
       lastMonthExpensesByCategory: lastMonthExp,
     }
 
-    const systemPrompt = `You are a professional AI financial advisor.
-Analyze the provided aggregated spending and income data for the current month vs the previous month.
+    const systemPrompt = `You are a professional transaction analyst for TrackMyMoney.
+Analyze only the provided aggregated transaction data for the current month vs the previous month.
 Provide exactly 3 actionable, specific financial insights.
 Format the response as exactly 3 plain-text bullets using "- ".
 Include comparative spending insights with percentages when the data supports them.
+Do not discuss budgets, goals, subscriptions, debt, investments, or general finance advice.
 Do not hallucinate numbers that are not in the data.`
 
     const result = streamAiText({

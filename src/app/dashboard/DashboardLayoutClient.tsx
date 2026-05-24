@@ -1,16 +1,16 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import type { User } from '@supabase/supabase-js'
 import Link from 'next/link'
-import Image from 'next/image'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useTheme } from 'next-themes'
 import { ToastProvider } from '@/components/ui/toast-provider'
-import { LogOut, Settings, WalletCards } from 'lucide-react'
+import { ChevronDown, LogOut, Menu, Settings, WalletCards, X } from 'lucide-react'
 import { useCurrencyStore } from '@/store/useCurrencyStore'
+import { BrandLogo } from '@/components/BrandLogo'
 
 interface Props {
   user: User
@@ -35,12 +35,15 @@ export default function DashboardLayoutClient({ user, initialTheme, initialCurre
   const router = useRouter()
   const supabase = createClient()
   const setCurrency = useCurrencyStore((state) => state.setCurrency)
+  const fetchExchangeRate = useCurrencyStore((state) => state.fetchExchangeRate)
   const { setTheme } = useTheme()
   const isInitialMount = useRef(true)
+  const [navMenuOpen, setNavMenuOpen] = useState(false)
 
   useEffect(() => {
     setCurrency(initialCurrency)
-  }, [initialCurrency, setCurrency])
+    void fetchExchangeRate()
+  }, [fetchExchangeRate, initialCurrency, setCurrency])
 
   useEffect(() => {
     if (isInitialMount.current && initialTheme) {
@@ -48,6 +51,19 @@ export default function DashboardLayoutClient({ user, initialTheme, initialCurre
       isInitialMount.current = false
     }
   }, [initialTheme, setTheme])
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setNavMenuOpen(false))
+    return () => window.cancelAnimationFrame(frame)
+  }, [pathname])
+
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setNavMenuOpen(false)
+    }
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -68,14 +84,57 @@ export default function DashboardLayoutClient({ user, initialTheme, initialCurre
       <header className="sticky top-0 z-50 border-b border-[var(--border-light)] bg-[var(--bg-base)]/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-4 py-3 md:px-6">
           <div className="flex min-w-0 items-center gap-4">
-            <Link href="/dashboard" className="flex shrink-0 items-center gap-2.5 text-[15px] font-bold tracking-tight text-[var(--text-main)]">
-              <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border border-[var(--border-light)] bg-[var(--bg-surface)]">
-                <Image src="/real-logo.png" alt="TrackMyMoney" width={22} height={22} className="h-5 w-5 opacity-90 dark:invert" />
-              </span>
-              <span className="hidden sm:inline">
-                Track<span className="text-[var(--text-muted)]">My</span>Money
-              </span>
-            </Link>
+            <div className="relative">
+              <button
+                type="button"
+                aria-expanded={navMenuOpen}
+                aria-controls="dashboard-logo-menu"
+                onClick={() => setNavMenuOpen((open) => !open)}
+                className="group flex shrink-0 items-center gap-2 rounded-[16px] border border-transparent p-1 pr-2 text-left hover:border-[var(--border-light)] hover:bg-[var(--bg-surface)]"
+              >
+                <BrandLogo markClassName="h-9 w-9 rounded-xl" textClassName="hidden text-[15px] sm:inline" />
+                <ChevronDown className={`h-4 w-4 text-[var(--text-muted)] transition-transform ${navMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {navMenuOpen ? (
+                <div
+                  id="dashboard-logo-menu"
+                  className="absolute left-0 top-[calc(100%+0.7rem)] z-[70] w-[min(92vw,360px)] overflow-hidden rounded-[22px] border border-[var(--border-light)] bg-[var(--bg-base)] p-2 shadow-[0_24px_80px_rgba(0,0,0,0.28)]"
+                >
+                  <div className="flex items-center justify-between border-b border-[var(--border-light)] px-3 py-2">
+                    <span className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                      Dashboard Sections
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setNavMenuOpen(false)}
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--text-muted)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-main)]"
+                      aria-label="Close dashboard menu"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <nav aria-label="Dashboard logo menu" className="grid gap-1 py-2">
+                    {navLinks.map((link) => {
+                      const active = isLinkActive(link.href)
+                      return (
+                        <Link
+                          key={`${link.href}-logo-menu`}
+                          href={link.href}
+                          className={`rounded-[14px] px-3 py-2.5 text-sm font-semibold transition-all ${
+                            active
+                              ? 'bg-[var(--accent)] text-black'
+                              : 'text-[var(--text-main)] hover:bg-[var(--bg-surface)]'
+                          }`}
+                        >
+                          {link.name}
+                        </Link>
+                      )
+                    })}
+                  </nav>
+                </div>
+              ) : null}
+            </div>
 
             <div className="hidden items-center gap-2 rounded-full border border-[var(--border-light)] bg-[var(--bg-surface)] px-3 py-2 font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--text-muted)] md:flex">
               <WalletCards className="h-3.5 w-3.5 text-[var(--accent)]" />
@@ -103,6 +162,14 @@ export default function DashboardLayoutClient({ user, initialTheme, initialCurre
 
           <div className="flex shrink-0 items-center gap-2">
             <ThemeToggle />
+            <button
+              type="button"
+              onClick={() => setNavMenuOpen((open) => !open)}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-light)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-main)] lg:hidden"
+              aria-label="Open dashboard sections"
+            >
+              <Menu className="h-4 w-4" />
+            </button>
             <Link
               href="/dashboard/settings"
               className="hidden h-10 w-10 items-center justify-center rounded-full border border-[var(--border-light)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-main)] sm:flex"
@@ -124,7 +191,8 @@ export default function DashboardLayoutClient({ user, initialTheme, initialCurre
               </div>
               <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-[var(--border-light)] bg-[var(--bg-surface)] font-mono text-sm font-bold text-[var(--text-muted)]">
                 {avatarUrl ? (
-                  <Image src={avatarUrl} alt="Avatar" width={36} height={36} className="h-full w-full object-cover" unoptimized />
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
                 ) : (
                   initials
                 )}

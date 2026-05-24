@@ -1,15 +1,19 @@
 'use client'
 
 import React, { useState, useTransition } from 'react'
-import { X, Check } from 'lucide-react'
+import { AlertCircle, X, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createSubscription, updateSubscription, type CreateSubscriptionPayload } from '@/app/dashboard/subscriptions/actions'
 import type { SubscriptionRow } from '@/app/dashboard/subscriptions/data'
 import { format } from 'date-fns'
+import { CategoryIcon } from '@/components/dashboard/CategoryIcon'
+import { useCurrencyStore } from '@/store/useCurrencyStore'
 
 interface CategoryItem {
   id: string
   name: string
+  icon?: string | null
+  color?: string | null
 }
 
 interface SubscriptionFormModalProps {
@@ -67,11 +71,17 @@ function SubscriptionFormModalContent({
   initialData,
   categories,
 }: Omit<SubscriptionFormModalProps, 'isOpen'>) {
-  const [formData, setFormData] = useState<SubscriptionFormData>(() => getInitialFormData(initialData))
   const [isPending, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
+  const currentCurrency = useCurrencyStore((state) => state.currency)
+  const [formData, setFormData] = useState<SubscriptionFormData>(() => ({
+    ...getInitialFormData(initialData),
+    currency: initialData?.currency || currentCurrency,
+  }))
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
     startTransition(async () => {
      
       if (!formData.merchant || formData.amount === undefined) return
@@ -81,7 +91,7 @@ function SubscriptionFormModalContent({
         merchant: formData.merchant,
         serviceName: formData.serviceName || undefined,
         amount: Number(formData.amount),
-        currency: formData.currency || 'USD',
+        currency: formData.currency || currentCurrency,
         interval: formData.interval || 'monthly',
         status: formData.status || 'active',
         nextChargeDate: formData.nextChargeDate ? new Date(formData.nextChargeDate).toISOString() : undefined,
@@ -96,7 +106,7 @@ function SubscriptionFormModalContent({
       if (res.success) {
         onClose()
       } else {
-        alert(res.error || "Failed to save subscription")
+        setError(res.error || 'Failed to save subscription')
       }
     })
   }
@@ -144,7 +154,9 @@ function SubscriptionFormModalContent({
               <div className="flex flex-col gap-2 relative">
                 <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest pl-2">Amount <span className="text-[var(--expense-red)]">*</span></label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] font-light">$</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] font-light">
+                    {currentCurrency === 'INR' ? 'Rs.' : '$'}
+                  </span>
                   <input 
                     type="number" 
                     step="0.01"
@@ -208,9 +220,9 @@ function SubscriptionFormModalContent({
                   onChange={e => setFormData({...formData, status: e.target.value as CreateSubscriptionPayload['status']})}
                   className="w-full px-4 py-3 bg-[var(--bg-muted)] border border-[var(--border-light)] rounded-xl text-sm font-medium text-[var(--text-main)] cursor-pointer"
                 >
-                  <option value="active">🟢 Active</option>
-                  <option value="paused">🟠 Paused</option>
-                  <option value="cancelled">⚫ Cancelled</option>
+                  <option value="active">Active</option>
+                  <option value="paused">Paused</option>
+                  <option value="cancelled">Cancelled</option>
                 </select>
               </div>
 
@@ -227,6 +239,27 @@ function SubscriptionFormModalContent({
                 </label>
               </div>
             </div>
+
+            {formData.categoryId ? (
+              <div className="flex items-center gap-2 rounded-xl border border-[var(--border-light)] bg-[var(--bg-muted)]/30 p-3 text-sm text-[var(--text-muted)]">
+                {(() => {
+                  const selected = categories.find(category => category.id === formData.categoryId)
+                  return selected ? (
+                    <>
+                      <CategoryIcon className="h-8 w-8 rounded-[10px]" color={selected.color} icon={selected.icon} name={selected.name} />
+                      <span>{selected.name}</span>
+                    </>
+                  ) : null
+                })()}
+              </div>
+            ) : null}
+
+            {error ? (
+              <div className="flex items-start gap-2 rounded-xl border border-[var(--expense-red)]/30 bg-[var(--expense-red)]/10 p-3 text-sm font-medium text-[var(--expense-red)]">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                {error}
+              </div>
+            ) : null}
 
           </form>
         </div>

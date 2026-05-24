@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { Target, AlertTriangle } from 'lucide-react'
+import { CategoryIcon } from '@/components/dashboard/CategoryIcon'
 
 type BudgetSnapshotRow = {
   id: string
@@ -78,7 +79,12 @@ export async function BudgetsSnapshotPanel() {
               <div className="flex justify-between items-center mb-3">
                 <span className="flex items-center gap-2">
                   <span className="w-6 h-6 flex items-center justify-center rounded-md bg-[var(--bg-base)] text-xs shadow-sm">
-                    {b.categories?.icon || '📦'}
+                    <CategoryIcon
+                      className="h-6 w-6 rounded-md"
+                      color={b.categories?.color}
+                      icon={b.categories?.icon}
+                      name={b.categories?.name}
+                    />
                   </span>
                   <span className="text-[11px] font-bold uppercase tracking-tight text-[var(--text-main)] max-w-[120px] truncate">
                     {b.categories?.name || 'General'}

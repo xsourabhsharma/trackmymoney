@@ -3,6 +3,8 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ArrowRight, Calendar, Receipt, Tag } from 'lucide-react'
 import { format } from 'date-fns'
+import { CategoryIcon } from '@/components/dashboard/CategoryIcon'
+import { useCurrency } from '@/hooks/useCurrency'
 
 interface Transaction {
   id: string
@@ -25,6 +27,7 @@ interface Props {
 }
 
 export function TransactionDrillDown({ isOpen, onClose, categoryName, transactions }: Props) {
+  const { fmt } = useCurrency()
   const filtered = transactions.filter(t =>
     t.type === 'expense' && (categoryName ? t.categories?.name === categoryName : true)
   )
@@ -73,8 +76,8 @@ export function TransactionDrillDown({ isOpen, onClose, categoryName, transactio
             <div className="p-6 bg-gradient-to-br from-[var(--bg-surface)] to-[var(--bg-base)] border-b border-[var(--border-light)]">
                <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-[0.1em]">Target Allocation Spent</p>
-                    <p className="text-2xl font-bold tracking-tighter text-[var(--text-main)]">${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                    <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-[0.1em]">Recorded spend</p>
+                    <p className="text-2xl font-bold tracking-tighter text-[var(--text-main)]">{fmt(total)}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-[0.1em]">Data Points</p>
@@ -99,9 +102,12 @@ export function TransactionDrillDown({ isOpen, onClose, categoryName, transactio
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex gap-4">
-                        <div className="w-10 h-10 rounded-full bg-[var(--bg-surface)] border border-[var(--border-light)] flex items-center justify-center text-lg shrink-0 group-hover:scale-110 transition-transform">
-                          {t.categories?.icon || '📦'}
-                        </div>
+                        <CategoryIcon
+                          className="h-10 w-10 rounded-full group-hover:scale-110 transition-transform"
+                          color={t.categories?.color}
+                          icon={t.categories?.icon}
+                          name={t.categories?.name}
+                        />
                         <div className="space-y-1">
                           <p className="text-xs font-bold text-[var(--text-main)] uppercase tracking-tight">{t.merchant || t.categories?.name || 'Unknown'}</p>
                           <div className="flex items-center gap-3">
@@ -116,7 +122,7 @@ export function TransactionDrillDown({ isOpen, onClose, categoryName, transactio
                       </div>
                       <div className="text-right flex flex-col items-end gap-1">
                         <p className={`text-sm font-bold tracking-tight ${t.type === 'expense' ? 'text-[var(--expense-red)]' : 'text-[var(--income-green)]'}`}>
-                          {t.type === 'expense' ? '-' : '+'}${parseFloat(t.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          {t.type === 'expense' ? '-' : '+'}{fmt(parseFloat(t.amount))}
                         </p>
                         <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                             <div className="px-2 py-0.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-light)] text-[7px] font-bold uppercase tracking-wider">Review</div>

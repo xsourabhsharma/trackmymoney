@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import type { FormEvent } from 'react'
 import Link from 'next/link'
 import {
   Activity,
@@ -207,8 +208,14 @@ function SignupFormInner() {
     }
   }
 
+  async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (isPending) return
+    await handleSubmit(new FormData(event.currentTarget))
+  }
+
   return (
-    <form action={handleSubmit} className="grid gap-5">
+    <form onSubmit={handleFormSubmit} className="grid gap-5">
       <AnimatePresence>
         {error ? (
           <motion.div

@@ -1,6 +1,7 @@
 'use client'
 
 import { Suspense, useState } from 'react'
+import type { FormEvent } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { Activity, AlertCircle, CheckCircle2, Eye, EyeOff, Loader2, Shield, Sparkles, TrendingUp } from 'lucide-react'
@@ -97,6 +98,12 @@ function LoginPageContent() {
     }
   }
 
+  async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (isPending) return
+    await handleSubmit(new FormData(event.currentTarget))
+  }
+
   return (
     <AuthExperienceShell
       description="Log in to access your AI-powered financial dashboard, upload statements, and track your net worth without noisy spreadsheets."
@@ -166,7 +173,7 @@ function LoginPageContent() {
             <span className="h-px flex-1 bg-[var(--public-border)]" />
           </div>
 
-          <form action={handleSubmit} className="grid gap-5">
+          <form onSubmit={handleFormSubmit} className="grid gap-5">
             <AnimatePresence>
               {error ? (
                 <motion.div

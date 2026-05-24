@@ -1,7 +1,7 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { BrandLogo } from '@/components/BrandLogo'
 
 export type PublicFooterLink = {
   href: string
@@ -40,16 +40,7 @@ export function PublicFooter({
       <div className="mx-auto grid max-w-[1220px] gap-10 px-5 py-10 md:grid-cols-[1.2fr_0.8fr_0.8fr] md:py-12">
         <div>
           <Link href="/" className="group mb-5 inline-flex items-center gap-3 font-bold text-[var(--public-text)]">
-            <span className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-[var(--public-border)] bg-white/[0.055]">
-              <Image
-                src="/real-logo.png"
-                alt="TrackMyMoney"
-                width={24}
-                height={24}
-                className="h-6 w-6 dark:invert"
-              />
-            </span>
-            Track<span className="text-[var(--public-muted)]">My</span>Money
+            <BrandLogo markClassName="h-10 w-10" textClassName="text-[var(--public-text)]" />
           </Link>
           <p className="max-w-[390px] text-sm leading-7 text-[var(--public-muted)]">
             A focused money command center for transactions, budgets, subscriptions, imports, reports, and AI-assisted review.

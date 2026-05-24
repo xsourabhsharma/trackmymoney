@@ -3,6 +3,7 @@
 import { CategoryBudgetItem } from '@/app/dashboard/budgets/data'
 import { Plus, TrendingUp } from 'lucide-react'
 import { useCurrency } from '@/hooks/useCurrency'
+import { CategoryIcon } from '@/components/dashboard/CategoryIcon'
 
 interface Props {
   categoryBudgets: CategoryBudgetItem[]
@@ -26,7 +27,7 @@ export function CategoryBudgetsPanel({ categoryBudgets, onAddBudget, onEditBudge
     return (
       <div className="py-20 text-center flex flex-col items-center gap-5 border-2 border-dashed border-[var(--border-light)] rounded-[24px] bg-[var(--bg-surface)]/30">
         <div className="w-16 h-16 rounded-full bg-[var(--bg-base)] border border-[var(--border-light)] flex items-center justify-center text-3xl shadow-sm">
-          🎯
+          <TrendingUp className="h-7 w-7 text-[var(--accent)]" />
         </div>
         <div>
           <p className="text-[13px] font-bold text-[var(--text-main)] tracking-tight mb-1">
@@ -70,7 +71,11 @@ export function CategoryBudgetsPanel({ categoryBudgets, onAddBudget, onEditBudge
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-11 h-11 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition-transform">
-                    {budget.categoryIcon || '📦'}
+                    <CategoryIcon
+                      className="h-11 w-11 rounded-xl group-hover:scale-110 transition-transform"
+                      icon={budget.categoryIcon}
+                      name={budget.categoryName}
+                    />
                   </div>
                   <div>
                     <span className="text-[13px] font-bold text-[var(--text-main)] uppercase tracking-tight block">
@@ -78,7 +83,7 @@ export function CategoryBudgetsPanel({ categoryBudgets, onAddBudget, onEditBudge
                     </span>
                     <span className="text-[11px] font-bold text-[var(--text-main)] opacity-70 uppercase tracking-widest">
                       {budget.period} budget
-                      {budget.rollover && ' · rollover'}
+                      {budget.rollover && ' - rollover'}
                     </span>
                   </div>
                 </div>

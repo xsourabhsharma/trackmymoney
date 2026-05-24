@@ -15,7 +15,7 @@ export default async function SettingsPage() {
 
   if (!user) return null
 
-  const { settings, integrations } = await loadSettingsPageData()
+  const { settings, integrations, externalAccessTokens } = await loadSettingsPageData()
 
   return (
     <div className="flex flex-col gap-8">
@@ -28,6 +28,7 @@ export default async function SettingsPage() {
       <SettingsClientOrchestrator 
         initialSettings={settings} 
         integrations={integrations} 
+        externalAccessTokens={externalAccessTokens}
         email={user.email!} 
       />
     </div>

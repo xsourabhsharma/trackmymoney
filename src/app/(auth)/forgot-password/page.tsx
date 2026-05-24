@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import type { FormEvent } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { requestPasswordReset } from '../login/actions'
 import { Mail, ArrowLeft, CheckCircle, Loader2, Shield, Lock, Send, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { BrandLogo } from '@/components/BrandLogo'
 
 export default function ForgotPasswordPage() {
   const [isPending, setIsPending] = useState(false)
@@ -26,6 +27,12 @@ export default function ForgotPasswordPage() {
     } else {
       setSent(true)
     }
+  }
+
+  async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (isPending) return
+    await handleSubmit(new FormData(event.currentTarget))
   }
 
   const fadeUp = {
@@ -49,10 +56,7 @@ export default function ForgotPasswordPage() {
           className="mb-12 flex justify-center"
         >
           <Link href="/" className="flex items-center gap-3 text-2xl font-black tracking-tight text-[var(--text-main)] group">
-            <div className="relative flex items-center justify-center w-12 h-12 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-light)] shadow-xl group-hover:scale-105 transition-transform duration-300">
-               <Image src="/real-logo.png" alt="TrackMyMoney Logo" width={32} height={32} className="w-8 h-8 opacity-90 group-hover:opacity-100 transition-opacity dark:invert" />
-            </div>
-            <span>Track<span className="text-[var(--text-muted)]">My</span>Money</span>
+            <BrandLogo markClassName="h-12 w-12 rounded-2xl group-hover:scale-105" textClassName="text-2xl" />
           </Link>
         </motion.div>
 
@@ -113,7 +117,7 @@ export default function ForgotPasswordPage() {
                 </div>
               )}
 
-              <form action={handleSubmit} className="space-y-6">
+              <form onSubmit={handleFormSubmit} className="space-y-6">
                 <div className="relative group">
                   <input 
                     type="email" 

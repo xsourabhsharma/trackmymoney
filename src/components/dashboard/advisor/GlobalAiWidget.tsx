@@ -211,7 +211,7 @@ export function GlobalAiWidget() {
   }
 
   return (
-    <div className="fixed inset-x-3 bottom-3 md:inset-x-auto md:bottom-6 md:right-6 z-50 flex flex-col items-end pointer-events-none">
+    <div className="fixed inset-x-3 bottom-24 md:inset-x-auto md:bottom-6 md:right-6 z-50 flex flex-col items-end pointer-events-none">
       <AnimatePresence>
         {widgetState !== 'minimized' && (
           <motion.div
@@ -260,15 +260,15 @@ export function GlobalAiWidget() {
                   <h2 className="text-2xl md:text-3xl font-bold text-[var(--accent)] mb-4 md:mb-6 tracking-tight">Nice to meet you!</h2>
 
                   <p className="text-[14px] md:text-[15px] text-[var(--text-main)] font-medium mb-4 md:mb-6 leading-relaxed">
-                    Hello! I&apos;m <Sparkles className="w-4 h-4 text-[var(--accent)] inline mr-0.5" /> AI Advisor, your financial partner.
+                    Hello! I&apos;m <Sparkles className="w-4 h-4 text-[var(--accent)] inline mr-0.5" /> your TrackMyMoney assistant for records and actions.
                   </p>
 
-                  <p className="text-[14px] md:text-[15px] text-[var(--text-main)] mb-2 md:mb-3">I can help you with:</p>
+                  <p className="text-[14px] md:text-[15px] text-[var(--text-main)] mb-2 md:mb-3">Ask me about:</p>
                   <ul className="text-[14px] md:text-[15px] text-[var(--text-muted)] space-y-2 mb-6 md:mb-8 ml-5 list-disc marker:text-[var(--accent)] w-full font-light">
-                    <li>Adding & tracking <strong className="text-[var(--text-main)] font-medium">transactions</strong></li>
-                    <li>Managing your <strong className="text-[var(--text-main)] font-medium">subscriptions</strong></li>
-                    <li>Setting new <strong className="text-[var(--text-main)] font-medium">budgets and goals</strong></li>
-                    <li><strong className="text-[var(--text-main)] font-medium">Insights and info</strong> about your finances</li>
+                    <li>Recorded <strong className="text-[var(--text-main)] font-medium">income and expenses</strong></li>
+                    <li><strong className="text-[var(--text-main)] font-medium">Budgets, subscriptions, goals, and debts</strong></li>
+                    <li>Confirmed <strong className="text-[var(--text-main)] font-medium">adds and updates</strong></li>
+                    <li>Month-to-month <strong className="text-[var(--text-main)] font-medium">financial changes</strong></li>
                   </ul>
 
                   <p className="text-[14px] md:text-[15px] text-[var(--text-main)]">Ask a question to get started.</p>
@@ -380,7 +380,7 @@ export function GlobalAiWidget() {
                   <input
                     value={myInput}
                     onChange={(e) => setMyInput(e.target.value)}
-                    placeholder="Ask something"
+                    placeholder="Ask or add with confirmation"
                     className="flex-1 bg-transparent text-[var(--text-main)] text-[14px] md:text-[15px] outline-none placeholder:text-[var(--text-muted)] px-1 md:px-2 min-w-0"
                     disabled={isLoading}
                   />
@@ -416,7 +416,7 @@ export function GlobalAiWidget() {
 
                 <div className="text-center mt-0.5 md:mt-1">
                   <p className="text-[12px] md:text-[11px] text-[var(--text-muted)]">
-                    AI can make mistakes, so double-check it. <a href="/privacy#ai-processing" className="text-[var(--accent)] hover:underline transition-colors">Learn more</a>
+                    Confirmed actions only. Your data stays scoped to your account. <a href="/privacy#ai-processing" className="text-[var(--accent)] hover:underline transition-colors">Learn more</a>
                   </p>
                 </div>
               </form>

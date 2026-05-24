@@ -10,6 +10,7 @@ import { UserSettings } from '@/app/dashboard/settings/data'
 import { uploadAvatar } from '@/app/dashboard/settings/avatar-actions'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
+import { useCurrencyStore } from '@/store/useCurrencyStore'
 
 interface Props {
   settings: UserSettings
@@ -27,6 +28,8 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const supabase = createClient()
+  const setCurrency = useCurrencyStore((state) => state.setCurrency)
+  const fetchExchangeRate = useCurrencyStore((state) => state.fetchExchangeRate)
 
   const [formData, setFormData] = useState<Pick<UserSettings, 'full_name' | 'timezone' | 'currency'>>({
     full_name: settings.full_name,
@@ -38,6 +41,9 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
     setIsPending(true)
     try {
       await onSave(formData)
+      setCurrency(formData.currency)
+      await fetchExchangeRate()
+      router.refresh()
       setIsSuccess(true)
       setTimeout(() => setIsSuccess(false), 3000)
     } catch (err) {

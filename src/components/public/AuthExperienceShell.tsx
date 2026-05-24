@@ -1,12 +1,12 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import type { LucideIcon } from 'lucide-react'
 import { ShieldCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { BrandLogo } from '@/components/BrandLogo'
 import { PublicPanel } from './PublicPanel'
 import { Reveal } from './Reveal'
 import { AuthTrustScene } from './three/AuthTrustScene'
@@ -61,12 +61,10 @@ export function AuthExperienceShell({
 
         <div className="relative z-10 flex items-center justify-between gap-4">
           <Link href={logoHref} className="group flex items-center gap-3 font-bold">
-            <span className="flex h-12 w-12 items-center justify-center rounded-[16px] border border-[var(--public-border)] bg-white/[0.055] shadow-[0_12px_32px_rgba(0,0,0,0.24)] transition-transform group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100">
-              <Image src="/real-logo.png" alt="TrackMyMoney" width={30} height={30} className="h-7 w-7 dark:invert" priority />
-            </span>
-            <span className="text-xl">
-              Track<span className="text-[var(--public-muted)]">My</span>Money
-            </span>
+            <BrandLogo
+              markClassName="h-12 w-12 rounded-[16px] transition-transform group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+              textClassName="text-xl text-[var(--public-text)]"
+            />
           </Link>
           <div className="flex items-center gap-2">
             <ThemeToggle variant="public" />
@@ -123,10 +121,7 @@ export function AuthExperienceShell({
         <div aria-hidden className="tm-public-texture absolute inset-0 opacity-45" />
         <div className="relative z-10 mb-10 flex items-center justify-between gap-4 lg:hidden">
           <Link href={logoHref} className="inline-flex items-center gap-3 font-bold text-[var(--public-text)]">
-            <span className="flex h-11 w-11 items-center justify-center rounded-[14px] border border-[var(--public-border)] bg-white/[0.055]">
-              <Image src="/real-logo.png" alt="TrackMyMoney" width={28} height={28} className="h-7 w-7 dark:invert" priority />
-            </span>
-            Track<span className="text-[var(--public-muted)]">My</span>Money
+            <BrandLogo markClassName="h-11 w-11" textClassName="text-[var(--public-text)]" />
           </Link>
           <ThemeToggle variant="public" />
         </div>

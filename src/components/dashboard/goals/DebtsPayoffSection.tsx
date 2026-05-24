@@ -1,7 +1,7 @@
 'use client'
 
 import type { DebtRow, DebtFreeCountdown, PayoffStrategy } from '@/app/dashboard/goals/data'
-import { Plus, Info } from 'lucide-react'
+import { Plus, Info, Route } from 'lucide-react'
 import { useCurrency } from '@/hooks/useCurrency'
 
 interface Props {
@@ -73,14 +73,14 @@ export function DebtsPayoffSection({ debts, payoffStrategy, countdown, onChangeS
       {debts.length > 0 && countdown && (
         <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-2xl flex items-center gap-4">
           <div className="w-12 h-12 rounded-full bg-[var(--income-green)]/10 border border-green-100 flex items-center justify-center text-xl flex-shrink-0">
-            🛤️
+            <Route className="h-6 w-6 text-[var(--income-green)]" />
           </div>
           <div>
             <p className="text-[11px] font-bold text-[var(--text-main)] uppercase tracking-tight">
-              Debt-free in <span className="text-[var(--income-green)]">{countdown.monthsToDebtFree} months</span> — by {countdown.debtFreeDate}
+              Debt-free in <span className="text-[var(--income-green)]">{countdown.monthsToDebtFree} months</span> - by {countdown.debtFreeDate}
             </p>
             <p className="text-[11px] text-[var(--text-muted)] mt-0.5 uppercase tracking-widest">
-              Using {STRATEGY_CONFIG[payoffStrategy]?.label || countdown.strategy} strategy · assuming current minimum payments
+              Using {STRATEGY_CONFIG[payoffStrategy]?.label || countdown.strategy} strategy - assuming current minimum payments
             </p>
           </div>
         </div>

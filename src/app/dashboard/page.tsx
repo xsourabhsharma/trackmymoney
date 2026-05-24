@@ -5,6 +5,7 @@ import { AddTransactionButton } from '@/components/dashboard/AddTransactionButto
 import DashboardClient from './DashboardClient'
 import Link from 'next/link'
 import type { OverviewData, OverviewPeriod } from '@/lib/types'
+import { AlertTriangle } from 'lucide-react'
 
 export default async function DashboardOverviewPage({
   searchParams,
@@ -26,7 +27,7 @@ export default async function DashboardOverviewPage({
     console.error('Failed to load dashboard data:', error)
     return (
         <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
-            <div className="text-4xl">⚠️</div>
+            <AlertTriangle className="h-10 w-10 text-[var(--expense-red)]" />
             <h1 className="text-xl font-bold uppercase tracking-widest text-[var(--text-main)]">Data Engine Failure</h1>
             <p className="text-sm text-[var(--text-muted)] max-w-[400px] text-center">We couldn&apos;t aggregate your financial data. This might be due to a missing database schema or connection issue.</p>
             <Link href="/dashboard" className="px-6 py-2 bg-[var(--text-main)] text-[var(--bg-base)] rounded-full text-xs font-bold uppercase tracking-widest mt-4">Try Reloading</Link>

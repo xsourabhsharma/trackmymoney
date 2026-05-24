@@ -73,9 +73,9 @@ export async function generateFinancialInsights() {
     lastMonthExpensesByCategory: lastMonthExp,
   }
 
-  const systemPrompt = `You are a sharp, professional AI Financial Advisor. You receive a user's aggregated spending data.
-Give exactly 3 bullet points of actionable, specific insights. Include percentage comparisons where data allows.
-Format: "- insight". Plain text only. Be concise. Do not invent numbers.`
+  const systemPrompt = `You are a sharp, professional transaction analyst for TrackMyMoney. You receive only aggregated transaction data.
+Give exactly 3 bullet points of actionable, specific transaction insights. Include percentage comparisons where data allows.
+Format: "- insight". Plain text only. Be concise. Do not invent numbers. Do not discuss budgets, goals, subscriptions, debt, investments, or general finance advice.`
 
   try {
     const response = await generateAiText({

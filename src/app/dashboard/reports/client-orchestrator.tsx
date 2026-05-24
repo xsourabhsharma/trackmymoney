@@ -29,12 +29,25 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
     if (partial.period) params.set('period', partial.period)
     if (partial.scope) params.set('scope', partial.scope)
     if (partial.view) params.set('view', partial.view)
+    if (partial.from !== undefined) {
+      if (partial.from) {
+        params.set('from', partial.from)
+      } else {
+        params.delete('from')
+      }
+    }
+    if (partial.to !== undefined) {
+      if (partial.to) {
+        params.set('to', partial.to)
+      } else {
+        params.delete('to')
+      }
+    }
     router.push(`?${params.toString()}`, { scroll: false })
   }
 
   return (
     <div className="flex flex-col gap-8">
-      {}
       <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm flex flex-col gap-6">
         <ReportsFilterBar filter={filter} onChangeFilter={handleFilterChange} />
         <div className="pt-4 border-t border-[var(--border-light)]">
@@ -47,9 +60,7 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
         )}
       </div>
 
-      {}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        {}
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm flex flex-col gap-4">
           <div className="flex items-center gap-2 pb-3 border-b border-[var(--border-light)]">
             <Activity className="w-4 h-4 text-[var(--income-green)]" />
@@ -58,7 +69,6 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
           <CashFlowChartSection points={data.cashFlowSeries} comparison={data.periodComparison} />
         </div>
 
-        {}
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm flex flex-col gap-4">
           <div className="flex items-center gap-2 pb-3 border-b border-[var(--border-light)]">
             <BarChart3 className="w-4 h-4 text-[var(--accent)]" />
@@ -68,9 +78,7 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
         </div>
       </div>
 
-      {}
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_1.5fr] gap-8">
-        {}
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
           <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-5">
             <Tag className="w-3.5 h-3.5 text-[var(--text-muted)]" />
@@ -82,7 +90,6 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
           <TopCategoriesSection topCategories={data.topCategories} totalExpenses={data.summary.periodExpenses} />
         </div>
 
-        {}
         <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
           <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-5">
             <Store className="w-3.5 h-3.5 text-[var(--text-muted)]" />
@@ -94,7 +101,6 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
         </div>
       </div>
 
-      {}
       <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
         <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-6">
           <GitCompare className="w-3.5 h-3.5 text-[var(--text-muted)]" />
@@ -103,7 +109,6 @@ export function ReportsClientOrchestrator({ initialData }: Props) {
         <PeriodComparisonSection comparison={data.periodComparison} />
       </div>
 
-      {}
       <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm">
         <div className="flex items-center gap-2 pb-4 border-b border-[var(--border-light)] mb-6">
           <Download className="w-3.5 h-3.5 text-[var(--text-muted)]" />

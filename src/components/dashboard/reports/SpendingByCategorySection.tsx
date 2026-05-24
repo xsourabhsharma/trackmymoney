@@ -1,7 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { CategorySpendingItem } from '@/app/dashboard/reports/data'
+import { FolderOpen } from 'lucide-react'
+import type { CategorySpendingItem } from '@/app/dashboard/reports/data'
+import { CategoryIcon } from '@/components/dashboard/CategoryIcon'
+import { useCurrency } from '@/hooks/useCurrency'
 
 interface Props {
   data: CategorySpendingItem[]
@@ -9,120 +12,123 @@ interface Props {
 
 type ChartMode = 'stacked' | 'donut'
 
-const PALETTE = ['#2D5A3D', '#6B4C9A', '#B8860B', '#1565C0', '#C62828', '#0D7377', '#D35400', '#6C3483', '#1A5276', '#145A32']
+const PALETTE = ['#ff5a1f', '#14824f', '#1565c0', '#6b4c9a', '#c98200', '#0d7377', '#c62828', '#475569']
 
 export function SpendingByCategorySection({ data }: Props) {
   const [mode, setMode] = useState<ChartMode>('stacked')
+  const { fmt } = useCurrency()
 
   if (data.length === 0) {
     return (
-      <div className="py-12 text-center flex flex-col items-center gap-3 border-2 border-dashed border-[var(--border-light)] rounded-[20px] bg-[var(--bg-surface)]/30">
-        <span className="text-3xl">🗂️</span>
-        <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">No spending by category for this period.</p>
-        <p className="text-[12px] text-[var(--text-muted)]">Add transactions with categories to see breakdowns here.</p>
+      <div className="flex flex-col items-center gap-3 rounded-[20px] border-2 border-dashed border-[var(--border-light)] bg-[var(--bg-surface)]/30 py-12 text-center">
+        <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--border-light)] bg-[var(--bg-base)] text-[var(--accent)]">
+          <FolderOpen className="h-5 w-5" />
+        </span>
+        <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-muted)]">No spending by category for this period.</p>
+        <p className="text-[12px] text-[var(--text-muted)]">Add categorized transactions to see breakdowns here.</p>
       </div>
     )
   }
 
-  const totalAmount = data.reduce((s, c) => s + c.amount, 0)
+  const totalAmount = data.reduce((sum, category) => sum + category.amount, 0)
 
   return (
     <div className="flex flex-col gap-4">
-      {}
-      <div className="flex gap-1.5 p-1 bg-[var(--bg-surface)] rounded-lg border border-[var(--border-light)] w-fit">
-        {(['stacked', 'donut'] as ChartMode[]).map(m => (
+      <div className="flex w-fit gap-1.5 rounded-lg border border-[var(--border-light)] bg-[var(--bg-surface)] p-1">
+        {(['stacked', 'donut'] as ChartMode[]).map((item) => (
           <button
-            key={m}
-            onClick={() => setMode(m)}
-            className={`px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider transition-all ${mode === m ? 'bg-[var(--bg-base)] shadow-sm text-[var(--text-main)]' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'}`}
+            key={item}
+            type="button"
+            onClick={() => setMode(item)}
+            className={`rounded-md px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-all ${mode === item ? 'bg-[var(--bg-base)] text-[var(--text-main)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'}`}
           >
-            {m}
+            {item}
           </button>
         ))}
       </div>
 
       {mode === 'stacked' ? (
         <div className="flex flex-col gap-3">
-          {}
-          <div className="flex h-6 rounded-lg overflow-hidden shadow-inner border border-[var(--border-light)]/20">
-            {data.slice(0, 8).map((cat, i) => (
+          <div className="flex h-6 overflow-hidden rounded-lg border border-[var(--border-light)]/20 shadow-inner">
+            {data.slice(0, 8).map((category, index) => (
               <div
-                key={cat.categoryName}
+                key={category.categoryName}
                 style={{
-                  width: `${cat.percentOfTotal}%`,
-                  backgroundColor: PALETTE[i % PALETTE.length],
+                  backgroundColor: category.categoryColor || PALETTE[index % PALETTE.length],
+                  width: `${category.percentOfTotal}%`,
                 }}
-                className="h-full hover:brightness-125 transition-all cursor-pointer"
-                title={`${cat.categoryName}: $${cat.amount.toFixed(2)} (${cat.percentOfTotal}%)`}
+                className="h-full transition-all hover:brightness-110"
+                title={`${category.categoryName}: ${fmt(category.amount)} (${category.percentOfTotal}%)`}
               />
             ))}
           </div>
 
-          {}
           <div className="flex flex-col gap-2">
-            {data.slice(0, 8).map((cat, i) => (
-              <div key={cat.categoryName} className="flex items-center gap-3">
-                <div
-                  className="w-2.5 h-2.5 rounded-[2px] flex-shrink-0"
-                  style={{ backgroundColor: PALETTE[i % PALETTE.length] }}
-                />
-                <div className="flex items-center gap-2 flex-1 min-w-0">
-                  {cat.categoryIcon && <span className="text-sm">{cat.categoryIcon}</span>}
-                  <span className="text-[12px] font-bold text-[var(--text-main)] uppercase truncate">{cat.categoryName}</span>
-                </div>
-                <div className="flex-1 h-1.5 bg-[var(--bg-surface)] rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{ width: `${cat.percentOfTotal}%`, backgroundColor: PALETTE[i % PALETTE.length] }}
+            {data.slice(0, 8).map((category, index) => {
+              const color = category.categoryColor || PALETTE[index % PALETTE.length]
+              return (
+                <div key={category.categoryName} className="flex items-center gap-3">
+                  <CategoryIcon
+                    className="h-8 w-8 rounded-[10px]"
+                    color={color}
+                    icon={category.categoryIcon}
+                    name={category.categoryName}
                   />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="truncate text-[12px] font-bold uppercase text-[var(--text-main)]">{category.categoryName}</span>
+                      <span className="text-[12px] font-bold tabular-nums text-[var(--text-muted)]">{category.percentOfTotal}%</span>
+                    </div>
+                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[var(--bg-surface)]">
+                      <div className="h-full rounded-full" style={{ width: `${category.percentOfTotal}%`, backgroundColor: color }} />
+                    </div>
+                  </div>
+                  <span className="w-24 text-right text-[12px] font-bold tabular-nums text-[var(--text-main)]">{fmt(category.amount)}</span>
                 </div>
-                <span className="text-[12px] font-bold tabular-nums text-[var(--text-muted)] w-12 text-right">{cat.percentOfTotal}%</span>
-                <span className="text-[12px] font-bold tabular-nums text-[var(--text-main)] w-20 text-right">
-                  ${cat.amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                </span>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       ) : (
-       
-        <div className="flex items-center gap-8">
-          <div className="relative w-36 h-36 flex-shrink-0">
-            <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+          <div className="relative h-36 w-36 shrink-0">
+            <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
               {(() => {
                 let offset = 0
                 const circumference = 2 * Math.PI * 35
-                return data.slice(0, 8).map((cat, i) => {
-                  const dash = (cat.amount / totalAmount) * circumference
+                return data.slice(0, 8).map((category, index) => {
+                  const dash = (category.amount / totalAmount) * circumference
                   const gap = circumference - dash
-                  const el = (
+                  const element = (
                     <circle
-                      key={cat.categoryName}
-                      cx="50" cy="50" r="35"
+                      key={category.categoryName}
+                      cx="50"
+                      cy="50"
                       fill="none"
-                      stroke={PALETTE[i % PALETTE.length]}
-                      strokeWidth="18"
+                      r="35"
+                      stroke={category.categoryColor || PALETTE[index % PALETTE.length]}
                       strokeDasharray={`${dash} ${gap}`}
                       strokeDashoffset={-offset}
+                      strokeWidth="18"
                     />
                   )
                   offset += dash
-                  return el
+                  return element
                 })
               })()}
-              <circle cx="50" cy="50" r="25" fill="var(--bg-base)" />
+              <circle cx="50" cy="50" fill="var(--bg-base)" r="25" />
             </svg>
-            <div className="absolute inset-0 flex items-center justify-center flex-col">
-              <span className="text-[12px] font-bold text-[var(--text-main)]">${(totalAmount / 1000).toFixed(1)}k</span>
-              <span className="text-[7px] text-[var(--text-muted)] uppercase">total</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-[12px] font-bold text-[var(--text-main)]">{fmt(totalAmount)}</span>
+              <span className="text-[7px] uppercase text-[var(--text-muted)]">total</span>
             </div>
           </div>
-          <div className="flex flex-col gap-2 flex-1 min-w-0">
-            {data.slice(0, 6).map((cat, i) => (
-              <div key={cat.categoryName} className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-[2px] flex-shrink-0" style={{ backgroundColor: PALETTE[i % PALETTE.length] }} />
-                <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase truncate flex-1">{cat.categoryName}</span>
-                <span className="text-[12px] font-bold tabular-nums text-[var(--text-main)]">{cat.percentOfTotal}%</span>
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
+            {data.slice(0, 6).map((category, index) => (
+              <div key={category.categoryName} className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 shrink-0 rounded-[3px]" style={{ backgroundColor: category.categoryColor || PALETTE[index % PALETTE.length] }} />
+                <span className="min-w-0 flex-1 truncate text-[12px] font-bold uppercase text-[var(--text-muted)]">{category.categoryName}</span>
+                <span className="text-[12px] font-bold tabular-nums text-[var(--text-main)]">{category.percentOfTotal}%</span>
               </div>
             ))}
           </div>

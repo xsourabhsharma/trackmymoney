@@ -1,6 +1,8 @@
 'use client'
 
+import { PartyPopper, Target, TrendingUp, Zap } from 'lucide-react'
 import type { GoalProgressSnapshot, DebtFreeCountdown } from '@/app/dashboard/goals/data'
+import { useCurrency } from '@/hooks/useCurrency'
 
 interface SnapshotProps {
   snapshot: GoalProgressSnapshot
@@ -8,10 +10,7 @@ interface SnapshotProps {
 
 export function GoalProgressSnapshotPanel({ snapshot }: SnapshotProps) {
   const pct = Math.round(snapshot.percentFunded)
-
-  function fmt(n: number) {
-    return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  }
+  const { fmt } = useCurrency()
 
   return (
     <div className="flex flex-col items-center text-center gap-5 h-full">
@@ -39,14 +38,17 @@ export function GoalProgressSnapshotPanel({ snapshot }: SnapshotProps) {
 
       <div className="space-y-3">
         <p className="text-[11px] font-bold text-[var(--text-main)] uppercase leading-relaxed px-2">
-          You&apos;ve saved ${fmt(snapshot.totalSaved)} out of ${fmt(snapshot.totalTarget)} in savings goals.
+          You&apos;ve saved {fmt(snapshot.totalSaved)} out of {fmt(snapshot.totalTarget)} in savings goals.
         </p>
         <span className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest inline-block shadow-sm border ${
           pct >= 75 ? 'bg-green-50 text-[var(--income-green)] border-green-100' :
           pct >= 40 ? 'bg-blue-50 text-blue-600 border-blue-100' :
           'bg-orange-50 text-orange-600 border-orange-100'
         }`}>
-          {pct >= 75 ? '🎯 Great progress' : pct >= 40 ? '📈 On track' : '⚡ Keep going'}
+          <span className="inline-flex items-center gap-1.5">
+            {pct >= 75 ? <Target className="h-3 w-3" /> : pct >= 40 ? <TrendingUp className="h-3 w-3" /> : <Zap className="h-3 w-3" />}
+            {pct >= 75 ? 'Great progress' : pct >= 40 ? 'On track' : 'Keep going'}
+          </span>
         </span>
       </div>
     </div>
@@ -63,7 +65,7 @@ export function DebtFreeCountdownPanel({ countdown, totalDebt }: CountdownProps)
   if (totalDebt === 0) {
     return (
       <div className="flex flex-col items-center justify-center text-center gap-4 h-full py-4">
-        <div className="text-4xl">🎉</div>
+        <PartyPopper className="h-10 w-10 text-[var(--income-green)]" />
         <div>
           <p className="text-[13px] font-bold text-[var(--income-green)] uppercase tracking-tight">Debt-Free!</p>
           <p className="text-[12px] text-[var(--text-muted)] mt-1">You have no tracked debts. Amazing!</p>

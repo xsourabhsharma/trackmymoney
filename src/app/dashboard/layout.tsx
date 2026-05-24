@@ -17,12 +17,12 @@ export default async function DashboardLayout({
   }
 
   let theme: 'system' | 'light' | 'dark' = 'system'
-  let currency: 'USD' | 'INR' = 'USD'
+  let currency: 'USD' | 'INR' = 'INR'
   
   try {
     const settings = await getUserSettings()
     theme = settings.theme ?? 'system'
-    currency = (settings.currency as 'USD' | 'INR') || 'USD'
+    currency = (settings.currency as 'USD' | 'INR') || 'INR'
   } catch {
    
   }
