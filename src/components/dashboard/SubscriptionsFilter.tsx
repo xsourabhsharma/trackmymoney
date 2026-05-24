@@ -15,14 +15,6 @@ export function SubscriptionsFilter() {
   const [query, setQuery] = useState(searchParams.get('q') || '')
   const [status, setStatus] = useState(searchParams.get('status') || 'all')
 
- 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      createQueryString('q', query)
-    }, 500)
-    return () => clearTimeout(handler)
-  }, [query])
-
   const createQueryString = useCallback(
     (name: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString())
@@ -38,6 +30,13 @@ export function SubscriptionsFilter() {
     },
     [searchParams, pathname, router]
   )
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      createQueryString('q', query)
+    }, 500)
+    return () => clearTimeout(handler)
+  }, [query, createQueryString])
 
   const handleReset = () => {
     setQuery('')

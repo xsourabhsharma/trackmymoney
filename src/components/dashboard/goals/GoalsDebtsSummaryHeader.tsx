@@ -1,7 +1,7 @@
 'use client'
 
-import { TopSummaryMetrics, GoalsDebtsFilter } from '@/app/dashboard/goals/data'
-import { Target, TrendingDown, Activity, Plus, Calendar, Filter } from 'lucide-react'
+import type { TopSummaryMetrics, GoalsDebtsFilter } from '@/app/dashboard/goals/data'
+import { Target, TrendingDown, Activity, Plus, Calendar } from 'lucide-react'
 import { useCurrency } from '@/hooks/useCurrency'
 
 interface Props {

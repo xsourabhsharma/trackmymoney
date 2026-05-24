@@ -48,7 +48,7 @@ export function SecuritySettingsSection() {
           <div className="flex items-center justify-between py-2 group cursor-pointer hover:bg-[var(--bg-surface)] px-2 -mx-2 rounded-xl transition-all">
             <div className="flex flex-col gap-0.5">
               <span className="text-[13px] font-bold text-[var(--text-main)] uppercase tracking-tight">Change Password</span>
-              <span className="text-[12px] font-medium text-[var(--text-muted)] uppercase tracking-widest">Update your node access key</span>
+              <span className="text-[12px] font-medium text-[var(--text-muted)] uppercase tracking-widest">Update your account password</span>
             </div>
             <Button 
               onClick={() => setIsChangingPassword(true)}

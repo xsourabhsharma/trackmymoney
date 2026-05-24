@@ -1,15 +1,19 @@
 'use client'
 
-import React, { useState, useTransition, useEffect } from 'react'
-import { X, Check } from 'lucide-react'
+import React, { useState, useTransition } from 'react'
+import { AlertCircle, X, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createSubscription, updateSubscription, type CreateSubscriptionPayload } from '@/app/dashboard/subscriptions/actions'
 import type { SubscriptionRow } from '@/app/dashboard/subscriptions/data'
-import { format, parseISO } from 'date-fns'
+import { format } from 'date-fns'
+import { CategoryIcon } from '@/components/dashboard/CategoryIcon'
+import { useCurrencyStore } from '@/store/useCurrencyStore'
 
 interface CategoryItem {
   id: string
   name: string
+  icon?: string | null
+  color?: string | null
 }
 
 interface SubscriptionFormModalProps {
@@ -19,47 +23,65 @@ interface SubscriptionFormModalProps {
   categories: CategoryItem[]
 }
 
-export function SubscriptionFormModal({ isOpen, onClose, initialData, categories }: SubscriptionFormModalProps) {
-  const [formData, setFormData] = useState<Partial<CreateSubscriptionPayload>>({
-    interval: 'monthly',
-    status: 'active',
-  })
-  
-  const [isPending, startTransition] = useTransition()
+type SubscriptionFormData = Partial<CreateSubscriptionPayload>
 
- 
-  useEffect(() => {
-    if (initialData) {
-      setFormData({
-        merchant: initialData.merchant,
-        serviceName: initialData.serviceName || '',
-        amount: initialData.amount,
-        currency: initialData.currency,
-        interval: initialData.interval,
-        status: initialData.status,
-        nextChargeDate: initialData.nextChargeDate ? initialData.nextChargeDate.split('T')[0] : '',
-        categoryId: initialData.categoryId || '',
-        potentialSavings: initialData.potentialSavings,
-      })
-    } else {
-      setFormData({
-        merchant: '',
-        serviceName: '',
-        amount: 0,
-        currency: 'USD',
-        interval: 'monthly',
-        status: 'active',
-        nextChargeDate: format(new Date(), 'yyyy-MM-dd'),
-        categoryId: '',
-        potentialSavings: false,
-      })
+function getInitialFormData(initialData: SubscriptionRow | null): SubscriptionFormData {
+  if (!initialData) {
+    return {
+      merchant: '',
+      serviceName: '',
+      amount: 0,
+      currency: 'USD',
+      interval: 'monthly',
+      status: 'active',
+      nextChargeDate: format(new Date(), 'yyyy-MM-dd'),
+      categoryId: '',
+      potentialSavings: false,
     }
-  }, [initialData, isOpen])
+  }
 
+  return {
+    merchant: initialData.merchant,
+    serviceName: initialData.serviceName || '',
+    amount: initialData.amount,
+    currency: initialData.currency,
+    interval: initialData.interval,
+    status: initialData.status,
+    nextChargeDate: initialData.nextChargeDate ? initialData.nextChargeDate.split('T')[0] : '',
+    categoryId: initialData.categoryId || '',
+    potentialSavings: initialData.potentialSavings,
+  }
+}
+
+export function SubscriptionFormModal({ isOpen, onClose, initialData, categories }: SubscriptionFormModalProps) {
   if (!isOpen) return null
+
+  return (
+    <SubscriptionFormModalContent
+      key={initialData?.id ?? 'new-subscription'}
+      onClose={onClose}
+      initialData={initialData}
+      categories={categories}
+    />
+  )
+}
+
+function SubscriptionFormModalContent({
+  onClose,
+  initialData,
+  categories,
+}: Omit<SubscriptionFormModalProps, 'isOpen'>) {
+  const [isPending, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
+  const currentCurrency = useCurrencyStore((state) => state.currency)
+  const [formData, setFormData] = useState<SubscriptionFormData>(() => ({
+    ...getInitialFormData(initialData),
+    currency: initialData?.currency || currentCurrency,
+  }))
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
     startTransition(async () => {
      
       if (!formData.merchant || formData.amount === undefined) return
@@ -69,9 +91,9 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
         merchant: formData.merchant,
         serviceName: formData.serviceName || undefined,
         amount: Number(formData.amount),
-        currency: formData.currency || 'USD',
-        interval: formData.interval as any,
-        status: formData.status as any,
+        currency: formData.currency || currentCurrency,
+        interval: formData.interval || 'monthly',
+        status: formData.status || 'active',
         nextChargeDate: formData.nextChargeDate ? new Date(formData.nextChargeDate).toISOString() : undefined,
         categoryId: formData.categoryId || undefined,
         potentialSavings: formData.potentialSavings
@@ -84,7 +106,7 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
       if (res.success) {
         onClose()
       } else {
-        alert(res.error || "Failed to save subscription")
+        setError(res.error || 'Failed to save subscription')
       }
     })
   }
@@ -132,7 +154,9 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
               <div className="flex flex-col gap-2 relative">
                 <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest pl-2">Amount <span className="text-[var(--expense-red)]">*</span></label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] font-light">$</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] font-light">
+                    {currentCurrency === 'INR' ? 'Rs.' : '$'}
+                  </span>
                   <input 
                     type="number" 
                     step="0.01"
@@ -167,7 +191,7 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
                   <label className="text-[12px] font-bold text-[var(--text-main)] uppercase tracking-widest pl-2">Interval</label>
                   <select 
                     value={formData.interval}
-                    onChange={e => setFormData({...formData, interval: e.target.value as any})}
+                    onChange={e => setFormData({...formData, interval: e.target.value as CreateSubscriptionPayload['interval']})}
                     className="w-full px-4 py-2.5 bg-[var(--bg-base)] border border-[var(--border-light)] rounded-lg text-sm text-[var(--text-main)] cursor-pointer"
                   >
                     <option value="weekly">Weekly</option>
@@ -193,12 +217,12 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
                 <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest pl-2">Status</label>
                 <select 
                   value={formData.status}
-                  onChange={e => setFormData({...formData, status: e.target.value as any})}
+                  onChange={e => setFormData({...formData, status: e.target.value as CreateSubscriptionPayload['status']})}
                   className="w-full px-4 py-3 bg-[var(--bg-muted)] border border-[var(--border-light)] rounded-xl text-sm font-medium text-[var(--text-main)] cursor-pointer"
                 >
-                  <option value="active">🟢 Active</option>
-                  <option value="paused">🟠 Paused</option>
-                  <option value="cancelled">⚫ Cancelled</option>
+                  <option value="active">Active</option>
+                  <option value="paused">Paused</option>
+                  <option value="cancelled">Cancelled</option>
                 </select>
               </div>
 
@@ -209,12 +233,33 @@ export function SubscriptionFormModal({ isOpen, onClose, initialData, categories
                   </div>
                   <div>
                     <p className="text-[11px] font-bold text-[var(--text-main)] tracking-wider">Flag for Savings</p>
-                    <p className="text-[11px] text-[var(--text-muted)] uppercase tracking-widest">Mark as "rarely used" manually</p>
+                    <p className="text-[11px] text-[var(--text-muted)] uppercase tracking-widest">Mark as &quot;rarely used&quot; manually</p>
                   </div>
                   <input type="checkbox" className="hidden" checked={formData.potentialSavings || false} onChange={e => setFormData({...formData, potentialSavings: e.target.checked})} />
                 </label>
               </div>
             </div>
+
+            {formData.categoryId ? (
+              <div className="flex items-center gap-2 rounded-xl border border-[var(--border-light)] bg-[var(--bg-muted)]/30 p-3 text-sm text-[var(--text-muted)]">
+                {(() => {
+                  const selected = categories.find(category => category.id === formData.categoryId)
+                  return selected ? (
+                    <>
+                      <CategoryIcon className="h-8 w-8 rounded-[10px]" color={selected.color} icon={selected.icon} name={selected.name} />
+                      <span>{selected.name}</span>
+                    </>
+                  ) : null
+                })()}
+              </div>
+            ) : null}
+
+            {error ? (
+              <div className="flex items-start gap-2 rounded-xl border border-[var(--expense-red)]/30 bg-[var(--expense-red)]/10 p-3 text-sm font-medium text-[var(--expense-red)]">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                {error}
+              </div>
+            ) : null}
 
           </form>
         </div>

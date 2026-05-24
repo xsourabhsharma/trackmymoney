@@ -3,6 +3,10 @@
 import { createClient } from '@/utils/supabase/server'
 import { ImportJob, ImportRow } from '@/lib/types'
 
+type ImportJobOwnerJoin = {
+  import_jobs?: { user_id?: string | null } | null
+}
+
 export async function getActiveImportJob() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -56,7 +60,8 @@ export async function updateImportRow(rowId: string, updates: Partial<ImportRow>
     .eq('id', rowId)
     .single()
 
-  if (!row || (row.import_jobs as any)?.user_id !== user.id) {
+  const ownedRow = row as ImportJobOwnerJoin | null
+  if (!ownedRow || ownedRow.import_jobs?.user_id !== user.id) {
     throw new Error('Forbidden')
   }
 

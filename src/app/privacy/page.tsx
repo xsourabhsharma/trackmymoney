@@ -1,13 +1,12 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { ArrowLeft } from 'lucide-react'
+import { LegalArticleShell, type LegalArticleSection } from '@/components/public'
 
 export const metadata = {
-  title: 'Privacy Policy | TrackMyMoney',
-  description: 'How TrackMyMoney collects, uses, stores, and protects information related to your account and financial data.',
+  title: 'Privacy Policy',
+  description:
+    'How TrackMyMoney collects, uses, stores, and protects information related to your account and financial data.',
 }
 
-const sections = [
+const sections: LegalArticleSection[] = [
   {
     id: 'overview',
     title: '1. Overview',
@@ -58,9 +57,7 @@ const sections = [
   {
     id: 'how-we-use',
     title: '3. How We Use Information',
-    paragraphs: [
-      'We use information to operate, secure, maintain, and improve TrackMyMoney.',
-    ],
+    paragraphs: ['We use information to operate, secure, maintain, and improve TrackMyMoney.'],
     bullets: [
       'Authenticate users and protect accounts.',
       'Store, organize, and display financial data inside the dashboard.',
@@ -151,120 +148,29 @@ const sections = [
     id: 'contact',
     title: '12. Contact',
     paragraphs: [
-      'If you have questions about this Privacy Policy or privacy-related requests, contact us at privacy@trackmymoney.app.',
+      <>
+        If you have questions about this Privacy Policy or privacy-related requests, contact us at{' '}
+        <a
+          href="mailto:privacy@trackmymoney.app"
+          className="font-medium text-[var(--public-text)] underline underline-offset-4 hover:text-[var(--public-orange)]"
+        >
+          privacy@trackmymoney.app
+        </a>
+        .
+      </>,
     ],
   },
-] as const
+]
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-main)] font-sans antialiased">
-      <nav className="border-b border-[var(--border-light)] py-4">
-        <div className="max-w-[800px] mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight group">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--text-main)]/5 border border-[var(--border-light)] overflow-hidden">
-              <Image src="/real-logo.png" alt="TrackMyMoney" width={20} height={20} className="w-5 h-5 opacity-90 group-hover:opacity-100 transition-opacity dark:invert" />
-            </div>
-            Track<span className="text-[var(--text-muted)]">My</span>Money
-          </Link>
-          <Link
-            href="/"
-            className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to home
-          </Link>
-        </div>
-      </nav>
-
-      <main className="max-w-[1000px] mx-auto px-6 py-12 md:py-20">
-        <div className="mb-10">
-          <h1 className="text-[2rem] md:text-[2.5rem] font-bold tracking-tight mb-3">Privacy Policy</h1>
-          <p className="text-[var(--text-muted)] text-sm">Last updated: March 27, 2026</p>
-        </div>
-
-        <div className="flex gap-10">
-          <nav className="hidden lg:block sticky top-24 self-start w-56 shrink-0">
-            <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest mb-3">On this page</p>
-            <ul className="flex flex-col gap-1.5 border-l border-[var(--border-light)] pl-3">
-              {sections.map((section) => (
-                <li key={section.id}>
-                  <a
-                    href={`#${section.id}`}
-                    className="text-[12px] font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors leading-tight block py-0.5"
-                  >
-                    {section.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <div className="flex-1 space-y-8 min-w-0">
-            {sections.map((section) => (
-              <section id={section.id} key={section.id}>
-                <h2 className="text-xl font-bold mb-3 tracking-tight">{section.title}</h2>
-
-                {section.paragraphs?.map((paragraph) => (
-                  <p key={paragraph} className="text-[15px] text-[var(--text-muted)] leading-relaxed mb-3">
-                    {section.id === 'contact' && paragraph.includes('privacy@trackmymoney.app') ? (
-                      <>
-                        If you have questions about this Privacy Policy or privacy-related requests, contact us at{' '}
-                        <a
-                          href="mailto:privacy@trackmymoney.app"
-                          className="text-[var(--text-main)] font-medium underline underline-offset-2 hover:opacity-80 transition-opacity"
-                        >
-                          privacy@trackmymoney.app
-                        </a>
-                        .
-                      </>
-                    ) : (
-                      paragraph
-                    )}
-                  </p>
-                ))}
-
-                {'groups' in section && section.groups ? (
-                  <div className="space-y-5">
-                    {section.groups.map((group) => (
-                      <div key={group.title}>
-                        <h3 className="text-base font-semibold mb-2">{group.title}</h3>
-                        <ul className="list-disc list-inside space-y-1.5 text-[15px] text-[var(--text-muted)] leading-relaxed pl-2">
-                          {group.bullets.map((bullet) => (
-                            <li key={bullet}>{bullet}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
-
-                {'bullets' in section && section.bullets ? (
-                  <ul className="list-disc list-inside space-y-1.5 text-[15px] text-[var(--text-muted)] leading-relaxed pl-2">
-                    {section.bullets.map((bullet) => (
-                      <li key={bullet}>{bullet}</li>
-                    ))}
-                  </ul>
-                ) : null}
-
-                {'note' in section && section.note ? (
-                  <p className="text-[15px] text-[var(--text-muted)] leading-relaxed mt-3">{section.note}</p>
-                ) : null}
-              </section>
-            ))}
-          </div>
-        </div>
-      </main>
-
-      <footer className="border-t border-[var(--border-light)] py-6">
-        <div className="max-w-[800px] mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[12px] text-[var(--text-muted)]">
-          <span>&copy; 2026 TrackMyMoney. All rights reserved.</span>
-          <div className="flex gap-4">
-            <span className="text-[var(--text-main)] font-medium">Privacy Policy</span>
-            <Link href="/terms" className="hover:text-[var(--text-main)] transition-colors">Terms of Service</Link>
-          </div>
-        </div>
-      </footer>
-    </div>
+    <LegalArticleShell
+      active="privacy"
+      contactEmail="privacy@trackmymoney.app"
+      description="How TrackMyMoney collects, uses, stores, and protects information related to your account and financial data."
+      lastUpdated="March 27, 2026"
+      sections={sections}
+      title="Privacy Policy"
+    />
   )
 }

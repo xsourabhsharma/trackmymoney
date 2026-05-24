@@ -2,8 +2,7 @@ import {
   startOfMonth, endOfMonth, 
   subMonths, 
   subDays, 
-  startOfYear, endOfYear, 
-  parseISO
+  startOfYear, endOfYear
 } from 'date-fns';
 
 export type TransactionsPeriod = 'this_month' | 'last_month' | 'last_3_months' | 'this_year' | 'all_time';

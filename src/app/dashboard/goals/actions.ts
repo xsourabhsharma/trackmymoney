@@ -2,34 +2,66 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
 
-async function getAuthUser() {
+type GoalStatus = 'active' | 'completed' | 'paused'
+
+async function getAuthContext() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
-  return user
+  return { user, supabase }
 }
-
+
+function requiredString(formData: FormData, key: string) {
+  const value = formData.get(key)
+  if (typeof value !== 'string' || value.trim() === '') {
+    throw new Error(`${key} is required`)
+  }
+  return value.trim()
+}
+
+function optionalString(formData: FormData, key: string) {
+  const value = formData.get(key)
+  return typeof value === 'string' && value.trim() !== '' ? value.trim() : null
+}
+
+function numberFromForm(formData: FormData, key: string, fallback?: number) {
+  const value = formData.get(key)
+  const parsed = typeof value === 'string' ? Number.parseFloat(value) : Number.NaN
+  if (Number.isFinite(parsed)) return parsed
+  if (fallback !== undefined) return fallback
+  throw new Error(`${key} must be a valid number`)
+}
+
+function optionalDateIso(value: string | null) {
+  if (!value) return null
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) throw new Error('Date is invalid')
+  return parsed.toISOString()
+}
+
+function goalStatusFromForm(formData: FormData): GoalStatus {
+  const status = formData.get('status')
+  return status === 'completed' || status === 'paused' ? status : 'active'
+}
 
 export async function addSavingsGoal(formData: FormData) {
-  const user = await getAuthUser()
-  const admin = createAdminClient()
+  const { user, supabase } = await getAuthContext()
 
-  const name = formData.get('name') as string
-  const targetAmount = parseFloat(formData.get('targetAmount') as string)
-  const currentAmount = parseFloat(formData.get('currentAmount') as string) || 0
-  const deadline = formData.get('deadline') as string
-  const icon = (formData.get('icon') as string) || '🎯'
-  const color = (formData.get('color') as string) || '#3B82F6'
-  const priority = parseInt(formData.get('priority') as string) || 1
+  const name = requiredString(formData, 'name')
+  const targetAmount = numberFromForm(formData, 'targetAmount')
+  const currentAmount = numberFromForm(formData, 'currentAmount', 0)
+  const deadline = optionalString(formData, 'deadline')
+  const icon = optionalString(formData, 'icon') || 'target'
+  const color = optionalString(formData, 'color') || '#3B82F6'
+  const priority = numberFromForm(formData, 'priority', 1)
 
-  const { error } = await admin.from('goals').insert({
+  const { error } = await supabase.from('goals').insert({
     user_id: user.id,
     name,
     target_amount: targetAmount,
     current_amount: currentAmount,
-    target_date: deadline ? new Date(deadline).toISOString() : null,
+    target_date: optionalDateIso(deadline),
     icon,
     color,
     priority,
@@ -41,23 +73,22 @@ export async function addSavingsGoal(formData: FormData) {
 }
 
 export async function updateSavingsGoal(formData: FormData) {
-  const user = await getAuthUser()
-  const admin = createAdminClient()
+  const { user, supabase } = await getAuthContext()
 
-  const id = formData.get('id') as string
-  const name = formData.get('name') as string
-  const targetAmount = parseFloat(formData.get('targetAmount') as string)
-  const currentAmount = parseFloat(formData.get('currentAmount') as string)
-  const deadline = formData.get('deadline') as string
-  const status = (formData.get('status') as string) || 'active'
+  const id = requiredString(formData, 'id')
+  const name = requiredString(formData, 'name')
+  const targetAmount = numberFromForm(formData, 'targetAmount')
+  const currentAmount = numberFromForm(formData, 'currentAmount')
+  const deadline = optionalString(formData, 'deadline')
+  const status = goalStatusFromForm(formData)
 
-  const { error } = await admin
+  const { error } = await supabase
     .from('goals')
     .update({
       name,
       target_amount: targetAmount,
       current_amount: currentAmount,
-      target_date: deadline ? new Date(deadline).toISOString() : null,
+      target_date: optionalDateIso(deadline),
       status,
       updated_at: new Date().toISOString(),
     })
@@ -69,10 +100,9 @@ export async function updateSavingsGoal(formData: FormData) {
 }
 
 export async function deleteSavingsGoal(id: string) {
-  const user = await getAuthUser()
-  const admin = createAdminClient()
+  const { user, supabase } = await getAuthContext()
 
-  const { error } = await admin
+  const { error } = await supabase
     .from('goals')
     .delete()
     .eq('id', id)
@@ -81,27 +111,25 @@ export async function deleteSavingsGoal(id: string) {
   if (error) throw new Error('Failed to delete goal')
   revalidatePath('/dashboard/goals', 'page')
 }
-
 
 export async function addDebt(formData: FormData) {
-  const user = await getAuthUser()
-  const admin = createAdminClient()
+  const { user, supabase } = await getAuthContext()
 
-  const name = formData.get('name') as string
-  const totalAmount = parseFloat(formData.get('totalAmount') as string)
-  const remainingAmount = parseFloat(formData.get('remainingAmount') as string) || totalAmount
-  const interestRate = parseFloat(formData.get('interestRate') as string) || 0
-  const minimumPayment = parseFloat(formData.get('minimumPayment') as string) || 0
-  const dueDate = formData.get('dueDate') as string
+  const name = requiredString(formData, 'name')
+  const totalAmount = numberFromForm(formData, 'totalAmount')
+  const remainingAmount = numberFromForm(formData, 'remainingAmount', totalAmount)
+  const interestRate = numberFromForm(formData, 'interestRate', 0)
+  const minimumPayment = numberFromForm(formData, 'minimumPayment', 0)
+  const dueDate = optionalString(formData, 'dueDate')
 
-  const { error } = await admin.from('debts').insert({
+  const { error } = await supabase.from('debts').insert({
     user_id: user.id,
     name,
     total_amount: totalAmount,
     remaining_amount: remainingAmount,
     interest_rate: interestRate,
     minimum_payment: minimumPayment,
-    due_date: dueDate ? new Date(dueDate).toISOString() : null,
+    due_date: optionalDateIso(dueDate),
   })
 
   if (error) throw new Error(`Failed to save debt: ${error.message}`)
@@ -109,17 +137,16 @@ export async function addDebt(formData: FormData) {
 }
 
 export async function updateDebt(formData: FormData) {
-  const user = await getAuthUser()
-  const admin = createAdminClient()
+  const { user, supabase } = await getAuthContext()
 
-  const id = formData.get('id') as string
-  const name = formData.get('name') as string
-  const totalAmount = parseFloat(formData.get('totalAmount') as string)
-  const remainingAmount = parseFloat(formData.get('remainingAmount') as string)
-  const interestRate = parseFloat(formData.get('interestRate') as string)
-  const minimumPayment = parseFloat(formData.get('minimumPayment') as string)
+  const id = requiredString(formData, 'id')
+  const name = requiredString(formData, 'name')
+  const totalAmount = numberFromForm(formData, 'totalAmount')
+  const remainingAmount = numberFromForm(formData, 'remainingAmount')
+  const interestRate = numberFromForm(formData, 'interestRate', 0)
+  const minimumPayment = numberFromForm(formData, 'minimumPayment', 0)
 
-  const { error } = await admin
+  const { error } = await supabase
     .from('debts')
     .update({
       name,
@@ -137,10 +164,9 @@ export async function updateDebt(formData: FormData) {
 }
 
 export async function deleteDebt(id: string) {
-  const user = await getAuthUser()
-  const admin = createAdminClient()
+  const { user, supabase } = await getAuthContext()
 
-  const { error } = await admin
+  const { error } = await supabase
     .from('debts')
     .delete()
     .eq('id', id)
@@ -149,38 +175,15 @@ export async function deleteDebt(id: string) {
   if (error) throw new Error('Failed to delete debt')
   revalidatePath('/dashboard/goals', 'page')
 }
-
 
 export async function applyGoalDebtSuggestion(suggestionId: string) {
-  const user = await getAuthUser()
-  const admin = createAdminClient()
-
-  try {
-    await admin
-      .from('ai_goal_debt_suggestions')
-      .update({ status: 'applied', applied_at: new Date().toISOString() })
-      .eq('id', suggestionId)
-      .eq('user_id', user.id)
-  } catch {
-   
-  }
-
+  await getAuthContext()
+  void suggestionId
   revalidatePath('/dashboard/goals', 'page')
 }
 
 export async function dismissGoalDebtSuggestion(suggestionId: string) {
-  const user = await getAuthUser()
-  const admin = createAdminClient()
-
-  try {
-    await admin
-      .from('ai_goal_debt_suggestions')
-      .update({ status: 'dismissed' })
-      .eq('id', suggestionId)
-      .eq('user_id', user.id)
-  } catch {
-   
-  }
-
+  await getAuthContext()
+  void suggestionId
   revalidatePath('/dashboard/goals', 'page')
 }

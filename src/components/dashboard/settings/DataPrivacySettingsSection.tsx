@@ -6,6 +6,11 @@ import { Button } from '@/components/ui/button'
 import { UserSettings } from '@/app/dashboard/settings/data'
 import { deleteUserAccountAction } from '@/app/dashboard/settings/actions'
 import { useRouter } from 'next/navigation'
+import {
+  AI_LEARNING_OPT_IN_COPY,
+  ARCHIVE_EXPORT_UNAVAILABLE_COPY,
+  SETTINGS_PRIVACY_COPY,
+} from '@/lib/settings/privacy-copy'
 
 interface Props {
   settings: UserSettings
@@ -14,34 +19,8 @@ interface Props {
 
 export function DataPrivacySettingsSection({ settings, onSave }: Props) {
   const router = useRouter()
-  const [isArchiving, setIsArchiving] = useState(false)
+  const [isSavingAiChoice, setIsSavingAiChoice] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  
- 
-  const [aiOptIn, setAiOptIn] = useState(settings.ai_learning_opt_in)
-
-  async function handleArchive() {
-    setIsArchiving(true)
-    try {
-     
-     
-      await new Promise(resolve => setTimeout(resolve, 800))
-      
-      const payload = JSON.stringify({ data: "archive_data", generatedAt: new Date().toISOString() }, null, 2)
-      const blob = new Blob([payload], { type: 'application/json' })
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `track_my_money_archive_${new Date().toISOString().split('T')[0]}.json`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-    } catch (error) {
-      console.error(error)
-    } finally {
-      setIsArchiving(false)
-    }
-  }
 
   async function handleTerminate() {
     if (!confirm('WARNING: This action is irreversible. Are you sure you want to delete your account?')) {
@@ -60,12 +39,16 @@ export function DataPrivacySettingsSection({ settings, onSave }: Props) {
     }
   }
 
-  function handleToggleAI() {
-    const newValue = !aiOptIn;
-    setAiOptIn(newValue);
-    onSave({ ai_learning_opt_in: newValue }).catch(() => {
-      setAiOptIn(!newValue);
-    });
+  async function handleToggleAI() {
+    const newValue = !settings.ai_learning_opt_in
+    setIsSavingAiChoice(true)
+    try {
+      await onSave({ ai_learning_opt_in: newValue })
+    } catch (err) {
+      console.error('Failed to save AI opt-in setting:', err)
+    } finally {
+      setIsSavingAiChoice(false)
+    }
   }
 
   return (
@@ -77,43 +60,52 @@ export function DataPrivacySettingsSection({ settings, onSave }: Props) {
       </div>
       
       <div className="space-y-4">
-        {}
-        <div className="flex items-center justify-between py-1 px-1 group cursor-pointer select-none" onClick={handleToggleAI}>
+        <button
+          type="button"
+          className="flex w-full items-center justify-between rounded-xl px-1 py-1 text-left select-none transition-colors hover:bg-[var(--bg-surface)] disabled:cursor-not-allowed disabled:opacity-70"
+          onClick={handleToggleAI}
+          disabled={isSavingAiChoice}
+          aria-pressed={settings.ai_learning_opt_in}
+          data-ai-learning-opt-in={settings.ai_learning_opt_in ? 'true' : 'false'}
+        >
           <div className="flex flex-col gap-0.5">
-            <span className="text-[12px] font-bold text-[var(--text-main)] uppercase tracking-tight">AI Learning Flow</span>
-            <span className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-widest">Help improve categorization models</span>
+            <span className="text-[12px] font-bold text-[var(--text-main)] uppercase tracking-tight">AI product learning</span>
+            <span className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-widest">Explicit opt-in: {settings.ai_learning_opt_in ? 'On' : 'Off'}</span>
           </div>
-          <button 
-            type="button"
-            className={`w-9 h-5 rounded-full relative transition-colors duration-200 shadow-sm ${aiOptIn ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-800'}`}
+          <span
+            className={`relative h-5 w-9 rounded-full shadow-sm transition-colors duration-200 ${settings.ai_learning_opt_in ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-800'}`}
           >
-            <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-transform duration-200 shadow-sm ${aiOptIn ? 'translate-x-4.5' : 'translate-x-0.5'}`} />
-          </button>
-        </div>
+            <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${settings.ai_learning_opt_in ? 'translate-x-4' : 'translate-x-0.5'}`} />
+          </span>
+        </button>
+        <p className="px-1 text-[11px] font-medium leading-relaxed text-[var(--text-muted)]">
+          {AI_LEARNING_OPT_IN_COPY}
+        </p>
 
-        {}
         <div className="flex flex-col gap-3 pt-4 border-t border-[var(--border-light)]/50">
           <Button 
-            onClick={handleArchive}
-            disabled={isArchiving}
+            disabled
             variant="outline" 
             className="w-full h-10 rounded-xl text-[12px] font-bold uppercase tracking-widest border-[var(--border-light)] hover:bg-[var(--bg-surface)] flex gap-2 shadow-sm transition-all"
           >
-            {isArchiving ? <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" /> : <Download className="w-3.5 h-3.5" />} 
-            {isArchiving ? "Packaging..." : "Full Ledger Archive"}
+            <Download className="w-3.5 h-3.5" />
+            Full archive pending
           </Button>
+          <p className="px-1 text-[11px] font-medium leading-relaxed text-[var(--text-muted)]">
+            {ARCHIVE_EXPORT_UNAVAILABLE_COPY}
+          </p>
 
           <Button 
             onClick={handleTerminate}
             disabled={isDeleting}
             className="w-full h-10 bg-[var(--expense-red)]/5 text-[var(--expense-red)] hover:bg-[var(--expense-red)] hover:text-white border border-[var(--expense-red)]/20 rounded-xl text-[12px] font-bold uppercase tracking-widest transition-all shadow-sm"
           >
-            {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Terminate Node Account'}
+            {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Delete account'}
           </Button>
         </div>
 
-        <p className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-widest text-center leading-relaxed italic px-2 opacity-60">
-          End-to-end encryption active. Zero third-party data sharing protocols detected.
+        <p className="px-2 text-center text-[11px] font-medium leading-relaxed text-[var(--text-muted)] opacity-70">
+          {SETTINGS_PRIVACY_COPY}
         </p>
       </div>
     </div>

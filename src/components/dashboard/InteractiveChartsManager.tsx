@@ -12,7 +12,7 @@ interface Transaction {
   amount: string
   merchant: string | null
   date: string
-  type: 'income' | 'expense'
+  type: 'income' | 'expense' | 'transfer'
   categories?: {
     name: string
     icon: string | null
@@ -20,10 +20,23 @@ interface Transaction {
   } | null
 }
 
+interface DonutDatum {
+  name: string
+  value: number
+  icon: string
+  color: string
+}
+
+interface CashFlowDatum {
+  month: string
+  income: number
+  expense: number
+}
+
 interface Props {
-  donutData: any[]
+  donutData: DonutDatum[]
   donutTotal: number
-  cashFlowData: any[]
+  cashFlowData: CashFlowDatum[]
   transactions: Transaction[]
 }
 
@@ -45,13 +58,13 @@ export function InteractiveChartsManager({ donutData, donutTotal, cashFlowData, 
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {}
-        <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm flex flex-col items-center justify-between min-h-[400px]">
+        <div className="tm-panel-dark flex min-h-[400px] flex-col items-center justify-between p-6">
           <div className="w-full flex items-center justify-between mb-4">
             <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] flex items-center gap-2">
-              <PieChartIcon className="w-3.5 h-3.5" /> Expense Breakdown
+              <PieChartIcon className="w-3.5 h-3.5 text-[var(--accent)]" /> Expense Breakdown
             </h3>
             <Link href="/dashboard/reports" className="text-[11px] font-bold text-[var(--accent)] uppercase tracking-widest hover:underline">
-              Full Report →
+              Full Report -&gt;
             </Link>
           </div>
           <ExpenseDonutChart 
@@ -67,10 +80,10 @@ export function InteractiveChartsManager({ donutData, donutTotal, cashFlowData, 
         </div>
 
         {}
-        <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm flex flex-col min-h-[400px]">
+        <div className="tm-panel-dark flex min-h-[400px] flex-col p-6">
           <div className="w-full flex items-center justify-between mb-8">
             <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)] flex items-center gap-2">
-              <TrendingUp className="w-3.5 h-3.5" /> Cash Flow
+              <TrendingUp className="w-3.5 h-3.5 text-[var(--accent)]" /> Cash Flow
             </h3>
             <div className="flex gap-3 items-center">
               <div className="flex items-center gap-1.5">
@@ -83,7 +96,7 @@ export function InteractiveChartsManager({ donutData, donutTotal, cashFlowData, 
               </div>
             </div>
           </div>
-          <div className="flex-grow flex items-center justify-center">
+          <div className="flex min-h-[280px] w-full min-w-0 flex-grow items-center justify-center">
             <CashFlowChart data={cashFlowData} />
           </div>
         </div>

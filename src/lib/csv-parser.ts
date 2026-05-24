@@ -1,8 +1,8 @@
 import { parse } from 'csv-parse/sync';
-import { format, parse as dateParse, isValid } from 'date-fns';
+import { parse as dateParse, isValid } from 'date-fns';
 
 export interface ParsedCsvRow {
-  raw: any;
+  raw: Record<string, string>;
   date: string | null;
   description: string;
   amount: number | null;
@@ -97,16 +97,16 @@ export function parseCsvFile(csvContent: string): { rows: ParsedCsvRow[]; error?
       skip_empty_lines: true,
       trim: true,
       relax_column_count: true,
-    });
+    }) as Record<string, string>[];
 
     if (records.length === 0) {
       return { rows: [], error: "CSV file is empty or headers could not be parsed." };
     }
 
-    const mappedRows = records.map((r: any) => mapRow(r));
+    const mappedRows = records.map((r) => mapRow(r));
     return { rows: mappedRows };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("CSV Parse Error:", error);
-    return { rows: [], error: error.message || "Failed to parse CSV file." };
+    return { rows: [], error: error instanceof Error ? error.message : "Failed to parse CSV file." };
   }
 }

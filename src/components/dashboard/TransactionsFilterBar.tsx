@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useState, useEffect } from 'react'
-import { Search, ChevronDown, Filter } from 'lucide-react'
+import { Search, ChevronDown } from 'lucide-react'
 import { AddTransactionButton } from '@/components/dashboard/AddTransactionButton'
 import { useDebounce } from '@/hooks/use-debounce'
 

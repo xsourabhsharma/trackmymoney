@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { PenLine, Calendar, Wallet } from 'lucide-react'
+import { PenLine } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -23,21 +23,40 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { updateSubscription } from '@/app/dashboard/subscriptions/actions'
+import type { SubscriptionInterval } from '@/lib/contracts'
 
-export function EditSubscriptionButton({ subscription, categories }: { subscription: any, categories: any[] }) {
+type EditableSubscription = {
+  id: string
+  merchant: string
+  amount: string | number
+  interval: SubscriptionInterval
+  nextChargeDate?: string | null
+  next_charge_date?: string | null
+  categoryId?: string | null
+  category_id?: string | null
+  categories?: { id?: string | null } | null
+}
+
+type EditableCategory = {
+  id: string
+  name: string
+  icon?: string | null
+}
+
+export function EditSubscriptionButton({ subscription, categories }: { subscription: EditableSubscription, categories: EditableCategory[] }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<string>(subscription.category_id || subscription.categories?.id || '')
+  const [selectedCategory, setSelectedCategory] = useState<string>(subscription.categoryId || subscription.category_id || subscription.categories?.id || '')
 
   async function handleSubmit(formData: FormData) {
     const id = subscription.id
     const payload = {
       merchant: formData.get('merchant') as string,
       amount: parseFloat(formData.get('amount') as string),
-      interval: formData.get('frequency') as 'weekly' | 'monthly' | 'yearly',
+      interval: formData.get('interval') as SubscriptionInterval,
       categoryId: selectedCategory,
-      nextChargeDate: formData.get('next_due_date') as string
+      nextChargeDate: formData.get('next_charge_date') as string
     }
     
     setIsLoading(true)
@@ -52,7 +71,8 @@ export function EditSubscriptionButton({ subscription, categories }: { subscript
     }
   }
 
-  const dateObj = subscription.next_due_date ? new Date(subscription.next_due_date) : new Date()
+  const nextChargeDate = subscription.nextChargeDate || subscription.next_charge_date
+  const dateObj = nextChargeDate ? new Date(nextChargeDate) : new Date()
   const formattedDate = dateObj.toISOString().split('T')[0]
 
   return (
@@ -80,8 +100,8 @@ export function EditSubscriptionButton({ subscription, categories }: { subscript
               <Input id="amount" name="amount" type="number" step="0.01" defaultValue={subscription.amount} required />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="frequency">Frequency</Label>
-              <Select name="frequency" defaultValue={subscription.frequency}>
+              <Label htmlFor="interval">Interval</Label>
+              <Select name="interval" defaultValue={subscription.interval}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -107,8 +127,8 @@ export function EditSubscriptionButton({ subscription, categories }: { subscript
             </Select>
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="next_due_date">Next Due Date</Label>
-            <Input id="next_due_date" name="next_due_date" type="date" defaultValue={formattedDate} required />
+            <Label htmlFor="next_charge_date">Next Charge Date</Label>
+            <Input id="next_charge_date" name="next_charge_date" type="date" defaultValue={formattedDate} required />
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>

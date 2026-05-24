@@ -11,6 +11,7 @@ const pool = new Pool({
 });
 
 const db = drizzle(pool, { schema });
+type TransactionInsert = typeof schema.transactions.$inferInsert;
 
 async function seed() {
   console.log('Seeding data...');
@@ -57,7 +58,7 @@ async function seed() {
 
  
   console.log('Inserting transactions...');
-  const txData: any[] = [];
+  const txData: TransactionInsert[] = [];
   const now = new Date();
   
   for (let i = 0; i < 30; i++) {

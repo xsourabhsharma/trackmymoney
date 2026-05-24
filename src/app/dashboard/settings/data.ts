@@ -1,80 +1,47 @@
 import { createClient } from '@/utils/supabase/server'
-
+import {
+  DEFAULT_SETTINGS,
+  getSettingsIntegrations,
+  resolveUserSettings,
+  type AccountScope,
+  type DashboardStrategy,
+  type DateSpectrum,
+  type Density,
+  type Integration,
+  type IntegrationStatus,
+  type IntegrationType,
+  type Landing,
+  type Theme,
+  type UserSettings,
+} from '@/lib/settings'
+import type { AnomalySensitivity, IntelligenceFrequency } from '@/lib/contracts/ai-settings'
+import type { FinanceToolScope } from '@/lib/finance-tools/types'
 
-export type Theme = 'system' | 'light' | 'dark'
-export type Density = 'comfortable' | 'compact'
-export type DashboardStrategy = 'standard' | 'analytics' | 'minimal'
-export type Landing = 'overview' | 'transactions' | 'capital_flow'
-export type DateSpectrum = 'this_month' | 'last_30' | 'fiscal_ytd'
-export type AccountScope = 'all' | 'personal' | 'business'
-export type AnomalySensitivity = 'low' | 'medium' | 'high'
-export type IntelligenceFrequency = 'instant' | 'daily' | 'weekly'
-
-export interface UserSettings {
-  full_name: string
-  timezone: string
-  currency: string
-
-  theme: Theme
-  density: Density
-  dashboard_strategy: DashboardStrategy
-  show_ai_panels: boolean
-  active_intelligence: boolean
-
-  default_landing: Landing
-  default_date_spectrum: DateSpectrum
-  default_account_scope: AccountScope
-
-  auto_categorize: boolean
-  auto_detect_subscriptions: boolean
-  auto_generate_monthly_report: boolean
-  anomaly_sensitivity: AnomalySensitivity
-
-  ai_learning_opt_in: boolean
-
-  notify_upcoming_subscriptions: boolean
-  notify_budget_overflow: boolean
-  notify_goal_debt_tips: boolean
-  notify_new_ai_insights: boolean
-  intelligence_frequency: IntelligenceFrequency
+export { DEFAULT_SETTINGS }
+export type {
+  AccountScope,
+  AnomalySensitivity,
+  DashboardStrategy,
+  DateSpectrum,
+  Density,
+  Integration,
+  IntegrationStatus,
+  IntegrationType,
+  IntelligenceFrequency,
+  Landing,
+  Theme,
+  UserSettings,
 }
 
-export type IntegrationType = 'bank' | 'card' | 'upi' | 'csv_import'
-export type IntegrationStatus = 'connected' | 'disconnected' | 'pending'
-
-export interface Integration {
+export interface ExternalAccessTokenSummary {
   id: string
-  type: IntegrationType
-  provider: string
-  status: IntegrationStatus
-  metadata: Record<string, unknown>
+  name: string
+  scopes: FinanceToolScope[]
+  last_used_at: string | null
+  expires_at: string | null
+  revoked_at: string | null
+  created_at: string | null
 }
-
-
-export const DEFAULT_SETTINGS: UserSettings = {
-  full_name: '',
-  timezone: 'UTC+05:30 IST',
-  currency: 'INR (₹)',
-  theme: 'system',
-  density: 'comfortable',
-  dashboard_strategy: 'standard',
-  show_ai_panels: true,
-  active_intelligence: true,
-  default_landing: 'overview',
-  default_date_spectrum: 'this_month',
-  default_account_scope: 'all',
-  auto_categorize: true,
-  auto_detect_subscriptions: true,
-  auto_generate_monthly_report: false,
-  anomaly_sensitivity: 'medium',
-  ai_learning_opt_in: false,
-  notify_upcoming_subscriptions: true,
-  notify_budget_overflow: true,
-  notify_goal_debt_tips: true,
-  notify_new_ai_insights: true,
-  intelligence_frequency: 'instant',
-}
-
 
 export async function getUserSettings(): Promise<UserSettings> {
   const supabase = await createClient()
@@ -87,42 +54,65 @@ export async function getUserSettings(): Promise<UserSettings> {
     .eq('id', user.id)
     .single()
 
-  if (!profile) return { ...DEFAULT_SETTINGS, full_name: user.email?.split('@')[0] || '' }
-
- 
-  const prefs = (profile.preferences as Partial<UserSettings>) || {}
-
-  return {
-    ...DEFAULT_SETTINGS,
-    ...prefs,
-    full_name: profile.full_name || prefs.full_name || user.email?.split('@')[0] || '',
-    currency: prefs.currency || profile.currency || DEFAULT_SETTINGS.currency,
+  if (!profile) {
+    return {
+      ...DEFAULT_SETTINGS,
+      full_name: user.email?.split('@')[0] || '',
+    }
   }
+
+  return resolveUserSettings({
+    preferences: profile.preferences,
+    profileFullName: profile.full_name,
+    profileCurrency: profile.currency,
+    fallbackName: user.email?.split('@')[0] || '',
+  })
 }
 
 export async function getUserIntegrations(): Promise<Integration[]> {
- 
- 
-  return []
+  return getSettingsIntegrations()
+}
+
+export async function getExternalAccessTokens(): Promise<ExternalAccessTokenSummary[]> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const { data, error } = await (supabase as unknown as {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    from(table: string): any
+  })
+    .from('external_access_tokens')
+    .select('id, name, scopes, last_used_at, expires_at, revoked_at, created_at')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('External access token load failed:', error.message)
+    return []
+  }
+
+  return (data || []) as ExternalAccessTokenSummary[]
 }
 
 export async function loadSettingsPageData() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  
+
   if (!user) {
-    return { user: null, settings: DEFAULT_SETTINGS, integrations: [] as Integration[] }
+    return { user: null, settings: DEFAULT_SETTINGS, integrations: [] as Integration[], externalAccessTokens: [] as ExternalAccessTokenSummary[] }
   }
 
-  const [settings, integrations] = await Promise.all([
+  const [settings, integrations, externalAccessTokens] = await Promise.all([
     getUserSettings(),
     getUserIntegrations(),
+    getExternalAccessTokens(),
   ])
 
   return {
     user,
     settings,
     integrations,
+    externalAccessTokens,
   }
 }
-

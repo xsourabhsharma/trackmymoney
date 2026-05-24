@@ -15,17 +15,21 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { editBudget } from '@/app/dashboard/budgets/actions'
 
-export function EditBudgetButton({ budget, categories }: { budget: any, categories: any[] }) {
+interface EditableBudget {
+  id: string
+  amount: string | number
+  rollover?: boolean | null
+}
+
+interface EditBudgetButtonProps {
+  budget: EditableBudget
+  categories?: Array<{ id: string; name: string }>
+}
+
+export function EditBudgetButton({ budget }: EditBudgetButtonProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)

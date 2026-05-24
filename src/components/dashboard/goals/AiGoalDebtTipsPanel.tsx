@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { AiGoalDebtSuggestion } from '@/app/dashboard/goals/data'
+import type { AiGoalDebtSuggestion } from '@/app/dashboard/goals/data'
 import { applyGoalDebtSuggestion, dismissGoalDebtSuggestion } from '@/app/dashboard/goals/actions'
-import { Sparkles, Check, X, ArrowRight } from 'lucide-react'
+import { Sparkles, Check, X } from 'lucide-react'
 
 interface Props {
   suggestions: AiGoalDebtSuggestion[]

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { PenLine, Wallet, CalendarIcon } from 'lucide-react'
+import { PenLine, Wallet } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -16,21 +16,34 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { updateTransaction } from '@/app/dashboard/actions'
+import type { TransactionRow } from '@/app/dashboard/transactions/data'
 
-export function EditTransactionButton({ transaction, categories, accounts = [] }: { transaction: any, categories: any[], accounts?: any[] }) {
+interface EditableCategory {
+  id: string
+  name: string
+  icon?: string | null
+  type?: string | null
+}
+
+interface EditTransactionButtonProps {
+  transaction: TransactionRow
+  categories: EditableCategory[]
+  accounts?: Array<{ id: string; name: string }>
+}
+
+export function EditTransactionButton({ transaction, categories }: EditTransactionButtonProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [transactionType, setTransactionType] = useState<'expense' | 'income'>(transaction.type)
+  const [transactionType, setTransactionType] = useState<TransactionRow['type']>(transaction.type)
   const [selectedCategory, setSelectedCategory] = useState<string>(transaction.category_id || transaction.categories?.id || transaction.categoryId || '')
-  const [selectedAccount, setSelectedAccount] = useState<string>(transaction.account_id || transaction.accountId || '')
   const [errors, setErrors] = useState<{ amount?: string; merchant?: string; category?: string }>({})
   
   const availableCategories = categories
     .filter(c => c.type === transactionType || c.id === selectedCategory)
     .filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
-  const handleTypeChange = (val: 'expense' | 'income') => {
+  const handleTypeChange = (val: TransactionRow['type']) => {
     setTransactionType(val)
     setSelectedCategory('')
     setErrors(prev => ({ ...prev, category: undefined }))
@@ -106,7 +119,7 @@ export function EditTransactionButton({ transaction, categories, accounts = [] }
               <Label htmlFor="type" className="text-[var(--text-muted)]">Type</Label>
               <select
                 value={transactionType}
-                onChange={(e) => handleTypeChange(e.target.value as 'expense' | 'income')}
+                onChange={(e) => handleTypeChange(e.target.value as TransactionRow['type'])}
                 className="h-9 w-full rounded-md border bg-[var(--bg-surface)] text-[var(--text-main)] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/30 border-[var(--border-light)]"
               >
                 <option value="expense">Expense</option>

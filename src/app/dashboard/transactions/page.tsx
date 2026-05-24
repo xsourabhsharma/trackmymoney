@@ -1,11 +1,21 @@
 import { Metadata } from 'next'
-import { loadTransactionsPageData, TransactionFilter, TransactionType } from './data'
+import {
+  loadTransactionsPageData,
+  normalizeTransactionId,
+  normalizeTransactionPage,
+  normalizeTransactionPageSize,
+  normalizeTransactionPeriod,
+  normalizeTransactionSortColumn,
+  normalizeTransactionSortDirection,
+  normalizeTransactionType,
+  sanitizeTransactionSearchTerm,
+  TransactionFilter,
+} from './data'
 
 export const metadata: Metadata = {
   title: 'Transactions',
   description: 'View, filter, and manage all your tracked income and expenses.',
 }
-import { TransactionsPeriod } from '@/lib/date-utils'
 import { createClient } from '@/utils/supabase/server'
 import { DashboardSubNav } from '@/components/dashboard/DashboardSubNav'
 import { TransactionsFilterBar } from '@/components/dashboard/TransactionsFilterBar'
@@ -14,6 +24,10 @@ import { SpendingByCategoryPanel } from '@/components/dashboard/SpendingByCatego
 import { TransactionsTable } from '@/components/dashboard/TransactionsTable'
 import { BudgetsSnapshotPanel } from '@/components/dashboard/BudgetsSnapshotPanel'
 
+function firstSearchParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value
+}
+
 export default async function TransactionsPage({
   searchParams,
 }: {
@@ -21,19 +35,18 @@ export default async function TransactionsPage({
 }) {
   const resolvedSearchParams = await searchParams
   
- 
   const filter: TransactionFilter = {
-    period: (resolvedSearchParams?.period as TransactionsPeriod) || 'this_month',
-    type: (resolvedSearchParams?.type as TransactionType | 'all') || 'all',
-    categoryId: (resolvedSearchParams?.cat as string) || 'all',
-    accountId: (resolvedSearchParams?.account as string) || 'all',
-    merchantQuery: (resolvedSearchParams?.q as string) || '',
+    period: normalizeTransactionPeriod(firstSearchParam(resolvedSearchParams?.period)),
+    type: normalizeTransactionType(firstSearchParam(resolvedSearchParams?.type)),
+    categoryId: normalizeTransactionId(firstSearchParam(resolvedSearchParams?.cat)),
+    accountId: normalizeTransactionId(firstSearchParam(resolvedSearchParams?.account)),
+    merchantQuery: sanitizeTransactionSearchTerm(firstSearchParam(resolvedSearchParams?.q)),
   }
   
-  const page = parseInt(resolvedSearchParams?.page as string || '1')
-  const pageSize = parseInt(resolvedSearchParams?.limit as string || '25')
-  const sortCol = (resolvedSearchParams?.sort as string) || 'date'
-  const sortDir = (resolvedSearchParams?.dir as string) || 'desc'
+  const page = normalizeTransactionPage(firstSearchParam(resolvedSearchParams?.page))
+  const pageSize = normalizeTransactionPageSize(firstSearchParam(resolvedSearchParams?.limit))
+  const sortCol = normalizeTransactionSortColumn(firstSearchParam(resolvedSearchParams?.sort))
+  const sortDir = normalizeTransactionSortDirection(firstSearchParam(resolvedSearchParams?.dir))
 
  
   const pageData = await loadTransactionsPageData(filter, page, pageSize, sortCol, sortDir)
@@ -44,17 +57,27 @@ export default async function TransactionsPage({
   if (!user) return null
 
   const [ { data: categories }, { data: accounts } ] = await Promise.all([
-    supabase.from('categories').select('id, name, color, icon, type').order('name'),
+    supabase
+      .from('categories')
+      .select('id, name, color, icon, type')
+      .or(`user_id.is.null,user_id.eq.${user.id}`)
+      .order('name'),
     supabase.from('accounts').select('id, name').eq('user_id', user.id).order('name')
   ])
+  const categoryOptions = (categories || []).map((category) => ({
+    ...category,
+    icon: category.icon ?? undefined,
+  }))
 
   return (
     <div className="flex flex-col gap-6 pb-20">
-      <DashboardSubNav />
+      <div className="rounded-[24px] border border-[var(--border-light)] bg-[var(--bg-surface)] p-3">
+        <DashboardSubNav />
+      </div>
 
       {}
       <TransactionsFilterBar 
-        categories={categories || []}
+        categories={categoryOptions}
         accounts={accounts || []}
         currentPeriod={filter.period}
         currentType={filter.type}
@@ -63,6 +86,12 @@ export default async function TransactionsPage({
         currentQuery={filter.merchantQuery || ''}
       />
 
+      {pageData.dataWarning && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
+          {pageData.dataWarning}
+        </div>
+      )}
+
       {}
       <TransactionsSummaryMetrics metrics={pageData.metrics} />
 
@@ -70,7 +99,7 @@ export default async function TransactionsPage({
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-8">
         
         {}
-        <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-[24px] p-6 shadow-sm overflow-hidden flex flex-col gap-6">
+        <div className="tm-panel-dark flex flex-col gap-6 overflow-hidden p-6">
           <div className="pb-4 border-b border-[var(--border-light)] flex justify-between items-center">
             <h3 className="text-sm font-bold uppercase tracking-widest text-[var(--text-main)]">Ledger</h3>
             <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
@@ -81,7 +110,7 @@ export default async function TransactionsPage({
           {}
           <TransactionsTable 
             transactions={pageData.transactions}
-            categories={categories || []}
+            categories={categoryOptions}
             accounts={accounts || []}
             totalCount={pageData.totalCount}
             currentPage={pageData.page}

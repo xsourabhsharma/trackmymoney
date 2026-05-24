@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, decimal, boolean, jsonb, pgEnum, integer, index } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, decimal, boolean, jsonb, pgEnum, integer, index, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const transactionSourceEnum = pgEnum("transaction_source", ["manual", "sms", "email", "import"]);
 export const transactionTypeEnum = pgEnum("transaction_type", ["income", "expense", "transfer"]);
@@ -33,7 +33,9 @@ export const accounts = pgTable("accounts", {
   lastSyncAt: timestamp("last_sync_at"),
   updatedAt: timestamp("updated_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (t) => ({
+  userIdx: index("idx_accounts_user").on(t.userId),
+}));
 
 export const categories = pgTable("categories", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -91,6 +93,7 @@ export const budgets = pgTable("budgets", {
   createdAt: timestamp("created_at").defaultNow(),
 }, (t) => ({
   userIdx: index("idx_budgets_user").on(t.userId),
+  userStatusIdx: index("idx_budgets_user_status").on(t.userId, t.status),
 }));
 
 export const goals = pgTable("goals", {
@@ -103,7 +106,7 @@ export const goals = pgTable("goals", {
   priority: decimal("priority", { precision: 2, scale: 0 }).default("1"),
   status: goalStatusEnum("status").default("active"),
   color: text("color").default("#3B82F6"),
-  icon: text("icon").default("🎯"),
+  icon: text("icon").default("target"),
   updatedAt: timestamp("updated_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
 }, (t) => ({
@@ -141,30 +144,9 @@ export const subscriptionEvents = pgTable("subscription_events", {
   eventType: subscriptionEventTypeEnum("event_type").notNull(),
   eventDate: timestamp("event_date").defaultNow().notNull(),
   data: jsonb("data"),
-});
-
-export const healthSnapshots = pgTable("health_snapshots", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
-  periodType: text("period_type").notNull(),
-  periodStart: timestamp("period_start").notNull(),
-  periodEnd: timestamp("period_end").notNull(),
-  savingsRate: decimal("savings_rate", { precision: 5, scale: 2 }),
-  budgetAdherence: decimal("budget_adherence", { precision: 5, scale: 2 }),
-  goalProgress: decimal("goal_progress", { precision: 5, scale: 2 }),
-  debtScore: decimal("debt_score", { precision: 5, scale: 2 }),
-  overallScore: decimal("overall_score", { precision: 5, scale: 2 }),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const chatMessages = pgTable("chat_messages", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
-  role: text("role").notNull(),
-  content: text("content").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
 }, (t) => ({
-  userIdx: index("idx_chat_messages_user_created").on(t.userId, t.createdAt),
+  userIdx: index("idx_subscription_events_user").on(t.userId),
+  subscriptionIdx: index("idx_subscription_events_subscription").on(t.subscriptionId),
 }));
 
 export const debts = pgTable("debts", {
@@ -189,39 +171,95 @@ export const aiInsights = pgTable("ai_insights", {
   insightsJson: jsonb("insights_json").notNull(),
   promptPayload: jsonb("prompt_payload"),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (t) => ({
+  userCreatedIdx: index("idx_ai_insights_user_created").on(t.userId, t.createdAt),
+}));
 
 export const importJobs = pgTable("import_jobs", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
   status: text("status").default("pending").notNull(),
-  source: text("source").default("csv").notNull(),    
-  filePath: text("file_path"),                        
+  source: text("source").default("csv").notNull(),
+  filePath: text("file_path"),
   rowCount: integer("row_count").default(0),
   errorMessage: text("error_message"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   completedAt: timestamp("completed_at"),
-});
+}, (t) => ({
+  userCreatedIdx: index("idx_import_jobs_user_created").on(t.userId, t.createdAt),
+}));
 
 export const importRows = pgTable("import_rows", {
   id: uuid("id").defaultRandom().primaryKey(),
   importJobId: uuid("import_job_id").references(() => importJobs.id, { onDelete: "cascade" }).notNull(),
   userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
-  rawRow: jsonb("raw_row"),                         
+  rawRow: jsonb("raw_row"),
   parsedDate: timestamp("parsed_date"),
   parsedDescription: text("parsed_description"),
   parsedAmount: decimal("parsed_amount", { precision: 12, scale: 2 }),
   parsedCurrency: text("parsed_currency").default("USD"),
-  parsedType: text("parsed_type"),                      
+  parsedType: text("parsed_type"),
   parsedMerchant: text("parsed_merchant"),
   parsedCategoryId: uuid("parsed_category_id").references(() => categories.id, { onDelete: "set null" }),
   aiConfidence: decimal("ai_confidence", { precision: 3, scale: 2 }),
-  aiPayload: jsonb("ai_payload"),                      
+  aiPayload: jsonb("ai_payload"),
   isDuplicateGuess: boolean("is_duplicate_guess").default(false),
   isSelectedForImport: boolean("is_selected_for_import").default(true),
   hasError: boolean("has_error").default(false),
   errorMessage: text("error_message"),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (t) => ({
+  jobIdx: index("idx_import_rows_job").on(t.importJobId),
+  statusIdx: index("idx_import_rows_status").on(t.importJobId, t.isSelectedForImport, t.hasError),
+  duplicateIdx: index("idx_import_rows_duplicate").on(t.importJobId, t.isDuplicateGuess),
+}));
+
+export const externalAccessTokens = pgTable("external_access_tokens", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
+  name: text("name").notNull(),
+  tokenHash: text("token_hash").notNull(),
+  scopes: text("scopes").array().notNull().default([]),
+  lastUsedAt: timestamp("last_used_at"),
+  expiresAt: timestamp("expires_at"),
+  revokedAt: timestamp("revoked_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (t) => ({
+  tokenHashIdx: uniqueIndex("idx_external_access_tokens_hash").on(t.tokenHash),
+  userIdx: index("idx_external_access_tokens_user").on(t.userId),
+}));
+
+export const toolConfirmations = pgTable("tool_confirmations", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
+  actor: text("actor").notNull(),
+  toolName: text("tool_name").notNull(),
+  payload: jsonb("payload").notNull(),
+  payloadHash: text("payload_hash").notNull(),
+  summary: text("summary").notNull(),
+  status: text("status").default("pending").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  confirmedAt: timestamp("confirmed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (t) => ({
+  userStatusIdx: index("idx_tool_confirmations_user_status").on(t.userId, t.status),
+  userToolIdx: index("idx_tool_confirmations_user_tool").on(t.userId, t.toolName),
+}));
+
+export const toolAuditEvents = pgTable("tool_audit_events", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
+  actor: text("actor").notNull(),
+  toolName: text("tool_name").notNull(),
+  action: text("action").notNull(),
+  resourceType: text("resource_type"),
+  resourceId: uuid("resource_id"),
+  status: text("status").notNull(),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (t) => ({
+  userCreatedIdx: index("idx_tool_audit_events_user_created").on(t.userId, t.createdAt),
+  userToolIdx: index("idx_tool_audit_events_user_tool").on(t.userId, t.toolName),
+}));
 

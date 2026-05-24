@@ -7,12 +7,14 @@ export const metadata: Metadata = {
   title: 'Subscriptions',
   description: 'Manage recurring bills, subscriptions, and upcoming charges.',
 }
-import { loadSubscriptionsPageData, type SubscriptionsFilter, type SubscriptionStatus } from './data'
+import { loadSubscriptionsPageData, type SubscriptionsFilter } from './data'
 import { SubscriptionsOverview } from '@/components/dashboard/SubscriptionsOverview'
 import { SubscriptionHealthPanel } from '@/components/dashboard/SubscriptionHealthPanel'
 import { UpcomingChargesPanel } from '@/components/dashboard/UpcomingChargesPanel'
 import { SubscriptionCategoriesPanel } from '@/components/dashboard/SubscriptionCategoriesPanel'
 import { SubscriptionsClientOrchestrator } from './client-orchestrator'
+import { DashboardSubNav } from '@/components/dashboard/DashboardSubNav'
+import { subscriptionStatusSchema } from '@/lib/contracts'
 
 export default async function SubscriptionsPage({
   searchParams
@@ -27,10 +29,13 @@ export default async function SubscriptionsPage({
   }
 
   const resolvedSearchParams = await searchParams
+  const parsedStatus = subscriptionStatusSchema.safeParse(resolvedSearchParams.status)
 
  
   const filter: SubscriptionsFilter = {
-    status: (resolvedSearchParams.status as SubscriptionStatus) || 'all',
+    status: resolvedSearchParams.status === 'all' || !resolvedSearchParams.status
+      ? 'all'
+      : parsedStatus.success ? parsedStatus.data : 'all',
     searchQuery: resolvedSearchParams.q || ''
   }
 
@@ -48,10 +53,13 @@ export default async function SubscriptionsPage({
     .order('name')
 
   return (
-    <div className="w-full h-full flex flex-col pt-8 lg:pt-0 max-w-7xl mx-auto animate-in fade-in duration-500">
+    <div className="mx-auto flex h-full w-full max-w-7xl flex-col gap-6 pt-8 animate-in fade-in duration-500 lg:pt-0">
+      <div className="rounded-[24px] border border-[var(--border-light)] bg-[var(--bg-surface)] p-3">
+        <DashboardSubNav />
+      </div>
       <div className="flex flex-col mb-8">
-        <h1 className="text-3xl font-light tracking-tight text-[var(--text-main)]">Subscriptions</h1>
-        <p className="text-sm text-[var(--text-muted)] mt-1 font-medium">Auto-renewals, health metrics, and savings targets.</p>
+        <h1 className="font-mono text-sm font-bold uppercase tracking-[0.22em] text-[var(--text-main)]">Subscriptions</h1>
+        <p className="mt-2 font-mono text-[13px] text-[var(--text-muted)]">Auto-renewals, health metrics, and savings targets.</p>
       </div>
 
       <SubscriptionsOverview metrics={pageData.overview} />

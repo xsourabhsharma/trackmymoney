@@ -6,7 +6,7 @@ import type { AiInsightRecord, AiInsight } from '@/lib/types'
 import { formatDistanceToNow } from 'date-fns'
 
 interface Props {
-  stats?: any
+  stats?: unknown
   lastInsight?: AiInsightRecord | null
 }
 
@@ -25,12 +25,12 @@ export function AIAdvisorCard({ stats, lastInsight }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ stats })
       })
-      const json = await res.json()
+      const json = await res.json() as { error?: string; insights?: AiInsight[] }
       if (json.error) throw new Error(json.error)
       setInsights(json.insights || [])
       setLastUpdated(new Date().toISOString())
-    } catch (err: any) {
-      setError(err.message || "Failed to generate insights")
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to generate insights")
     } finally {
       setIsLoading(false)
     }

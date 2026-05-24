@@ -1,6 +1,7 @@
 'use client'
 
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
+import { useCurrency } from '@/hooks/useCurrency'
 
 interface MonthlyData {
   month: string
@@ -13,10 +14,11 @@ interface Props {
 }
 
 export function CashFlowChart({ data }: Props) {
+  const { fmt } = useCurrency()
+
   if (!data || data.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[250px] gap-3">
-        {}
         <svg className="w-48 h-24 opacity-15" viewBox="0 0 200 100" fill="none">
           <path d="M10 80 Q50 60 80 50 T150 30 T190 20" stroke="var(--border-dark)" strokeWidth="2" strokeDasharray="6 4" />
           <path d="M10 90 Q50 75 80 70 T150 60 T190 55" stroke="var(--border-dark)" strokeWidth="2" strokeDasharray="6 4" />
@@ -31,9 +33,9 @@ export function CashFlowChart({ data }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-4 w-full">
-      <div className="h-[250px]">
-        <ResponsiveContainer width="100%" height="100%">
+    <div className="flex w-full min-w-0 flex-col gap-4">
+      <div className="h-[250px] w-full min-w-0">
+        <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 560, height: 250 }}>
           <AreaChart data={data} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
@@ -56,7 +58,7 @@ export function CashFlowChart({ data }: Props) {
               tick={{ fontSize: 9, fontWeight: 700, fill: 'var(--text-muted)' }}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(v) => `$${v >= 1000 ? `${(v / 1000).toFixed(0)}K` : v}`}
+              tickFormatter={(value) => fmt(Number(value))}
             />
             <Tooltip
               content={({ payload, label }) => {
@@ -70,7 +72,7 @@ export function CashFlowChart({ data }: Props) {
                           <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
                           {p.name === 'income' ? 'Income' : 'Expenses'}
                         </span>
-                        <span>$ {(p.value as number).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                        <span>{fmt(Number(p.value || 0))}</span>
                       </div>
                     ))}
                   </div>

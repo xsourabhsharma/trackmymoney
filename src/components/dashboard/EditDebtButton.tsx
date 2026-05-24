@@ -17,7 +17,16 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { updateDebt } from '@/app/dashboard/goals/actions'
 
-export function EditDebtButton({ debt }: { debt: any }) {
+interface EditableDebt {
+  id: string
+  name: string
+  total_amount: string | number
+  remaining_amount: string | number
+  interest_rate?: string | number | null
+  minimum_payment?: string | number | null
+}
+
+export function EditDebtButton({ debt }: { debt: EditableDebt }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -68,11 +77,11 @@ export function EditDebtButton({ debt }: { debt: any }) {
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="interestRate">APR (%)</Label>
-              <Input id="interestRate" name="interestRate" type="number" step="0.01" defaultValue={debt.interest_rate} />
+              <Input id="interestRate" name="interestRate" type="number" step="0.01" defaultValue={debt.interest_rate ?? undefined} />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="minimumPayment">Min Payment ($)</Label>
-              <Input id="minimumPayment" name="minimumPayment" type="number" step="0.01" defaultValue={debt.minimum_payment} />
+              <Input id="minimumPayment" name="minimumPayment" type="number" step="0.01" defaultValue={debt.minimum_payment ?? undefined} />
             </div>
           </div>
           <DialogFooter>

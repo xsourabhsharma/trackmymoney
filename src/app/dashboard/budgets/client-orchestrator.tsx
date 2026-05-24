@@ -73,6 +73,12 @@ export function BudgetsClientOrchestrator({ initialData, categories }: Props) {
           filter={filter}
           onFilterChange={setFilter}
         />
+
+        {data.dataWarning && (
+          <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
+            {data.dataWarning}
+          </div>
+        )}
       </div>
 
       {}
@@ -136,6 +142,9 @@ export function BudgetsClientOrchestrator({ initialData, categories }: Props) {
               <Sparkles className="w-3.5 h-3.5 text-[var(--accent)]" />
               <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">AI Budget Suggestions</h3>
             </div>
+            <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-[var(--text-muted)]">
+              AI budget suggestions are not configured for this database.
+            </p>
             <AiBudgetSuggestionsPanel suggestions={data.aiSuggestions} />
           </div>
         </div>

@@ -3,19 +3,16 @@
 import { useState, useOptimistic, useTransition } from 'react'
 import { useCurrency } from '@/hooks/useCurrency'
 import { format } from 'date-fns'
-import { 
-  ArrowUpDown, 
-  Trash2, 
-  ArrowUp, 
-  ArrowDown, 
-  ChevronLeft, 
-  ChevronRight, 
-  Eye, 
-  Edit2, 
-  MoreHorizontal,
+import {
+  ArrowUpDown,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
   Download,
-  CheckCircle2,
-  Tag
+  FolderOpen,
 } from 'lucide-react'
 import {
   Table,
@@ -28,20 +25,38 @@ import {
 import { Button } from "@/components/ui/button"
 import { EditTransactionButton } from '@/components/dashboard/EditTransactionButton'
 import { DeleteTransactionButton } from '@/components/dashboard/DeleteTransactionButton'
+import { CategoryIcon } from '@/components/dashboard/CategoryIcon'
 import { bulkDeleteTransactions } from '@/app/dashboard/transactions/bulk-actions'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import type { TransactionRow } from '@/app/dashboard/transactions/data'
 
-export function TransactionsTable({ 
-  transactions, 
+type TableTransaction = TransactionRow & {
+  receipt_url?: string | null
+}
+
+interface TableCategory {
+  id: string
+  name: string
+  icon?: string | null
+  type?: string | null
+}
+
+interface TableAccount {
+  id: string
+  name: string
+}
+
+export function TransactionsTable({
+  transactions,
   categories,
   accounts = [],
   totalCount,
   currentPage,
   pageSize
-}: { 
-  transactions: any[], 
-  categories: any[],
-  accounts?: any[],
+}: {
+  transactions: TableTransaction[],
+  categories: TableCategory[],
+  accounts?: TableAccount[],
   totalCount: number,
   currentPage: number,
   pageSize: number
@@ -49,12 +64,12 @@ export function TransactionsTable({
   const router = useRouter()
   const searchParams = useSearchParams()
   const pathname = usePathname()
-  const [isPending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
   const { fmt } = useCurrency()
-  
+
   const [optimisticTransactions, removeOptimisticTransactions] = useOptimistic(
     transactions,
-    (state, idsToRemove: string[]) => state.filter((tx: any) => !idsToRemove.includes(tx.id))
+    (state, idsToRemove: string[]) => state.filter((tx) => !idsToRemove.includes(tx.id))
   )
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -79,7 +94,7 @@ export function TransactionsTable({
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedIds(new Set(optimisticTransactions.map((t: any) => t.id)))
+      setSelectedIds(new Set(optimisticTransactions.map((t) => t.id)))
     } else {
       setSelectedIds(new Set())
     }
@@ -95,10 +110,10 @@ export function TransactionsTable({
   const handleBulkDelete = async () => {
     if (selectedIds.size === 0) return
     if (!confirm(`Are you sure you want to delete ${selectedIds.size} transactions?`)) return
-    
+
     setIsDeleting(true)
     const idsToDelete = Array.from(selectedIds)
-    
+
     startTransition(() => {
       removeOptimisticTransactions(idsToDelete)
     })
@@ -139,7 +154,7 @@ export function TransactionsTable({
       a.click()
       a.remove()
       window.URL.revokeObjectURL(url)
-      
+
       setSelectedIds(new Set())
     } catch (err) {
       console.error(err)
@@ -162,21 +177,21 @@ export function TransactionsTable({
       <div className="flex flex-wrap items-center justify-between gap-4 py-3 border-b border-[var(--border-light)] mb-2">
         <div className="flex items-center gap-4">
           <label className="flex items-center gap-2 text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-tight cursor-pointer">
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               className="w-4 h-4 rounded border-[var(--border-light)] text-[var(--text-main)] focus:ring-0 cursor-pointer"
-              checked={selectedIds.size === optimisticTransactions.length && optimisticTransactions.length > 0} 
+              checked={selectedIds.size === optimisticTransactions.length && optimisticTransactions.length > 0}
               onChange={(e) => handleSelectAll(e.target.checked)}
             />
             Select all
           </label>
-          
+
           {selectedIds.size > 0 && (
             <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleBulkDelete} 
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBulkDelete}
                 disabled={isDeleting}
                 className="h-8 rounded-full border-[var(--expense-red)] text-[var(--expense-red)] hover:bg-[var(--expense-red)] hover:text-white text-[12px] font-bold uppercase tracking-widest"
               >
@@ -184,9 +199,9 @@ export function TransactionsTable({
                 {isDeleting ? "Wiping..." : "Delete Selected"}
               </Button>
               <div className="h-4 w-[1px] bg-[var(--border-light)] mx-1"></div>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleExportSelected}
                 disabled={isExporting}
                 className="h-8 rounded-full border-[var(--border-light)] bg-[var(--text-main)] text-[var(--bg-base)] text-[12px] font-bold uppercase tracking-widest hover:bg-[var(--text-main)]/90"
@@ -200,34 +215,34 @@ export function TransactionsTable({
       </div>
 
       {}
-      <div className="border border-[var(--border-light)] rounded-[20px] overflow-hidden bg-[var(--bg-base)] shadow-sm">
+      <div className="tm-table">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="bg-[var(--bg-surface)] border-b border-[var(--border-light)] hover:bg-[var(--bg-surface)]">
+              <TableRow className="border-b border-[var(--border-light)] bg-[var(--bg-surface-hover)] hover:bg-[var(--bg-surface-hover)]">
                 <TableHead className="w-[40px]"></TableHead>
-                <TableHead 
-                  className="p-4 cursor-pointer hover:text-[var(--text-main)] transition-colors text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)]"
+                <TableHead
+                  className="cursor-pointer p-4 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--text-muted)] transition-colors hover:text-[var(--text-main)]"
                   onClick={() => handleSort('date')}
                 >
                   <div className="flex items-center gap-2">Date <SortIcon col="date" /></div>
                 </TableHead>
-                <TableHead 
-                  className="p-4 cursor-pointer hover:text-[var(--text-main)] transition-colors text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)]"
+                <TableHead
+                  className="cursor-pointer p-4 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--text-muted)] transition-colors hover:text-[var(--text-main)]"
                   onClick={() => handleSort('merchant')}
                 >
                   <div className="flex items-center gap-2">Merchant / Description <SortIcon col="merchant" /></div>
                 </TableHead>
-                <TableHead className="p-4 text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Category</TableHead>
-                <TableHead className="p-4 text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Type</TableHead>
-                <TableHead className="p-4 text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Account</TableHead>
-                <TableHead 
-                  className="p-4 text-right cursor-pointer hover:text-[var(--text-main)] transition-colors text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)]"
+                <TableHead className="p-4 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--text-muted)]">Category</TableHead>
+                <TableHead className="p-4 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--text-muted)]">Type</TableHead>
+                <TableHead className="p-4 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--text-muted)]">Account</TableHead>
+                <TableHead
+                  className="cursor-pointer p-4 text-right font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--text-muted)] transition-colors hover:text-[var(--text-main)]"
                   onClick={() => handleSort('amount')}
                 >
                   <div className="flex items-center justify-end gap-2">Amount <SortIcon col="amount" /></div>
                 </TableHead>
-                <TableHead className="p-4 text-right text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Actions</TableHead>
+                <TableHead className="p-4 text-right font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--text-muted)]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -235,10 +250,12 @@ export function TransactionsTable({
                 <TableRow>
                   <TableCell colSpan={8} className="h-40 text-center">
                     <div className="flex flex-col items-center gap-4 py-8">
-                      <div className="text-3xl opacity-30">📭</div>
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--border-light)] bg-[var(--bg-surface)] text-[var(--accent)]">
+                        <FolderOpen className="h-5 w-5" />
+                      </div>
                       <span className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">No transactions match your filters</span>
                       <div className="flex items-center gap-3 mt-2">
-                        <button 
+                        <button
                           onClick={() => router.push('/dashboard/transactions')}
                           className="px-4 py-2 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[12px] font-bold uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-[var(--text-main)] transition-colors"
                         >
@@ -249,13 +266,13 @@ export function TransactionsTable({
                   </TableCell>
                 </TableRow>
               ) : (
-                optimisticTransactions.map((tx: any) => (
+                optimisticTransactions.map((tx) => (
                   <TableRow key={tx.id} className="group hover:bg-[var(--bg-surface)] transition-all border-b border-[var(--border-light)]/50 last:border-0">
                     <TableCell className="p-4">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         className="w-4 h-4 rounded border-[var(--border-light)] text-[var(--text-main)] focus:ring-0 cursor-pointer"
-                        checked={selectedIds.has(tx.id)} 
+                        checked={selectedIds.has(tx.id)}
                         onChange={(e) => handleSelectOne(e.target.checked, tx.id)}
                       />
                     </TableCell>
@@ -264,9 +281,7 @@ export function TransactionsTable({
                     </TableCell>
                     <TableCell className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-light)] flex items-center justify-center text-sm shadow-sm group-hover:scale-110 transition-transform">
-                          {tx.categories?.icon || '💸'}
-                        </div>
+                        <CategoryIcon className="h-8 w-8 rounded-lg group-hover:scale-110 transition-transform" icon={tx.categories?.icon} name={tx.categories?.name} />
                         <div className="flex flex-col overflow-hidden max-w-[180px]">
                           <span className="text-[12px] font-bold truncate text-[var(--text-main)] uppercase tracking-tight">{tx.merchant}</span>
                           {tx.description && (
@@ -288,12 +303,12 @@ export function TransactionsTable({
                       </span>
                     </TableCell>
                     <TableCell className="p-4 text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
-                      {tx.accountName || '—'}
+                      {tx.accountName || '-'}
                     </TableCell>
                     <TableCell className={`p-4 text-right text-[13px] font-bold tabular-nums tracking-tighter ${
                       tx.type === 'income' ? 'text-[var(--income-green)]' : 'text-[var(--text-main)]'
                     }`}>
-                      {tx.type === 'income' ? '+ ' : '- '}{fmt(parseFloat(tx.amount as string), tx.currency)}
+                      {tx.type === 'income' ? '+ ' : '- '}{fmt(Number(tx.amount), tx.currency)}
                     </TableCell>
                     <TableCell className="p-4 text-right">
                       <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -317,20 +332,20 @@ export function TransactionsTable({
       {}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 mt-2">
         <div className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">
-          Showing {((currentPage - 1) * pageSize) + 1}–{Math.min(currentPage * pageSize, totalCount)} of {totalCount} nodes
+          Showing {((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, totalCount)} of {totalCount} transactions
         </div>
-        
+
         <div className="flex items-center gap-1.5">
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             disabled={currentPage === 1}
             onClick={() => handlePageChange(currentPage - 1)}
             className="h-8 w-8 p-0 rounded-lg border-[var(--border-light)] hover:bg-[var(--bg-surface)] disabled:opacity-30 transition-all"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          
+
           <div className="flex items-center gap-1 px-1">
             {[...Array(Math.min(5, totalPages))].map((_, i) => {
               const p = i + 1;
@@ -339,8 +354,8 @@ export function TransactionsTable({
                   key={p}
                   onClick={() => handlePageChange(p)}
                   className={`h-8 min-w-[32px] px-2 rounded-lg text-[11px] font-bold transition-all border ${
-                    currentPage === p 
-                      ? 'bg-[var(--text-main)] text-[var(--bg-base)] border-[var(--text-main)] shadow-sm' 
+                    currentPage === p
+                      ? 'bg-[var(--text-main)] text-[var(--bg-base)] border-[var(--text-main)] shadow-sm'
                       : 'bg-transparent text-[var(--text-muted)] border-transparent hover:border-[var(--border-light)] hover:bg-[var(--bg-surface)]'
                   }`}
                 >
@@ -351,9 +366,9 @@ export function TransactionsTable({
             {totalPages > 5 && <span className="px-1 text-[var(--text-muted)] text-xs">...</span>}
           </div>
 
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             disabled={currentPage === totalPages}
             onClick={() => handlePageChange(currentPage + 1)}
             className="h-8 w-8 p-0 rounded-lg border-[var(--border-light)] hover:bg-[var(--bg-surface)] disabled:opacity-30 transition-all"

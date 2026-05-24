@@ -1,6 +1,8 @@
 'use client'
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
+import { PieChart as PieChartIcon } from 'lucide-react'
+import { useCurrency } from '@/hooks/useCurrency'
 
 interface CategoryData {
   name: string
@@ -18,16 +20,17 @@ interface Props {
 const FALLBACK_COLORS = ['#2D5A3D', '#6B4C9A', '#B8860B', '#1565C0', '#C62828', '#00695C', '#E65100']
 
 export function ExpenseDonutChart({ data, total, onSectorClick }: Props) {
+  const { fmt } = useCurrency()
+
   if (!data || data.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 gap-3">
-        {}
         <div className="relative w-36 h-36">
           <svg className="w-full h-full -rotate-90 opacity-20" viewBox="0 0 128 128">
             <circle cx="64" cy="64" r="58" stroke="var(--border-dark)" strokeWidth="8" fill="none" strokeDasharray="12 8" />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-2xl opacity-40">📊</span>
+            <PieChartIcon className="h-8 w-8 text-[var(--text-muted)] opacity-60" />
           </div>
         </div>
         <p className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">No expense data yet</p>
@@ -41,7 +44,7 @@ export function ExpenseDonutChart({ data, total, onSectorClick }: Props) {
   return (
     <div className="flex flex-col items-center">
       <div className="w-44 h-44 relative">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 176, height: 176 }}>
           <PieChart>
             <Pie
               data={data}
@@ -70,8 +73,8 @@ export function ExpenseDonutChart({ data, total, onSectorClick }: Props) {
                 const pct = total > 0 ? ((d.value / total) * 100).toFixed(1) : '0'
                 return (
                   <div className="bg-[var(--bg-base)] border border-[var(--border-light)] rounded-xl px-3 py-2 shadow-lg">
-                    <div className="text-[11px] font-bold text-[var(--text-main)] uppercase">{d.icon} {d.name}</div>
-                    <div className="text-[12px] font-bold text-[var(--text-muted)] tabular-nums">$ {d.value.toLocaleString(undefined, { minimumFractionDigits: 2 })} · {pct}%</div>
+                    <div className="text-[11px] font-bold text-[var(--text-main)] uppercase">{d.name}</div>
+                    <div className="text-[12px] font-bold text-[var(--text-muted)] tabular-nums">{fmt(d.value)} - {pct}%</div>
                   </div>
                 )
               }}
@@ -80,7 +83,7 @@ export function ExpenseDonutChart({ data, total, onSectorClick }: Props) {
         </ResponsiveContainer>
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="text-center">
-            <div className="text-xl font-bold tracking-tighter">${total.toLocaleString()}</div>
+            <div className="text-xl font-bold tracking-tighter">{fmt(total)}</div>
             <div className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Total</div>
           </div>
         </div>

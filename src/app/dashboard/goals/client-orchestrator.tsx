@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { GoalsDebtsPageData, GoalsDebtsFilter, SavingsGoalRow, DebtRow, PayoffStrategy, simulateDebtPayoff } from '@/app/dashboard/goals/data'
+import { GoalsDebtsPageData, GoalsDebtsFilter, SavingsGoalRow, DebtRow, simulateDebtPayoff } from '@/app/dashboard/goals/data'
 import { GoalsDebtsSummaryHeader } from '@/components/dashboard/goals/GoalsDebtsSummaryHeader'
 import { SavingsGoalsSection } from '@/components/dashboard/goals/SavingsGoalsSection'
 import { DebtsPayoffSection } from '@/components/dashboard/goals/DebtsPayoffSection'
@@ -75,6 +75,11 @@ export function GoalsDebtsClientOrchestrator({ initialData }: Props) {
           onAddGoal={handleOpenAddGoal}
           onAddDebt={handleOpenAddDebt}
         />
+        {data.dataWarning && (
+          <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
+            {data.dataWarning}
+          </div>
+        )}
       </div>
 
       {}
@@ -159,6 +164,9 @@ export function GoalsDebtsClientOrchestrator({ initialData }: Props) {
             <Sparkles className="w-3.5 h-3.5 text-[var(--accent)]" />
             <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">AI Goal & Debt Tips</h3>
           </div>
+          <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-[var(--text-muted)]">
+            AI goal and debt tips are not configured for this database.
+          </p>
           <AiGoalDebtTipsPanel suggestions={data.aiSuggestions} />
         </div>
       </div>

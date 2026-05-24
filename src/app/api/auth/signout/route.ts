@@ -15,7 +15,9 @@ export async function POST(request: Request) {
   }
 
   revalidatePath('/', 'layout')
-  return NextResponse.redirect(new URL('/login', request.url), {
+  const response = NextResponse.redirect(new URL('/login', request.url), {
     status: 302,
   })
+  response.headers.set('Cache-Control', 'private, no-store, max-age=0')
+  return response
 }

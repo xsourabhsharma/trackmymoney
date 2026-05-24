@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { X, Target, Loader2, CreditCard } from 'lucide-react'
+import { AlertCircle, Banknote, BriefcaseBusiness, Car, GraduationCap, Home, Laptop, Plane, Shield, X, Target, Loader2, CreditCard } from 'lucide-react'
 import { addSavingsGoal, updateSavingsGoal, addDebt, updateDebt } from '@/app/dashboard/goals/actions'
-import { SavingsGoalRow, DebtRow } from '@/app/dashboard/goals/data'
+import type { SavingsGoalRow, DebtRow } from '@/app/dashboard/goals/data'
 
 
 interface GoalModalProps {
@@ -12,13 +12,23 @@ interface GoalModalProps {
   editGoal?: SavingsGoalRow | null
 }
 
-const GOAL_ICONS = ['🎯', '🏠', '🚗', '✈️', '💍', '🎓', '🏖️', '💰', '📱', '🛡️']
+const GOAL_ICONS = [
+  { key: 'target', label: 'Target', icon: Target },
+  { key: 'home', label: 'Home', icon: Home },
+  { key: 'car', label: 'Car', icon: Car },
+  { key: 'travel', label: 'Travel', icon: Plane },
+  { key: 'education', label: 'Education', icon: GraduationCap },
+  { key: 'business', label: 'Business', icon: BriefcaseBusiness },
+  { key: 'cash', label: 'Cash', icon: Banknote },
+  { key: 'device', label: 'Device', icon: Laptop },
+  { key: 'protected', label: 'Protected', icon: Shield },
+]
 
 export function GoalFormModal({ isOpen, onClose, editGoal }: GoalModalProps) {
   const isEdit = !!editGoal
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
-  const [selectedIcon, setSelectedIcon] = useState(editGoal?.icon || '🎯')
+  const [selectedIcon, setSelectedIcon] = useState(editGoal?.icon && /^[a-z-]+$/i.test(editGoal.icon) ? editGoal.icon : 'target')
 
   if (!isOpen) return null
 
@@ -35,8 +45,8 @@ export function GoalFormModal({ isOpen, onClose, editGoal }: GoalModalProps) {
         if (isEdit) await updateSavingsGoal(data)
         else await addSavingsGoal(data)
         onClose()
-      } catch (err: any) {
-        setError(err.message || 'Something went wrong.')
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Something went wrong.')
       }
     })
   }
@@ -69,10 +79,10 @@ export function GoalFormModal({ isOpen, onClose, editGoal }: GoalModalProps) {
           <div className="flex flex-col gap-2">
             <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Icon</label>
             <div className="flex flex-wrap gap-2">
-              {GOAL_ICONS.map(icon => (
-                <button type="button" key={icon} onClick={() => setSelectedIcon(icon)}
-                  className={`w-9 h-9 rounded-xl text-lg transition-all border ${selectedIcon === icon ? 'bg-[var(--text-main)] shadow-md border-[var(--text-main)] scale-110' : 'bg-[var(--bg-surface)] border-[var(--border-light)] hover:border-[var(--border-dark)]'}`}>
-                  {icon}
+              {GOAL_ICONS.map(({ icon: Icon, key, label }) => (
+                <button type="button" key={key} onClick={() => setSelectedIcon(key)} aria-label={label}
+                  className={`w-9 h-9 rounded-xl transition-all border flex items-center justify-center ${selectedIcon === key ? 'bg-[var(--text-main)] text-[var(--bg-base)] shadow-md border-[var(--text-main)] scale-110' : 'bg-[var(--bg-surface)] text-[var(--text-main)] border-[var(--border-light)] hover:border-[var(--border-dark)]'}`}>
+                  <Icon className="h-4 w-4" />
                 </button>
               ))}
             </div>
@@ -108,7 +118,7 @@ export function GoalFormModal({ isOpen, onClose, editGoal }: GoalModalProps) {
               className="w-full px-4 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[13px] text-[var(--text-main)] focus:outline-none focus:border-[var(--border-dark)] transition-all" />
           </div>
 
-          {error && <p className="text-[11px] font-bold text-[var(--expense-red)] bg-red-50 border border-red-100 rounded-lg px-4 py-3">⚠️ {error}</p>}
+          {error && <p className="flex items-center gap-2 text-[11px] font-bold text-[var(--expense-red)] bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 rounded-lg px-4 py-3"><AlertCircle className="h-3.5 w-3.5" /> {error}</p>}
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="flex-1 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] text-[var(--text-muted)] rounded-xl text-[12px] font-bold uppercase tracking-widest hover:border-[var(--border-dark)] transition-all">Cancel</button>
@@ -147,8 +157,8 @@ export function DebtFormModal({ isOpen, onClose, editDebt }: DebtModalProps) {
         if (isEdit) await updateDebt(data)
         else await addDebt(data)
         onClose()
-      } catch (err: any) {
-        setError(err.message || 'Something went wrong.')
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Something went wrong.')
       }
     })
   }
@@ -178,7 +188,7 @@ export function DebtFormModal({ isOpen, onClose, editDebt }: DebtModalProps) {
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2 col-span-2">
               <label className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Debt Name</label>
-              <input name="name" required defaultValue={editDebt?.name || ''} placeholder="e.g. Credit Card – Chase"
+              <input name="name" required defaultValue={editDebt?.name || ''} placeholder="e.g. Credit Card - Chase"
                 className="w-full px-4 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl text-[13px] font-medium text-[var(--text-main)] focus:outline-none focus:border-[var(--border-dark)] transition-all" />
             </div>
             <div className="flex flex-col gap-2 col-span-2">
@@ -212,7 +222,7 @@ export function DebtFormModal({ isOpen, onClose, editDebt }: DebtModalProps) {
             </div>
           </div>
 
-          {error && <p className="text-[11px] font-bold text-[var(--expense-red)] bg-red-50 border border-red-100 rounded-lg px-4 py-3">⚠️ {error}</p>}
+          {error && <p className="flex items-center gap-2 text-[11px] font-bold text-[var(--expense-red)] bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 rounded-lg px-4 py-3"><AlertCircle className="h-3.5 w-3.5" /> {error}</p>}
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="flex-1 py-3 bg-[var(--bg-surface)] border border-[var(--border-light)] text-[var(--text-muted)] rounded-xl text-[12px] font-bold uppercase tracking-widest hover:border-[var(--border-dark)] transition-all">Cancel</button>

@@ -10,10 +10,10 @@ export function FinancialHealthScore({ details }: Props) {
   const { score, label, savingsRateScore, budgetAdherenceScore, goalProgressScore, debtManagementScore } = details
 
   const getGrade = (s: number) => {
-    if (s >= 80) return { color: 'text-[var(--income-green)]', bg: 'bg-green-50 dark:bg-green-950/30', border: 'border-green-200 dark:border-green-900/50' }
-    if (s >= 60) return { color: 'text-[#1565C0]', bg: 'bg-blue-50 dark:bg-blue-950/30', border: 'border-blue-200 dark:border-blue-900/50' }
-    if (s >= 40) return { color: 'text-[var(--warning)]', bg: 'bg-orange-50 dark:bg-orange-950/30', border: 'border-orange-200 dark:border-orange-900/50' }
-    return { color: 'text-[var(--expense-red)]', bg: 'bg-red-50 dark:bg-red-950/30', border: 'border-red-200 dark:border-red-900/50' }
+    if (s >= 80) return { color: 'text-[var(--income-green)]', bg: 'bg-[var(--income-green)]/10', border: 'border-[var(--income-green)]/25' }
+    if (s >= 60) return { color: 'text-[var(--accent)]', bg: 'bg-[var(--accent)]/10', border: 'border-[var(--accent)]/25' }
+    if (s >= 40) return { color: 'text-[var(--warning)]', bg: 'bg-[var(--warning)]/10', border: 'border-[var(--warning)]/25' }
+    return { color: 'text-[var(--expense-red)]', bg: 'bg-[var(--expense-red)]/10', border: 'border-[var(--expense-red)]/25' }
   }
 
  
@@ -26,8 +26,8 @@ export function FinancialHealthScore({ details }: Props) {
 
   if (isNewUser) {
     return (
-      <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm flex flex-col items-center gap-4">
-        <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-main)] opacity-80 self-start">Financial Health</h3>
+      <div className="flex flex-col items-center gap-4 rounded-[24px] border border-[var(--border-light)] bg-[var(--bg-surface)] p-6">
+        <h3 className="self-start font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-main)]">Financial Health</h3>
         <div className="py-6 text-center flex flex-col items-center gap-3">
           <div className="text-3xl opacity-60">💪</div>
           <p className="text-[12px] font-bold text-[var(--text-main)] uppercase tracking-widest">Not enough data yet</p>
@@ -40,8 +40,8 @@ export function FinancialHealthScore({ details }: Props) {
   }
 
   return (
-    <div className="bg-[var(--bg-base)] rounded-[24px] border border-[var(--border-light)] p-6 shadow-sm flex flex-col items-center gap-4">
-      <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-main)] opacity-80 self-start">Financial Health</h3>
+    <div className="flex flex-col items-center gap-4 rounded-[24px] border border-[var(--border-light)] bg-[var(--bg-surface)] p-6">
+      <h3 className="self-start font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--text-main)]">Financial Health</h3>
       
       {}
       <div className="relative w-36 h-36">
@@ -49,7 +49,7 @@ export function FinancialHealthScore({ details }: Props) {
           <circle cx="64" cy="64" r="58" stroke="var(--border-light)" strokeWidth="8" fill="none" />
           <circle
             cx="64" cy="64" r="58"
-            stroke={score >= 70 ? '#2D5A3D' : score >= 50 ? '#B8860B' : '#6B3A3A'}
+            stroke={score >= 70 ? 'var(--income-green)' : score >= 50 ? 'var(--accent)' : 'var(--expense-red)'}
             strokeWidth="8"
             fill="none"
             strokeLinecap="round"
@@ -59,8 +59,8 @@ export function FinancialHealthScore({ details }: Props) {
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={`text-3xl font-bold tabular-nums tracking-tighter ${grade.color}`}>{validScore}</span>
-          <span className="text-[11px] font-bold text-[var(--text-main)] opacity-60 uppercase tracking-widest">/100</span>
+          <span className={`font-mono text-3xl font-bold tabular-nums ${grade.color}`}>{validScore}</span>
+          <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--text-muted)]">/100</span>
         </div>
       </div>
 
@@ -78,7 +78,7 @@ export function FinancialHealthScore({ details }: Props) {
         ].map((item) => (
           <div key={item.label} className="flex flex-col gap-1">
             <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest mb-0.5">
-              <span className="text-[var(--text-main)] opacity-70">{item.label}</span>
+              <span className="text-[var(--text-muted)]">{item.label}</span>
               <span className="text-[var(--text-main)] tabular-nums">{item.value}%</span>
             </div>
             <div className="h-1.5 bg-[var(--bg-surface)] rounded-full overflow-hidden">
@@ -86,7 +86,7 @@ export function FinancialHealthScore({ details }: Props) {
                 className="h-full rounded-full transition-all duration-700"
                 style={{ 
                   width: `${item.value}%`,
-                  backgroundColor: item.value >= 70 ? '#2D5A3D' : item.value >= 40 ? '#B8860B' : '#6B3A3A'
+                  backgroundColor: item.value >= 70 ? 'var(--income-green)' : item.value >= 40 ? 'var(--accent)' : 'var(--expense-red)'
                 }}
               />
             </div>

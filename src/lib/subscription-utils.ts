@@ -31,12 +31,19 @@ export interface DetectedSubscription {
   transactionIds: string[];
 }
 
+interface SubscriptionDetectionTransaction {
+  id: string
+  type: string
+  merchant?: string | null
+  amount: string | number
+  date: string
+}
 
-export function detectSubscriptionsFromTransactions(transactions: any[]): DetectedSubscription[] {
+export function detectSubscriptionsFromTransactions(transactions: SubscriptionDetectionTransaction[]): DetectedSubscription[] {
  
  
  
-  const groups = new Map<string, any[]>();
+  const groups = new Map<string, SubscriptionDetectionTransaction[]>();
   
   for (const tx of transactions) {
     if (tx.type !== 'expense') continue;
@@ -54,7 +61,7 @@ export function detectSubscriptionsFromTransactions(transactions: any[]): Detect
   const detected: DetectedSubscription[] = [];
 
  
-  for (const [key, group] of groups.entries()) {
+  for (const [, group] of groups.entries()) {
     if (group.length < 3) continue;
 
    
@@ -88,7 +95,7 @@ export function detectSubscriptionsFromTransactions(transactions: any[]): Detect
       if (interval === 'yearly') nextCharge.setFullYear(nextCharge.getFullYear() + 1);
 
       detected.push({
-        merchant: sorted[0].merchant,
+        merchant: sorted[0].merchant || 'Unknown Merchant',
         canonicalAmount: Number(sorted[0].amount),
         interval,
         lastChargeDate: lastCharge.toISOString(),

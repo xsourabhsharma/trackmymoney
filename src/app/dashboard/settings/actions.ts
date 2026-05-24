@@ -1,8 +1,12 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
-import { UserSettings, DEFAULT_SETTINGS } from './data'
+import type { UserSettings } from './data'
+import {
+  mergeSettingsPreferences,
+  normalizeCurrencyCode,
+  sanitizeUserSettingsPatch,
+} from '@/lib/settings'
 import { revalidatePath } from 'next/cache'
 
 export async function upsertUserSettingsAction(partial: Partial<UserSettings>) {
@@ -11,17 +15,19 @@ export async function upsertUserSettingsAction(partial: Partial<UserSettings>) {
   
   if (authErr || !user) throw new Error('Unauthorized')
 
+  const cleanPartial = sanitizeUserSettingsPatch(partial)
+  if (Object.keys(cleanPartial).length === 0) {
+    return { success: true }
+  }
+
  
   const { data: profile } = await supabase
     .from('profiles')
-    .select('preferences, full_name')
+    .select('preferences')
     .eq('id', user.id)
     .single()
 
-  const existingPrefs = (profile?.preferences as Record<string, unknown>) || {}
-
- 
-  const mergedPrefs = { ...existingPrefs, ...partial }
+  const mergedPrefs = mergeSettingsPreferences(profile?.preferences, cleanPartial)
 
  
   const updatePayload: Record<string, unknown> = {
@@ -30,15 +36,13 @@ export async function upsertUserSettingsAction(partial: Partial<UserSettings>) {
   }
 
  
-  if (partial.full_name !== undefined) {
-    updatePayload.full_name = partial.full_name
+  if (cleanPartial.full_name !== undefined) {
+    updatePayload.full_name = cleanPartial.full_name
   }
 
  
-  if (partial.currency !== undefined) {
-   
-    const rawCurrency = partial.currency.split(' ')[0] || partial.currency
-    updatePayload.currency = rawCurrency
+  if (cleanPartial.currency !== undefined) {
+    updatePayload.currency = normalizeCurrencyCode(cleanPartial.currency)
   }
 
   const { error } = await supabase
@@ -65,13 +69,5 @@ export async function deleteUserAccountAction() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
- 
-  const admin = createAdminClient()
-  const { error } = await admin.auth.admin.deleteUser(user.id)
-  
-  if (error) throw new Error(`Termination failed: ${error.message}`)
-  
- 
-  await supabase.auth.signOut()
-  return { success: true }
+  throw new Error('Account deletion is not implemented yet. Contact support to request deletion.')
 }

@@ -1,33 +1,50 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/utils/supabase/server'
 
-export async function bulkInsertTransactions(transactions: any[]) {
+export interface BulkTransactionInput {
+  amount: number | string
+  merchant?: string | null
+  date: string
+  type?: string | null
+}
+
+function toImportedTransaction(userId: string, tx: BulkTransactionInput) {
+  const amount = typeof tx.amount === 'number' ? tx.amount : Number.parseFloat(tx.amount)
+  const parsedDate = new Date(tx.date)
+
+  if (!Number.isFinite(amount) || amount <= 0 || Number.isNaN(parsedDate.getTime())) {
+    return null
+  }
+
+  return {
+    user_id: userId,
+    amount,
+    currency: 'USD',
+    type: tx.type?.toLowerCase() === 'income' ? 'income' as const : 'expense' as const,
+    merchant: tx.merchant?.trim() || 'Unknown Merchant',
+    date: parsedDate.toISOString(),
+    source: 'import' as const,
+    is_reviewed: true,
+  }
+}
+
+export async function bulkInsertTransactions(transactions: BulkTransactionInput[]) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) throw new Error("Unauthorized")
 
-  const supabaseAdmin = createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const formattedTransactions = transactions
+    .map((tx) => toImportedTransaction(user.id, tx))
+    .filter((tx): tx is NonNullable<ReturnType<typeof toImportedTransaction>> => tx !== null)
 
- 
-  const formattedTransactions = transactions.map((tx) => ({
-    user_id: user.id,
-    amount: parseFloat(tx.amount),
-    currency: 'USD',
-    type: tx.type.toLowerCase() === 'income' ? 'income' : 'expense',
-    merchant: tx.merchant || 'Unknown Merchant',
-    date: new Date(tx.date).toISOString(),
-    source: 'import',
-    is_reviewed: true,
-  }))
+  if (formattedTransactions.length === 0) {
+    throw new Error('No valid transactions to import')
+  }
 
-  const { error } = await supabaseAdmin
+  const { error } = await supabase
     .from('transactions')
     .insert(formattedTransactions)
 
@@ -41,18 +58,14 @@ export async function bulkInsertTransactions(transactions: any[]) {
 }
 
 export async function bulkDeleteTransactions(ids: string[]) {
+  if (ids.length === 0) return { success: true }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) throw new Error("Unauthorized")
 
-  const { createClient: createAdminClient } = await import('@supabase/supabase-js');
-  const supabaseAdmin = createAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
-  const { error } = await supabaseAdmin
+  const { error } = await supabase
     .from('transactions')
     .delete()
     .eq('user_id', user.id)

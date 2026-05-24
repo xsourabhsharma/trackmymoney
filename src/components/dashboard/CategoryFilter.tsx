@@ -10,7 +10,13 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-export function CategoryFilter({ categories }: { categories: any[] }) {
+interface CategoryFilterItem {
+  id: string
+  name: string
+  icon?: string | null
+}
+
+export function CategoryFilter({ categories }: { categories: CategoryFilterItem[] }) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const currentCategory = searchParams.get('cat') || 'all'

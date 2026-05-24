@@ -25,8 +25,32 @@ export interface UpdateBudgetInput {
   rollover?: boolean
 }
 
+async function assertBudgetCategoryAccess(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  categoryId: string
+) {
+  const { data, error } = await supabase
+    .from('categories')
+    .select('id')
+    .eq('id', categoryId)
+    .eq('type', 'expense')
+    .or(`user_id.is.null,user_id.eq.${userId}`)
+    .maybeSingle()
+
+  if (error) {
+    console.error('budget category access check error:', error.message)
+    throw new Error('Could not verify the selected category')
+  }
+
+  if (!data) {
+    throw new Error('Selected category is not available for this account')
+  }
+}
+
 export async function createBudget(payload: CreateBudgetInput): Promise<void> {
   const { user, supabase } = await getAuthUser()
+  await assertBudgetCategoryAccess(supabase, user.id, payload.categoryId)
 
   const periodStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
   const periodEnd = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0, 23, 59, 59).toISOString()
@@ -53,6 +77,9 @@ export async function createBudget(payload: CreateBudgetInput): Promise<void> {
 
 export async function updateBudget(id: string, payload: UpdateBudgetInput): Promise<void> {
   const { user, supabase } = await getAuthUser()
+  if (payload.categoryId !== undefined) {
+    await assertBudgetCategoryAccess(supabase, user.id, payload.categoryId)
+  }
 
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
   if (payload.categoryId !== undefined) updates.category_id = payload.categoryId
@@ -84,53 +111,15 @@ export async function deleteBudget(id: string): Promise<void> {
 }
 
 export async function applyBudgetSuggestion(suggestionId: string): Promise<void> {
-  const { user, supabase } = await getAuthUser()
-
-  try {
-   
-    const { data: suggestion, error: fetchErr } = await supabase
-      .from('budget_ai_suggestions')
-      .select('*')
-      .eq('id', suggestionId)
-      .eq('user_id', user.id)
-      .single()
-
-    if (fetchErr || !suggestion) return
-
-   
-    if (suggestion.budget_id && suggestion.to_amount) {
-      await supabase
-        .from('budgets')
-        .update({ limit_amount: suggestion.to_amount, updated_at: new Date().toISOString() })
-        .eq('id', suggestion.budget_id)
-        .eq('user_id', user.id)
-    }
-
-   
-    await supabase
-      .from('budget_ai_suggestions')
-      .update({ status: 'applied', applied_at: new Date().toISOString() })
-      .eq('id', suggestionId)
-      .eq('user_id', user.id)
-  } catch {
-   
-  }
+  await getAuthUser()
+  void suggestionId
 
   revalidatePath('/dashboard/budgets', 'page')
 }
 
 export async function dismissBudgetSuggestion(suggestionId: string): Promise<void> {
-  const { user, supabase } = await getAuthUser()
-
-  try {
-    await supabase
-      .from('budget_ai_suggestions')
-      .update({ status: 'dismissed' })
-      .eq('id', suggestionId)
-      .eq('user_id', user.id)
-  } catch {
-   
-  }
+  await getAuthUser()
+  void suggestionId
 
   revalidatePath('/dashboard/budgets', 'page')
 }

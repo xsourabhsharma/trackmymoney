@@ -1,6 +1,4 @@
 import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
-
 
 export type BudgetPeriod = 'this_month' | 'last_month' | 'last_three_months' | 'all'
 export type BudgetScope = 'all' | 'personal' | 'business'
@@ -29,7 +27,6 @@ export function getDateRangeForBudgetPeriod(period: BudgetPeriod, now: Date = ne
       return { startDate: start.toISOString(), endDate: end.toISOString() }
     }
     case 'last_three_months': {
-     
       const start = new Date(year, month - 3, 1)
       const end = new Date(year, month, 0, 23, 59, 59)
       return { startDate: start.toISOString(), endDate: end.toISOString() }
@@ -39,7 +36,6 @@ export function getDateRangeForBudgetPeriod(period: BudgetPeriod, now: Date = ne
       return { startDate: null, endDate: null }
   }
 }
-
 
 export interface BudgetOverviewMetrics {
   totalBudget: number
@@ -95,22 +91,57 @@ export interface BudgetsPageData {
   alerts: BudgetAlertItem[]
   aiSuggestions: AiBudgetSuggestion[]
   hasNoCategories: boolean
+  dataWarning?: string
 }
-
+
+interface BudgetCategory {
+  id: string
+  name: string
+  icon: string | null
+  color: string | null
+}
+
+interface BudgetRow {
+  id: string
+  period_type: string | null
+  limit_amount: string | number
+  rollover: boolean | null
+  category_id: string | null
+  categories: BudgetCategory | BudgetCategory[] | null
+}
+
+interface BudgetTransactionRow {
+  amount: string | number
+  category_id: string | null
+}
+
+const BUDGET_PERIODS: readonly BudgetPeriod[] = ['this_month', 'last_month', 'last_three_months', 'all']
+const BUDGET_SCOPES: readonly BudgetScope[] = ['all', 'personal', 'business']
+
+function normalizeBudgetFilter(filter: BudgetFilter): BudgetFilter {
+  return {
+    period: BUDGET_PERIODS.includes(filter.period) ? filter.period : 'this_month',
+    scope: BUDGET_SCOPES.includes(filter.scope) ? filter.scope : 'all',
+  }
+}
+
+function unwrapJoin<T>(value: T | T[] | null | undefined): T | null {
+  if (!value) return null
+  return Array.isArray(value) ? value[0] ?? null : value
+}
 
 export async function loadBudgetsPageData(filter: BudgetFilter): Promise<BudgetsPageData> {
   const supabase = await createClient()
   const { data: { user }, error: authErr } = await supabase.auth.getUser()
   if (authErr || !user) throw new Error('Unauthorized')
 
-  const admin = createAdminClient()
-  const { startDate, endDate } = getDateRangeForBudgetPeriod(filter.period)
+  const safeFilter = normalizeBudgetFilter(filter)
+  const { startDate, endDate } = getDateRangeForBudgetPeriod(safeFilter.period)
 
- 
-  const { data: budgetsRaw, error: budgetsError } = await admin
+  const { data: budgetsRaw, error: budgetsError } = await supabase
     .from('budgets')
     .select(`
-      id, period_type, period_start, period_end, limit_amount, spent, rollover,
+      id, period_type, limit_amount, rollover,
       category_id,
       categories ( id, name, icon, color )
     `)
@@ -121,10 +152,7 @@ export async function loadBudgetsPageData(filter: BudgetFilter): Promise<Budgets
     console.error('Error fetching budgets:', budgetsError.message, budgetsError.hint)
   }
 
-  const budgets = budgetsRaw || []
-
- 
-  let txQuery = admin
+  let txQuery = supabase
     .from('transactions')
     .select('amount, category_id')
     .eq('user_id', user.id)
@@ -133,59 +161,56 @@ export async function loadBudgetsPageData(filter: BudgetFilter): Promise<Budgets
   if (startDate) txQuery = txQuery.gte('date', startDate)
   if (endDate) txQuery = txQuery.lte('date', endDate)
 
-  const { data: transactions } = await txQuery
+  const { data: transactionsRaw, error: transactionsError } = await txQuery
 
- 
+  if (transactionsError) {
+    console.error('Error fetching budget transactions:', transactionsError.message, transactionsError.hint)
+  }
+
   const spentByCategory: Record<string, number> = {}
-  for (const tx of transactions || []) {
+  for (const tx of (transactionsRaw || []) as BudgetTransactionRow[]) {
     if (tx.category_id) {
       spentByCategory[tx.category_id] = (spentByCategory[tx.category_id] || 0) + Number(tx.amount || 0)
     }
   }
 
- 
-  const categoryBudgets: CategoryBudgetItem[] = budgets.map((b: any) => {
-    const cat = b.categories as { id: string; name: string; icon: string | null; color: string | null } | null
-    const catId = cat?.id || b.category_id
-    const budgetAmount = Number(b.limit_amount || 0)
-    const spentAmount = spentByCategory[catId] || 0
+  const categoryBudgets: CategoryBudgetItem[] = ((budgetsRaw || []) as unknown as BudgetRow[]).map((budget) => {
+    const category = unwrapJoin(budget.categories)
+    const categoryId = category?.id || budget.category_id
+    const budgetAmount = Number(budget.limit_amount || 0)
+    const spentAmount = categoryId ? spentByCategory[categoryId] || 0 : 0
     const remainingAmount = budgetAmount - spentAmount
     const percentageUsed = budgetAmount > 0 ? (spentAmount / budgetAmount) * 100 : 0
 
     return {
-      budgetId: b.id,
-      categoryId: catId,
-      categoryName: cat?.name || 'Uncategorized',
-      categoryIcon: cat?.icon || null,
-      categoryColor: cat?.color || null,
-      period: b.period_type || 'monthly',
+      budgetId: budget.id,
+      categoryId,
+      categoryName: category?.name || 'Uncategorized',
+      categoryIcon: category?.icon || null,
+      categoryColor: category?.color || null,
+      period: budget.period_type || 'monthly',
       budgetAmount,
       spentAmount,
       remainingAmount,
       percentageUsed,
-      rollover: b.rollover || false,
+      rollover: budget.rollover || false,
     }
   })
 
- 
   categoryBudgets.sort((a, b) => b.percentageUsed - a.percentageUsed)
 
- 
-  const totalBudget = categoryBudgets.reduce((s, c) => s + c.budgetAmount, 0)
-  const totalSpent = categoryBudgets.reduce((s, c) => s + c.spentAmount, 0)
+  const totalBudget = categoryBudgets.reduce((sum, category) => sum + category.budgetAmount, 0)
+  const totalSpent = categoryBudgets.reduce((sum, category) => sum + category.spentAmount, 0)
   const remaining = totalBudget - totalSpent
-
   const overview: BudgetOverviewMetrics = { totalBudget, totalSpent, remaining }
 
- 
-  const spendingVsBudget: SpendingVsBudgetPoint[] = categoryBudgets.map(c => ({
-    label: c.categoryName,
-    budgetAmount: c.budgetAmount,
-    spentAmount: c.spentAmount,
-    categoryId: c.categoryId,
+  const spendingVsBudget: SpendingVsBudgetPoint[] = categoryBudgets.map(category => ({
+    label: category.categoryName,
+    budgetAmount: category.budgetAmount,
+    spentAmount: category.spentAmount,
+    categoryId: category.categoryId,
   }))
 
- 
   spendingVsBudget.unshift({
     label: 'Overall',
     budgetAmount: totalBudget,
@@ -193,25 +218,24 @@ export async function loadBudgetsPageData(filter: BudgetFilter): Promise<Budgets
     categoryId: null,
   })
 
- 
   const alerts: BudgetAlertItem[] = []
 
-  for (const c of categoryBudgets) {
-    if (c.percentageUsed > 100) {
+  for (const category of categoryBudgets) {
+    if (category.percentageUsed > 100) {
       alerts.push({
         type: 'over_budget',
-        categoryName: c.categoryName,
-        message: `${c.categoryName} is over budget by $${Math.abs(c.remainingAmount).toFixed(2)} (${Math.round(c.percentageUsed)}% used)`,
+        categoryName: category.categoryName,
+        message: `${category.categoryName} is over budget by $${Math.abs(category.remainingAmount).toFixed(2)} (${Math.round(category.percentageUsed)}% used)`,
         severity: 'critical',
-        amount: Math.abs(c.remainingAmount),
+        amount: Math.abs(category.remainingAmount),
       })
-    } else if (c.percentageUsed >= 80) {
+    } else if (category.percentageUsed >= 80) {
       alerts.push({
         type: 'near_limit',
-        categoryName: c.categoryName,
-        message: `${c.categoryName} is at ${Math.round(c.percentageUsed)}% — only $${c.remainingAmount.toFixed(2)} left`,
+        categoryName: category.categoryName,
+        message: `${category.categoryName} is at ${Math.round(category.percentageUsed)}% - only $${category.remainingAmount.toFixed(2)} left`,
         severity: 'warning',
-        amount: c.remainingAmount,
+        amount: category.remainingAmount,
       })
     }
   }
@@ -226,38 +250,16 @@ export async function loadBudgetsPageData(filter: BudgetFilter): Promise<Budgets
     })
   }
 
- 
-  let aiSuggestions: AiBudgetSuggestion[] = []
-  try {
-    const { data: suggestionsRaw } = await admin
-      .from('budget_ai_suggestions')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('status', 'pending')
-      .order('created_at', { ascending: false })
-      .limit(5)
-
-    aiSuggestions = (suggestionsRaw || []).map((s: any) => ({
-      id: s.id,
-      budgetId: s.budget_id,
-      message: s.message,
-      fromAmount: s.from_amount ? Number(s.from_amount) : null,
-      toAmount: s.to_amount ? Number(s.to_amount) : null,
-      suggestionType: s.suggestion_type || 'general',
-      status: s.status,
-      createdAt: s.created_at,
-    }))
-  } catch {
-   
-  }
-
   return {
-    filter,
+    filter: safeFilter,
     overview,
     categoryBudgets,
     spendingVsBudget,
     alerts,
-    aiSuggestions,
+    aiSuggestions: [],
     hasNoCategories: categoryBudgets.length === 0,
+    dataWarning: budgetsError || transactionsError
+      ? 'Some budget data could not be loaded. Refresh the page or try again later.'
+      : undefined,
   }
 }

@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { X, Plus, Edit3, Loader2 } from 'lucide-react'
+import { AlertCircle, X, Plus, Edit3, Loader2 } from 'lucide-react'
 import { createBudget, updateBudget } from '@/app/dashboard/budgets/actions'
-import { CategoryBudgetItem } from '@/app/dashboard/budgets/data'
+import type { CategoryBudgetItem } from '@/app/dashboard/budgets/data'
+import { CategoryIcon } from '@/components/dashboard/CategoryIcon'
+import { useCurrencyStore } from '@/store/useCurrencyStore'
 
 interface Category {
   id: string
@@ -31,6 +33,7 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
     .filter(c => c.type === 'expense')
     .filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
   const isEdit = !!editBudget
+  const currentCurrency = useCurrencyStore((state) => state.currency)
 
   const [form, setForm] = useState({
     categoryId: editBudget?.categoryId || '',
@@ -76,8 +79,8 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
           })
         }
         onClose()
-      } catch (err: any) {
-        setError(err.message || 'Something went wrong.')
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Something went wrong.')
       }
     })
   }
@@ -133,11 +136,22 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
               >
                 <option value="">Select a category...</option>
                 {expenseCategories.map(c => (
-                  <option key={c.id} value={c.id}>
-                    {c.icon ? `${c.icon} ` : ''}{c.name}
-                  </option>
+                  <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
+              {form.categoryId ? (
+                <div className="mt-3 flex items-center gap-2 text-sm text-[var(--text-muted)]">
+                  {(() => {
+                    const selected = expenseCategories.find(category => category.id === form.categoryId)
+                    return selected ? (
+                      <>
+                        <CategoryIcon className="h-8 w-8 rounded-[10px]" color={selected.color} icon={selected.icon} name={selected.name} />
+                        <span>{selected.name}</span>
+                      </>
+                    ) : null
+                  })()}
+                </div>
+              ) : null}
             </div>
           )}
 
@@ -147,7 +161,9 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
               Budget Limit
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] font-bold text-lg">$</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] font-bold text-lg">
+                {currentCurrency === 'INR' ? 'Rs.' : '$'}
+              </span>
               <input
                 type="number"
                 value={form.limitAmount}
@@ -203,8 +219,8 @@ export function BudgetFormModal({ isOpen, onClose, editBudget, categories }: Pro
 
           {}
           {error && (
-            <p className="text-[11px] font-bold text-[var(--expense-red)] bg-red-50 border border-red-100 rounded-lg px-4 py-3">
-              ⚠️ {error}
+            <p className="flex items-center gap-2 text-[11px] font-bold text-[var(--expense-red)] bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 rounded-lg px-4 py-3">
+              <AlertCircle className="h-3.5 w-3.5" /> {error}
             </p>
           )}
 

@@ -12,6 +12,7 @@ const pool = new Pool({
 });
 
 const db = drizzle(pool, { schema });
+type TransactionInsert = typeof schema.transactions.$inferInsert;
 
 async function seed() {
   console.log('Seeding data for demotest@gmail.com...');
@@ -49,28 +50,26 @@ async function seed() {
 
  
   console.log('Inserting categories...');
-  const catHousing = { id: uuidv4(), userId, name: 'Housing', type: 'expense' as const, isDefault: true, icon: '🏠', color: '#3b82f6' };
-  const catGroceries = { id: uuidv4(), userId, name: 'Groceries', type: 'expense' as const, isDefault: true, icon: '🛒', color: '#10b981' };
-  const catDining = { id: uuidv4(), userId, name: 'Dining Out', type: 'expense' as const, isDefault: true, icon: '🍔', color: '#f59e0b' };
-  const catTransport = { id: uuidv4(), userId, name: 'Transportation', type: 'expense' as const, isDefault: true, icon: '🚗', color: '#6366f1' };
-  const catShopping = { id: uuidv4(), userId, name: 'Shopping', type: 'expense' as const, isDefault: true, icon: '🛍️', color: '#ec4899' };
-  const catUtilities = { id: uuidv4(), userId, name: 'Utilities', type: 'expense' as const, isDefault: true, icon: '⚡', color: '#eab308' };
-  const catSubs = { id: uuidv4(), userId, name: 'Subscriptions', type: 'expense' as const, isDefault: true, icon: '📱', color: '#d946ef' };
-  const catSalary = { id: uuidv4(), userId, name: 'Salary', type: 'income' as const, isDefault: true, icon: '💵', color: '#10b981' };
-  const catBonus = { id: uuidv4(), userId, name: 'Bonus', type: 'income' as const, isDefault: true, icon: '🎉', color: '#f59e0b' };
+  const catHousing = { id: uuidv4(), userId, name: 'Housing', type: 'expense' as const, isDefault: true, icon: 'home', color: '#3b82f6' };
+  const catGroceries = { id: uuidv4(), userId, name: 'Groceries', type: 'expense' as const, isDefault: true, icon: 'groceries', color: '#10b981' };
+  const catDining = { id: uuidv4(), userId, name: 'Dining Out', type: 'expense' as const, isDefault: true, icon: 'dining', color: '#f59e0b' };
+  const catTransport = { id: uuidv4(), userId, name: 'Transportation', type: 'expense' as const, isDefault: true, icon: 'transport', color: '#6366f1' };
+  const catShopping = { id: uuidv4(), userId, name: 'Shopping', type: 'expense' as const, isDefault: true, icon: 'shopping', color: '#ec4899' };
+  const catUtilities = { id: uuidv4(), userId, name: 'Utilities', type: 'expense' as const, isDefault: true, icon: 'utilities', color: '#eab308' };
+  const catSubs = { id: uuidv4(), userId, name: 'Subscriptions', type: 'expense' as const, isDefault: true, icon: 'subscriptions', color: '#d946ef' };
+  const catSalary = { id: uuidv4(), userId, name: 'Salary', type: 'income' as const, isDefault: true, icon: 'salary', color: '#10b981' };
+  const catBonus = { id: uuidv4(), userId, name: 'Bonus', type: 'income' as const, isDefault: true, icon: 'bonus', color: '#f59e0b' };
 
   const categoriesData = [catHousing, catGroceries, catDining, catTransport, catShopping, catUtilities, catSubs, catSalary, catBonus];
   await db.insert(schema.categories).values(categoriesData);
 
  
   console.log('Inserting transactions...');
-  const txData: any[] = [];
+  const txData: TransactionInsert[] = [];
   const now = new Date();
   
  
   for (let m = 0; m < 4; m++) {
-    const monthDate = new Date(now.getFullYear(), now.getMonth() - m, 15);
-   
     txData.push({ id: uuidv4(), userId, accountId: accountsData[0].id, categoryId: catSalary.id, amount: '3250.00', currency: 'USD', type: 'income', merchant: 'Tech Corp Inc.', date: new Date(now.getFullYear(), now.getMonth() - m, 1), status: 'cleared', source: 'manual' });
     txData.push({ id: uuidv4(), userId, accountId: accountsData[0].id, categoryId: catSalary.id, amount: '3250.00', currency: 'USD', type: 'income', merchant: 'Tech Corp Inc.', date: new Date(now.getFullYear(), now.getMonth() - m, 15), status: 'cleared', source: 'manual' });
    

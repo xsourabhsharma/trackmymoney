@@ -1,11 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import type { FormEvent } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { requestPasswordReset } from '../login/actions'
 import { Mail, ArrowLeft, CheckCircle, Loader2, Shield, Lock, Send, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ThemeToggle } from '@/components/ThemeToggle'
+import { BrandLogo } from '@/components/BrandLogo'
 
 export default function ForgotPasswordPage() {
   const [isPending, setIsPending] = useState(false)
@@ -27,6 +29,12 @@ export default function ForgotPasswordPage() {
     }
   }
 
+  async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (isPending) return
+    await handleSubmit(new FormData(event.currentTarget))
+  }
+
   const fadeUp = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
@@ -34,6 +42,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)] flex flex-col items-center justify-center px-6 py-12 font-sans relative overflow-hidden">
+      <ThemeToggle variant="public" className="fixed right-5 top-5 z-30" />
       {}
       <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[var(--income-green)]/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />
@@ -47,10 +56,7 @@ export default function ForgotPasswordPage() {
           className="mb-12 flex justify-center"
         >
           <Link href="/" className="flex items-center gap-3 text-2xl font-black tracking-tight text-[var(--text-main)] group">
-            <div className="relative flex items-center justify-center w-12 h-12 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-light)] shadow-xl group-hover:scale-105 transition-transform duration-300">
-               <Image src="/real-logo.png" alt="TrackMyMoney Logo" width={32} height={32} className="w-8 h-8 opacity-90 group-hover:opacity-100 transition-opacity dark:invert" />
-            </div>
-            <span>Track<span className="text-[var(--text-muted)]">My</span>Money</span>
+            <BrandLogo markClassName="h-12 w-12 rounded-2xl group-hover:scale-105" textClassName="text-2xl" />
           </Link>
         </motion.div>
 
@@ -111,7 +117,7 @@ export default function ForgotPasswordPage() {
                 </div>
               )}
 
-              <form action={handleSubmit} className="space-y-6">
+              <form onSubmit={handleFormSubmit} className="space-y-6">
                 <div className="relative group">
                   <input 
                     type="email" 

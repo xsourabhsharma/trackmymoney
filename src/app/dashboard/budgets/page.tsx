@@ -5,7 +5,6 @@ export const metadata: Metadata = {
   title: 'Budgets',
   description: 'Set spending limits, track category budgets, and stay on top of your money.',
 }
-import { createAdminClient } from '@/utils/supabase/admin'
 import { DashboardSubNav } from '@/components/dashboard/DashboardSubNav'
 import { BudgetsClientOrchestrator } from '@/app/dashboard/budgets/client-orchestrator'
 import { loadBudgetsPageData } from '@/app/dashboard/budgets/data'
@@ -15,12 +14,10 @@ export default async function BudgetsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  const admin = createAdminClient()
-
- 
-  const { data: allCategories } = await admin
+  const { data: allCategories } = await supabase
     .from('categories')
     .select('id, name, icon, color, type')
+    .or(`user_id.is.null,user_id.eq.${user.id}`)
     .order('name')
 
  
@@ -31,7 +28,9 @@ export default async function BudgetsPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <DashboardSubNav />
+      <div className="rounded-[24px] border border-[var(--border-light)] bg-[var(--bg-surface)] p-3">
+        <DashboardSubNav />
+      </div>
       <BudgetsClientOrchestrator
         initialData={pageData}
         categories={allCategories || []}

@@ -10,6 +10,7 @@ import { UserSettings } from '@/app/dashboard/settings/data'
 import { uploadAvatar } from '@/app/dashboard/settings/avatar-actions'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
+import { useCurrencyStore } from '@/store/useCurrencyStore'
 
 interface Props {
   settings: UserSettings
@@ -27,8 +28,10 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const supabase = createClient()
+  const setCurrency = useCurrencyStore((state) => state.setCurrency)
+  const fetchExchangeRate = useCurrencyStore((state) => state.fetchExchangeRate)
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Pick<UserSettings, 'full_name' | 'timezone' | 'currency'>>({
     full_name: settings.full_name,
     timezone: settings.timezone,
     currency: settings.currency,
@@ -38,6 +41,9 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
     setIsPending(true)
     try {
       await onSave(formData)
+      setCurrency(formData.currency)
+      await fetchExchangeRate()
+      router.refresh()
       setIsSuccess(true)
       setTimeout(() => setIsSuccess(false), 3000)
     } catch (err) {
@@ -60,8 +66,8 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
     try {
       const result = await uploadAvatar(formData)
       setLocalAvatarUrl(result.url + `?t=${Date.now()}`)
-    } catch (err: any) {
-      setAvatarError(err.message || 'Avatar upload failed.')
+    } catch (err: unknown) {
+      setAvatarError(err instanceof Error ? err.message : 'Avatar upload failed.')
     } finally {
       setAvatarPending(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -114,7 +120,7 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
           onChange={handleAvatarChange}
         />
 
-        <p className="text-[12px] font-medium text-[var(--text-muted)]">Click avatar to change · Max 2 MB</p>
+        <p className="text-[12px] font-medium text-[var(--text-muted)]">Click avatar to change - Max 2 MB</p>
 
         {avatarError && (
           <p className="text-[12px] font-bold text-[var(--expense-red)] flex items-center gap-1">
@@ -147,10 +153,10 @@ export function ProfileSettingsSection({ settings, email, avatarUrl, onSave }: P
             <div className="relative">
               <select
                 value={formData.currency}
-                onChange={e => setFormData({ ...formData, currency: e.target.value })}
+                onChange={e => setFormData({ ...formData, currency: e.target.value as UserSettings['currency'] })}
                 className="w-full pl-3 pr-8 py-2.5 bg-[var(--bg-base)] border border-[var(--border-light)] rounded-xl text-[11px] font-bold appearance-none outline-none focus:border-[var(--border-dark)] cursor-pointer uppercase tracking-tight"
               >
-                <option value="INR">INR (₹)</option>
+                <option value="INR">INR (Rs.)</option>
                 <option value="USD">USD ($)</option>
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[var(--text-muted)] pointer-events-none" />

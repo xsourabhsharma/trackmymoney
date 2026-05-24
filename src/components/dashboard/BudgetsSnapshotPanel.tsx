@@ -1,5 +1,18 @@
 import { createClient } from '@/utils/supabase/server'
 import { Target, AlertTriangle } from 'lucide-react'
+import { CategoryIcon } from '@/components/dashboard/CategoryIcon'
+
+type BudgetSnapshotRow = {
+  id: string
+  limit_amount: string | number
+  spent: string | number | null
+  categories?: {
+    id?: string | null
+    name?: string | null
+    icon?: string | null
+    color?: string | null
+  } | null
+}
 
 export async function BudgetsSnapshotPanel() {
   const supabase = await createClient()
@@ -41,7 +54,7 @@ export async function BudgetsSnapshotPanel() {
         <Target className="w-3.5 h-3.5" /> Budgets Snapshot
       </h3>
       <div className="flex flex-col gap-6">
-        {budgets.map((b: any) => {
+        {(budgets as BudgetSnapshotRow[]).map((b) => {
           const limit = Number(b.limit_amount) || 1
           const spent = Number(b.spent) || 0
           const rawPercent = (spent / limit) * 100
@@ -66,7 +79,12 @@ export async function BudgetsSnapshotPanel() {
               <div className="flex justify-between items-center mb-3">
                 <span className="flex items-center gap-2">
                   <span className="w-6 h-6 flex items-center justify-center rounded-md bg-[var(--bg-base)] text-xs shadow-sm">
-                    {b.categories?.icon || '📦'}
+                    <CategoryIcon
+                      className="h-6 w-6 rounded-md"
+                      color={b.categories?.color}
+                      icon={b.categories?.icon}
+                      name={b.categories?.name}
+                    />
                   </span>
                   <span className="text-[11px] font-bold uppercase tracking-tight text-[var(--text-main)] max-w-[120px] truncate">
                     {b.categories?.name || 'General'}

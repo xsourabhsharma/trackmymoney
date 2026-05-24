@@ -50,7 +50,7 @@ export function computeExpenseBreakdown(transactions: TransactionRow[], outflowT
         map[catId] = {
           amount: 0,
           name: cat?.name || 'Uncategorized',
-          icon: cat?.icon || '📦',
+          icon: cat?.icon || 'other',
           color: cat?.color || '#3B82F6',
         };
       }

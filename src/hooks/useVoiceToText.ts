@@ -2,54 +2,97 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 
+interface SpeechRecognitionAlternativeLike {
+  transcript: string
+}
+
+interface SpeechRecognitionResultLike {
+  isFinal: boolean
+  length: number
+  [index: number]: SpeechRecognitionAlternativeLike
+}
+
+interface SpeechRecognitionResultListLike {
+  length: number
+  [index: number]: SpeechRecognitionResultLike
+}
+
+interface SpeechRecognitionEventLike {
+  results: SpeechRecognitionResultListLike
+}
+
+interface SpeechRecognitionErrorEventLike {
+  error: string
+}
+
+interface SpeechRecognitionLike {
+  continuous: boolean
+  interimResults: boolean
+  onstart: (() => void) | null
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null
+  onend: (() => void) | null
+  onerror: ((event: SpeechRecognitionErrorEventLike) => void) | null
+  start: () => void
+  stop: () => void
+}
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike
+
+function getSpeechRecognitionConstructor(): SpeechRecognitionConstructor | undefined {
+  if (typeof window === 'undefined') return undefined
+
+  const speechWindow = window as Window & {
+    SpeechRecognition?: SpeechRecognitionConstructor
+    webkitSpeechRecognition?: SpeechRecognitionConstructor
+  }
+
+  return speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition
+}
+
 export function useVoiceToText({ onFinalTranscript }: { onFinalTranscript: (text: string) => void }) {
   const [isListening, setIsListening] = useState(false)
   const [interimText, setInterimText] = useState('')
-  const [isSupported, setIsSupported] = useState(true)
-  const recognitionRef = useRef<any>(null)
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null)
+  const isSupported = typeof window === 'undefined' ? true : Boolean(getSpeechRecognitionConstructor())
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-      if (SpeechRecognition) {
-        recognitionRef.current = new SpeechRecognition()
-        recognitionRef.current.continuous = true
-        recognitionRef.current.interimResults = true
+    const SpeechRecognition = getSpeechRecognitionConstructor()
+    if (!SpeechRecognition) return
 
-        let lastProcessedIndex = 0;
+    recognitionRef.current = new SpeechRecognition()
+    recognitionRef.current.continuous = true
+    recognitionRef.current.interimResults = true
 
-        recognitionRef.current.onstart = () => {
-          lastProcessedIndex = 0;
+    let lastProcessedIndex = 0;
+
+    recognitionRef.current.onstart = () => {
+      lastProcessedIndex = 0;
+    }
+
+    recognitionRef.current.onresult = (event: SpeechRecognitionEventLike) => {
+      let currentInterim = ''
+
+      for (let i = lastProcessedIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          onFinalTranscript(event.results[i][0].transcript.trim())
+          lastProcessedIndex = i + 1;
+        } else {
+          currentInterim += event.results[i][0].transcript
         }
-
-        recognitionRef.current.onresult = (event: any) => {
-          let currentInterim = ''
-          
-          for (let i = lastProcessedIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-              onFinalTranscript(event.results[i][0].transcript.trim())
-              lastProcessedIndex = i + 1;
-            } else {
-              currentInterim += event.results[i][0].transcript
-            }
-          }
-
-          setInterimText(currentInterim)
-        }
-
-        recognitionRef.current.onend = () => {
-          setIsListening(false)
-          setInterimText('')
-        }
-
-        recognitionRef.current.onerror = (event: any) => {
-          console.error('[SpeechRecognition] Error: ', event.error)
-          setIsListening(false)
-          setInterimText('')
-        }
-      } else {
-        setIsSupported(false)
       }
+
+      setInterimText(currentInterim)
+    }
+
+    recognitionRef.current.onend = () => {
+      setIsListening(false)
+      setInterimText('')
+    }
+
+    recognitionRef.current.onerror = (event: SpeechRecognitionErrorEventLike) => {
+      console.error('[SpeechRecognition] Error: ', event.error)
+      setIsListening(false)
+      setInterimText('')
     }
   }, [onFinalTranscript])
 

@@ -29,7 +29,7 @@ export default async function AutoParsePage() {
 
   return (
     <div className="flex flex-col gap-8 pb-20">
-      <div className="flex flex-wrap items-center justify-between gap-4 overflow-x-auto pb-2">
+      <div className="flex flex-wrap items-center justify-between gap-4 overflow-x-auto rounded-[24px] border border-[var(--border-light)] bg-[var(--bg-surface)] p-3">
         <DashboardSubNav />
       </div>
 
@@ -37,7 +37,11 @@ export default async function AutoParsePage() {
         initialJob={activeJob}
         categories={categoriesRes.data || []}
         accounts={accountsRes.data || []}
-        recentJobs={recentJobsRes.data || []}
+        recentJobs={(recentJobsRes.data || []).map((job) => ({
+          ...job,
+          row_count: job.row_count ?? 0,
+          created_at: job.created_at ?? new Date(0).toISOString(),
+        }))}
       />
     </div>
   )

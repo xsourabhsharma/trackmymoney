@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -50,6 +50,23 @@
 :root {
   color-scheme: light;
   --radius: 0.625rem;
+  --background: #f6f2ec;
+  --foreground: #111111;
+  --card: #fffaf2;
+  --card-foreground: #111111;
+  --popover: #fffaf2;
+  --popover-foreground: #111111;
+  --primary: #111111;
+  --primary-foreground: #fff8ec;
+  --secondary: #efe7db;
+  --secondary-foreground: #111111;
+  --muted: #eee7dc;
+  --muted-foreground: #746f66;
+  --accent-foreground: #111111;
+  --destructive: #d93d1a;
+  --border: rgba(17, 17, 17, 0.12);
+  --input: rgba(17, 17, 17, 0.14);
+  --ring: #ff5a1f;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -59,27 +76,28 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  /* Ultra-Premium Light Theme */
-  --bg-base: #FAFAFA;
-  --bg-surface: #FFFFFF;
-  --bg-surface-dark: #F1F5F9;
-  --bg-surface-hover: #F8FAFC;
-  --bg-muted: #F1F5F9;
+  --bg-base: #f6f2ec;
+  --bg-surface: #fffaf2;
+  --bg-surface-dark: #ece2d4;
+  --bg-surface-hover: #f0e7db;
+  --bg-muted: #e7ded3;
 
-  --text-main: #0F172A;
-  --text-muted: #64748B;
-  --text-inverse: #FFFFFF;
-  --text-inverse-muted: #CBD5E1;
+  --text-main: #111111;
+  --text-muted: #706c65;
+  --text-subtle: #9a938a;
+  --text-inverse: #ffffff;
+  --text-inverse-muted: #a3a3a3;
 
-  --border-light: rgba(15, 23, 42, 0.08);
-  --border-dark: rgba(15, 23, 42, 0.15);
+  --border-light: rgba(17, 17, 17, 0.1);
+  --border-dark: rgba(17, 17, 17, 0.22);
 
-  --accent: #3B82F6; /* Premium Blue */
-  --success: #10B981;
-  --danger: #EF4444;
-  --income-green: #10B981;
-  --expense-red: #EF4444;
-  --warning: #F59E0B;
+  --accent: #ff5a1f;
+  --accent-strong: #ff4b12;
+  --success: #14824f;
+  --danger: #e23d18;
+  --income-green: #14824f;
+  --expense-red: #e23d18;
+  --warning: #c98200;
 
   --radius-sm: 12px;
   --radius-md: 20px;
@@ -95,6 +113,21 @@
   --space-12: 48px;
   --space-16: 64px;
   --space-20: 80px;
+
+  --public-bg: #fbf6ec;
+  --public-bg-soft: #f0e7db;
+  --public-surface: rgba(17, 17, 17, 0.045);
+  --public-surface-strong: rgba(17, 17, 17, 0.078);
+  --public-border: rgba(17, 17, 17, 0.12);
+  --public-border-strong: rgba(17, 17, 17, 0.22);
+  --public-text: #14110d;
+  --public-muted: rgba(20, 17, 13, 0.64);
+  --public-subtle: rgba(20, 17, 13, 0.42);
+  --public-orange: #ff5a1f;
+  --public-orange-strong: #ff6f2f;
+  --public-lime: #188a53;
+  --public-radius-md: 22px;
+  --public-radius-lg: 30px;
 }
 
 .dark {
@@ -112,34 +145,50 @@
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --accent: #ff5a1f;
+  --accent-foreground: #050505;
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
 
-  /* Ultra-Premium Dark Theme for Target UI */
-  --bg-base: #020617; /* Deep Slate/Black */
-  --bg-surface: #0B1120; /* Darker Slate */
-  --bg-surface-dark: #1E293B;
-  --bg-surface-hover: rgba(30, 41, 59, 0.7);
-  --bg-muted: #1E293B;
+  --bg-base: #050505;
+  --bg-surface: #0b0b0b;
+  --bg-surface-dark: #111111;
+  --bg-surface-hover: #171717;
+  --bg-muted: #141414;
 
-  --text-main: #FFFFFF;
-  --text-muted: #94A3B8;
-  --text-inverse: #020617;
-  --text-inverse-muted: #475569;
+  --text-main: #f7f7f2;
+  --text-muted: #8f969b;
+  --text-subtle: #5f6468;
+  --text-inverse: #050505;
+  --text-inverse-muted: #525252;
 
-  --border-light: rgba(255, 255, 255, 0.08);
-  --border-dark: rgba(255, 255, 255, 0.15);
+  --border-light: rgba(255, 255, 255, 0.075);
+  --border-dark: rgba(255, 255, 255, 0.18);
 
-  /* Vibrant functional colors for dark mode */
-  --accent: #38BDF8; /* Neon Sky Blue */
-  --success: #34D399; /* Neon Emerald */
-  --danger: #FB7185; /* Soft Neon Rose */
-  --income-green: #34D399;
-  --expense-red: #FB7185;
-  --warning: #FBBF24;
+  --accent: #ff5a1f;
+  --accent-strong: #ff4b12;
+  --success: #d9ff74;
+  --danger: #ff5a1f;
+  --income-green: #d9ff74;
+  --expense-red: #ff5a1f;
+  --warning: #ffb020;
+
+  --public-bg: #050505;
+  --public-bg-soft: #090807;
+  --public-surface: rgba(255, 255, 255, 0.065);
+  --public-surface-strong: rgba(255, 255, 255, 0.1);
+  --public-border: rgba(255, 255, 255, 0.105);
+  --public-border-strong: rgba(255, 255, 255, 0.2);
+  --public-text: #f7f2e8;
+  --public-muted: rgba(247, 242, 232, 0.62);
+  --public-subtle: rgba(247, 242, 232, 0.38);
+  --public-orange: #ff5a1f;
+  --public-orange-strong: #ff6f2f;
+  --public-lime: #d9ff74;
+  --public-radius-md: 22px;
+  --public-radius-lg: 30px;
 }
 
 @layer base {
@@ -148,6 +197,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    background: var(--bg-base);
+    color: var(--text-main);
   }
   html {
     @apply font-sans;
@@ -161,17 +212,76 @@
     background-color: transparent;
   }
   ::selection {
-    background-color: #3B82F6; /* Premium Blue for light mode */
+    background-color: var(--accent);
     color: #ffffff;
   }
 }
 
 .dark ::selection {
-  background-color: #38BDF8; /* Neon Sky Blue for dark mode */
+  background-color: var(--accent);
   color: #000000;
 }
 
 @layer components {
+  .tm-public-shell {
+    position: relative;
+    isolation: isolate;
+    background:
+      radial-gradient(circle at 18% 10%, rgba(255, 90, 31, 0.18), transparent 32rem),
+      radial-gradient(circle at 86% 0%, rgba(217, 255, 116, 0.1), transparent 26rem),
+      linear-gradient(180deg, var(--public-bg), var(--public-bg-soft) 54%, var(--public-bg));
+    color: var(--public-text);
+  }
+
+  .tm-public-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(circle at center, color-mix(in srgb, var(--public-text) 18%, transparent) 0 0.5px, transparent 0.8px),
+      linear-gradient(color-mix(in srgb, var(--public-text) 3%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--public-text) 3%, transparent) 1px, transparent 1px);
+    background-size: 5px 5px, 72px 72px, 72px 72px;
+    opacity: 0.18;
+    mask-image: linear-gradient(to bottom, black, rgba(0, 0, 0, 0.82), transparent 96%);
+  }
+
+  .tm-public-texture {
+    background-image:
+      radial-gradient(circle at center, color-mix(in srgb, var(--public-text) 20%, transparent) 0 0.45px, transparent 0.9px),
+      linear-gradient(135deg, rgba(255, 90, 31, 0.08), transparent 28%),
+      linear-gradient(315deg, rgba(217, 255, 116, 0.055), transparent 32%);
+    background-size: 4px 4px, 100% 100%, 100% 100%;
+  }
+
+  .tm-public-orbit {
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: 9999px;
+    filter: blur(22px);
+  }
+
+  .tm-public-orbit-one {
+    right: -8rem;
+    top: 12rem;
+    width: 18rem;
+    height: 18rem;
+    background: rgba(255, 90, 31, 0.12);
+    animation: tm-public-float 14s ease-in-out infinite;
+  }
+
+  .tm-public-orbit-two {
+    bottom: 12rem;
+    left: -9rem;
+    width: 16rem;
+    height: 16rem;
+    background: rgba(217, 255, 116, 0.08);
+    animation: tm-public-float 17s ease-in-out infinite reverse;
+  }
+
   /* Unified premium button styles */
   .btn-primary {
     @apply inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-bold uppercase tracking-widest bg-[var(--text-main)] text-[var(--bg-base)] hover:opacity-90 active:scale-[0.98] transition-all shadow-lg;
@@ -188,6 +298,77 @@
   /* Shared card foundation */
   .card-premium {
     @apply bg-[var(--bg-base)] border border-[var(--border-light)] rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow;
+  }
+
+  .tm-console {
+    background:
+      radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 12%, transparent), transparent 34rem),
+      var(--bg-base);
+    color: var(--text-main);
+  }
+
+  .tm-panel {
+    @apply border border-[var(--border-light)] bg-[var(--bg-surface)] shadow-sm;
+    border-radius: clamp(20px, 2vw, 32px);
+  }
+
+  .tm-panel-dark {
+    background: linear-gradient(180deg, rgba(255,255,255,0.025), transparent 48%), var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: clamp(20px, 2vw, 32px);
+  }
+
+  .tm-panel-accent {
+    background: var(--accent);
+    color: #050505;
+    border: 1px solid color-mix(in srgb, var(--accent) 80%, #000);
+    border-radius: clamp(22px, 2vw, 32px);
+  }
+
+  .tm-label {
+    @apply font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-[var(--text-muted)];
+  }
+
+  .tm-value {
+    @apply font-mono tabular-nums tracking-normal text-[var(--text-main)];
+  }
+
+  .tm-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-[14px] border px-5 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.18em] transition-all active:scale-[0.98];
+  }
+
+  .tm-button-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-[14px] border border-[var(--accent)] bg-[var(--accent)] px-5 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-black transition-all hover:brightness-110 active:scale-[0.98];
+  }
+
+  .tm-button-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-[14px] border border-[var(--border-dark)] bg-transparent px-5 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--text-main)] transition-all hover:border-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] active:scale-[0.98];
+  }
+
+  .tm-table {
+    @apply overflow-hidden border border-[var(--border-light)] bg-[var(--bg-surface)];
+    border-radius: 22px;
+  }
+
+  .tm-route-chip {
+    @apply whitespace-nowrap rounded-full border px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.16em] transition-all;
+  }
+
+  .tm-route-chip-active {
+    @apply border-[var(--accent)] bg-[var(--accent)] text-black;
+  }
+
+  .tm-route-chip-idle {
+    @apply border-[var(--border-light)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:border-[var(--border-dark)] hover:text-[var(--text-main)];
+  }
+
+  .tm-scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .tm-scrollbar-none::-webkit-scrollbar {
+    display: none;
   }
 }
 
@@ -210,7 +391,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   PREMIUM ANIMATION SYSTEM — TrackMyMoney
+   PREMIUM ANIMATION SYSTEM - TrackMyMoney
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ─── Keyframes ─────────────────────────────────────────────────────────── */
@@ -290,6 +471,15 @@
 @keyframes borderDraw {
   from { border-color: transparent; }
   to   { border-color: var(--border-light); }
+}
+
+@keyframes tm-public-float {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(18px, -22px, 0) scale(1.05);
+  }
 }
 
 /* ─── Utility Classes ───────────────────────────────────────────────────── */
@@ -449,4 +639,21 @@ select:focus, input:focus, textarea:focus {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+
+  .tm-public-orbit,
+  .animate-breathe,
+  .animate-pulse-glow,
+  .animate-shimmer,
+  .animate-stagger > *,
+  .dashboard-section {
+    animation: none !important;
+  }
 }

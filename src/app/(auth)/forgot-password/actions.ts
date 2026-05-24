@@ -1,8 +1,8 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
+import { getPublicSiteUrl } from '@/lib/env'
 
 export async function resetPassword(formData: FormData) {
   const email = formData.get('email') as string
@@ -11,8 +11,10 @@ export async function resetPassword(formData: FormData) {
 
  
  
+  const redirectOrigin = getPublicSiteUrl()
+
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/auth/callback?next=/update-password`,
+    redirectTo: `${redirectOrigin}/auth/callback?next=/update-password`,
   })
 
   if (error) {

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { updatePassword } from './actions'
 import { Key, Lock, ShieldCheck, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default function UpdatePasswordPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -28,8 +29,13 @@ export default function UpdatePasswordPage() {
     setError(null)
 
     try {
-      await updatePassword(formData)
-    } catch {
+      const result = await updatePassword(formData)
+      if (result?.error) {
+        setError(result.error)
+        setIsPending(false)
+      }
+    } catch (caught) {
+      if (caught instanceof Error && caught.message === 'NEXT_REDIRECT') throw caught
       setError('Something went wrong. Please try again.')
       setIsPending(false)
     }
@@ -37,6 +43,7 @@ export default function UpdatePasswordPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)] grid grid-cols-1 lg:grid-cols-2 font-sans overflow-hidden">
+      <ThemeToggle variant="public" className="fixed right-5 top-5 z-30" />
       {}
       <div className="hidden lg:flex flex-col justify-center px-16 py-20 relative overflow-hidden bg-gradient-to-br from-[#45433A] to-[#2a2824]">
         <div className="absolute top-[-50%] right-[-50%] w-full h-full rounded-full opacity-30 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)' }} />

@@ -8,7 +8,13 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Filter, X, ChevronDown, ChevronUp } from 'lucide-react'
 
-export function AdvancedFilterPanel({ categories }: { categories: any[] }) {
+interface FilterCategory {
+  id: string
+  name: string
+  icon?: string | null
+}
+
+export function AdvancedFilterPanel({ categories }: { categories: FilterCategory[] }) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const pathname = usePathname()
